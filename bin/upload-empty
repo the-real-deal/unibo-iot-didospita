@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -e # exit on error
+
+DEV_TTY=${DEV_TTY:-${1:-"/dev/ttyACM0"}}
+TMP_DIR=$(mktemp -d)
+cd $TMP_DIR
+pio project init --board uno
+echo -e "#include <Arduino.h>\nvoid setup(){}\nvoid loop(){}" > src/main.cpp
+pio run -t upload
+cd -
+rm -rf $TMP_DIR
