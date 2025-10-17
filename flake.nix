@@ -36,6 +36,8 @@
               set -a
               source .env 2>/dev/null
               set +a
+
+              export PATH=$(realpath bin):$PATH
             '';
           };
       }

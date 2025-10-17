@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+sudo chmod a+rw "$DEV_TTY"
