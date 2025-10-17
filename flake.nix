@@ -22,7 +22,18 @@
               nixd
               nil
               nixfmt
+              # arduino
+              platformio
+              platformio-core
+              arduino
+              arduino-core
+              avrdude
             ];
+            shellHook = ''
+              set -a
+              source .env 2>/dev/null
+              set +a
+            '';
           };
       }
     );

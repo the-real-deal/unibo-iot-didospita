@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #define LED_PIN 9
 
 int brightness;
@@ -7,7 +8,7 @@ int currIntensity;
 void setup() {
   currIntensity = 0;
   fadeAmount = 5;
-  pinMode(LED_PIN,OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() {

@@ -1,0 +1,106 @@
+{
+    "version": 1,
+    "author": "Anonymous maker",
+    "editor": "wokwi",
+    "parts": [
+        {
+            "type": "wokwi-breadboard",
+            "id": "bb1",
+            "top": -3,
+            "left": 367.6,
+            "attrs": {}
+        },
+        {
+            "type": "wokwi-arduino-uno",
+            "id": "uno",
+            "top": 0,
+            "left": 0,
+            "attrs": {}
+        },
+        {
+            "type": "wokwi-led",
+            "id": "led1",
+            "top": 82.8,
+            "left": 512.6,
+            "attrs": {
+                "color": "red"
+            }
+        },
+        {
+            "type": "wokwi-resistor",
+            "id": "r1",
+            "top": 138.35,
+            "left": 537.6,
+            "attrs": {
+                "value": "220"
+            }
+        }
+    ],
+    "connections": [
+        [
+            "bb1:tp.17",
+            "bb1:22b.f",
+            "green",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "bb1:15b.j",
+            "bb1:bn.10",
+            "black",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "bb1:bn.1",
+            "uno:GND.3",
+            "black",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "uno:9",
+            "bb1:tp.1",
+            "green",
+            [
+                "v0"
+            ]
+        ],
+        [
+            "r1:1",
+            "bb1:16b.i",
+            "",
+            [
+                "$bb"
+            ]
+        ],
+        [
+            "r1:2",
+            "bb1:22b.i",
+            "",
+            [
+                "$bb"
+            ]
+        ],
+        [
+            "led1:A",
+            "bb1:16b.g",
+            "",
+            [
+                "$bb"
+            ]
+        ],
+        [
+            "led1:C",
+            "bb1:15b.g",
+            "",
+            [
+                "$bb"
+            ]
+        ]
+    ],
+    "dependencies": {}
+}
