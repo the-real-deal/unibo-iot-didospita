@@ -22,6 +22,9 @@
               nixd
               nil
               nixfmt
+              # c/c++
+              clang-tools # must be before clang to have the correct clangd in PATH
+              gcc
               # arduino
               platformio
               platformio-core
