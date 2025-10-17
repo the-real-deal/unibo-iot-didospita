@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
+
+DEV_TTY=${DEV_TTY:-${1:-"/dev/ttyACM0"}}
 sudo chmod a+rw "$DEV_TTY"
