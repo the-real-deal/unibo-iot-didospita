@@ -35,9 +35,8 @@
             shellHook = ''
               set -a
               source .env 2>/dev/null
+              PATH=$(realpath ./bin):$PATH
               set +a
-
-              export PATH=$(realpath bin):$PATH
             '';
           };
       }
