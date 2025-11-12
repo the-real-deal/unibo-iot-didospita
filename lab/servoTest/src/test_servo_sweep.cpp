@@ -1,9 +1,9 @@
-#include "servo_motor_impl.h"
+#include "servo_motor_impl.hpp"
 #include <Arduino.h>
 
-int pos;   
+int pos;
 int delta;
-ServoMotor* pMotor;
+ServoMotor *pMotor;
 
 void setup() {
   Serial.begin(9600);
@@ -16,8 +16,8 @@ void loop() {
   pMotor->on();
   for (int i = 0; i < 180; i++) {
     Serial.println(pos);
-    pMotor->setPosition(pos);         
-    delay(2);            
+    pMotor->setPosition(pos);
+    delay(2);
     pos += delta;
   }
   pMotor->off();
