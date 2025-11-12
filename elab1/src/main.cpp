@@ -83,7 +83,7 @@ void btn3_pressed() { turn_on_specific_led(PIN_BUTTON_3); }
 void btn4_pressed() { turn_on_specific_led(PIN_BUTTON_4); }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(SERIAL_BAUD_RATE);
   Wire.begin();
   while (!Serial)
     ;

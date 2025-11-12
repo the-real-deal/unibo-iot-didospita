@@ -18,5 +18,6 @@
 #define LCD_DISPLAY_HEIGHT 2
 
 #define DEFAULT_DEBOUNCE_MS 40
+#define SERIAL_BAUD_RATE 9600
 
 #endif // CONFIG_H
