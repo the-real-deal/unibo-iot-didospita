@@ -1,0 +1,6 @@
+# https://docs.wokwi.com/vscode/project-config
+
+[wokwi]
+version = 1
+firmware = '.pio/build/uno/firmware.hex'
+elf = '.pio/build/uno/firmware.hex'
