@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include <vector>
+#include <Arduino.h>
 
 /*BUTTON PIN*/
 #define pinButton1 2
@@ -22,9 +22,10 @@
 /*int prevts = 0;
 int numFiltered = 0;*/
 
-std::vector<int> numbers = {1, 2, 3, 4};
-list<int> rdSeq;
+const int numb[] = {1,2,3,4};
+int seq[sizeof(numb)/sizeof(numb[0])];
 LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0X27,20,4);
+
 
 void setup() {
   Serial.begin(9600);
@@ -33,10 +34,10 @@ void setup() {
   
   /*BUTTON SETUP*/
   /*al posto di inc ci va turn_on_led*/
-  attachInterrupt(digitalPinToInterrupt(pinButton1), inc, RISING);
+  /*attachInterrupt(digitalPinToInterrupt(pinButton1), inc, RISING);
   attachInterrupt(digitalPinToInterrupt(pinButton2), inc, RISING);
   attachInterrupt(digitalPinToInterrupt(pinButton3), inc, RISING);
-  attachInterrupt(digitalPinToInterrupt(pinButton4), inc, RISING);
+  attachInterrupt(digitalPinToInterrupt(pinButton4), inc, RISING);*/
 
   
   /*LED SETUP*/
@@ -47,7 +48,7 @@ void setup() {
   pinMode(pinLedG4, OUTPUT);
   
   /*I2C SETUP*/
-  i2c_scan();
+  /*i2c_scan();*/
   lcd.init();
   lcd.backlight();
 }
@@ -60,7 +61,6 @@ void loop() {
   
   /*Cloni la lista con dentro 1234*/
   /*Shuffle List di quella clonata*/
-  rdSeq = numbers.copy().random_shuffle(numbers.begin(),numbers.end());
   /*Display sequence*/
   /*Interrupts*/
   
@@ -77,6 +77,20 @@ void loop() {
     numFiltered++;
   }
 }*/
+
+void generate_sequence(){
+  bool gen[5];
+  for (int i = 0; i < 4; i++)
+  {
+    int val;
+    do
+    {
+      val = (rand() % 4) + 1;
+    } while (gen[val]);
+    gen[val] = true;
+    seq[i] = val;
+  }
+}
 
 void turn_off_leds() {
 	
