@@ -4,3 +4,7 @@
 # direnv
 .direnv/
 .envrc*
+
+# platformio
+.vscode
+.pio
