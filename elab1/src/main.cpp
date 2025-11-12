@@ -1,57 +1,21 @@
+#include "config.h"
+#include "debounce.hpp"
+#include "display.hpp"
+#include "i2c.hpp"
 #include <Arduino.h>
+#include <EnableInterrupt.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
-
-/*BUTTON PIN*/
-#define pinButton1 2
-#define pinButton2 3
-#define pinButton3 4
-#define pinButton4 5
-
-/*LED PIN*/
-#define pinLedR 7
-#define pinLedG1 8
-#define pinLedG2 9
-#define pinLedG3 10
-#define pinLedG4 11
-
-/*POTENZIOMETER PIN*/
-#define potPin A0
-#define DEBOUNCE_TIME 40
 
 /*int prevts = 0;
 int numFiltered = 0;*/
 
 const int numb[] = {1, 2, 3, 4};
 int seq[sizeof(numb) / sizeof(numb[0])];
-LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2);
+LiquidCrystal_I2C *lcd;
 
-void i2c_scan() {
-  Serial.println("\nI2C Scanner");
-  int found = 0;
-  while (found == 0) {
-    Serial.println("Scanning...");
-    int nDevices = 0;
-    for (byte address = 1; address < 127; address++) {
-      Wire.beginTransmission(address);
-      byte error = Wire.endTransmission();
-      if (error == 0) {
-        Serial.print("I2C device found at address 0x");
-        if (address < 16)
-          Serial.print("0");
-        Serial.print(address, HEX);
-        Serial.println(" !");
-        nDevices++;
-        // lcd = LiquidCrystal_I2C(address, 20, 4);
-        found = 1;
-      } else if (error == 4) {
-        Serial.print("Unknown error at address 0x");
-        if (address < 16)
-          Serial.print("0");
-        Serial.println(address, HEX);
-      }
-    }
-  }
+void i2c_callback(const uint8_t address) {
+  lcd = create_display(address, LCD_DISPLAY_WIDTH, LCD_DISPLAY_HEIGHT);
 }
 
 void generate_sequence() {
@@ -66,9 +30,17 @@ void generate_sequence() {
   }
 }
 
-void turn_off_leds() {}
+void turn_off_leds() {
+  digitalWrite(PIN_LED_G1, LOW);
+  digitalWrite(PIN_LED_G2, LOW);
+  digitalWrite(PIN_LED_G3, LOW);
+  digitalWrite(PIN_LED_G4, LOW);
+}
 
-void turn_on_specific_led(int pinButton) {
+void turn_on_specific_led(const int pinButton) {
+  if (check_debounce_default()) {
+    return;
+  }
   /*Spegni tutti i led accessi
   (L'idea è quella di lasciare il led accesso fino
   al prossimo click, se non si vuole così allora si mette
@@ -80,22 +52,35 @@ void turn_on_specific_led(int pinButton) {
 
   /*Se non va che i define usare i numeri o trovare un altro
   modo*/
+
+  Serial.print("Button pressed: ");
+  Serial.println(pinButton);
+
   turn_off_leds();
   switch (pinButton) {
-  case pinButton1:
-    digitalWrite(pinLedG1, HIGH);
+  case PIN_BUTTON_1:
+    Serial.println("1");
+    digitalWrite(PIN_LED_G1, HIGH);
     break;
-  case pinButton2:
-    digitalWrite(pinLedG2, HIGH);
+  case PIN_BUTTON_2:
+    Serial.println("2");
+    digitalWrite(PIN_LED_G2, HIGH);
     break;
-  case pinButton3:
-    digitalWrite(pinLedG3, HIGH);
+  case PIN_BUTTON_3:
+    Serial.println("3");
+    digitalWrite(PIN_LED_G3, HIGH);
     break;
-  case pinButton4:
-    digitalWrite(pinLedG4, HIGH);
+  case PIN_BUTTON_4:
+    Serial.println("4");
+    digitalWrite(PIN_LED_G4, HIGH);
     break;
   }
 }
+
+void btn1_pressed() { turn_on_specific_led(PIN_BUTTON_1); }
+void btn2_pressed() { turn_on_specific_led(PIN_BUTTON_2); }
+void btn3_pressed() { turn_on_specific_led(PIN_BUTTON_3); }
+void btn4_pressed() { turn_on_specific_led(PIN_BUTTON_4); }
 
 void setup() {
   Serial.begin(9600);
@@ -105,22 +90,21 @@ void setup() {
 
   /*BUTTON SETUP*/
   /*al posto di inc ci va turn_on_led*/
-  /*attachInterrupt(digitalPinToInterrupt(pinButton1), inc, RISING);
-  attachInterrupt(digitalPinToInterrupt(pinButton2), inc, RISING);
-  attachInterrupt(digitalPinToInterrupt(pinButton3), inc, RISING);
-  attachInterrupt(digitalPinToInterrupt(pinButton4), inc, RISING);*/
+  enableInterrupt(PIN_BUTTON_1, btn1_pressed, RISING);
+  enableInterrupt(PIN_BUTTON_2, btn2_pressed, RISING);
+  enableInterrupt(PIN_BUTTON_3, btn3_pressed, RISING);
+  enableInterrupt(PIN_BUTTON_4, btn4_pressed, RISING);
 
   /*LED SETUP*/
-  pinMode(pinLedR, OUTPUT);
-  pinMode(pinLedG1, OUTPUT);
-  pinMode(pinLedG2, OUTPUT);
-  pinMode(pinLedG3, OUTPUT);
-  pinMode(pinLedG4, OUTPUT);
+  pinMode(PIN_LED_R, OUTPUT);
+  pinMode(PIN_LED_G1, OUTPUT);
+  pinMode(PIN_LED_G2, OUTPUT);
+  pinMode(PIN_LED_G3, OUTPUT);
+  pinMode(PIN_LED_G4, OUTPUT);
 
-  /*I2C SETUP*/
-  i2c_scan();
-  lcd.init();
-  lcd.backlight();
+  /* I2C SETUP */
+  i2c_scan(i2c_callback);
+  interrupts();
 }
 
 void loop() {
@@ -133,18 +117,9 @@ void loop() {
   /*Display sequence*/
   /*Interrupts*/
   generate_sequence();
-  lcd.setCursor(0, 0);
+  lcd->setCursor(0, 0);
   for (size_t i = 0; i < 4; i++) {
-    lcd.print(seq[i]);
+    lcd->print(seq[i]);
   }
   delay(1000);
 }
-
-/*void inc() {
-  long ts = millis();
-  if ((ts - prevts) > DEBOUNCE_TIME) {
-    prevts = ts;
-  } else {
-    numFiltered++;
-  }
-}*/
