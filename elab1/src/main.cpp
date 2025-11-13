@@ -14,10 +14,6 @@ const int numb[] = {1, 2, 3, 4};
 int seq[sizeof(numb) / sizeof(numb[0])];
 LiquidCrystal_I2C *lcd;
 
-void i2cScanCallback(const uint8_t address) {
-  lcd = createDisplay(address, LCD_DISPLAY_WIDTH, LCD_DISPLAY_HEIGHT);
-}
-
 void generateSequence() {
   bool gen[5] = {0};
   for (int i = 0; i < 4; i++) {
@@ -77,11 +73,6 @@ void turnOnLed(const int pinButton) {
   }
 }
 
-void btn1Pressed() { turnOnLed(PIN_BUTTON_1); }
-void btn2Pressed() { turnOnLed(PIN_BUTTON_2); }
-void btn3Pressed() { turnOnLed(PIN_BUTTON_3); }
-void btn4Pressed() { turnOnLed(PIN_BUTTON_4); }
-
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
   Wire.begin();
@@ -90,10 +81,10 @@ void setup() {
 
   /*BUTTON SETUP*/
   /*al posto di inc ci va turn_on_led*/
-  enableInterrupt(PIN_BUTTON_1, btn1Pressed, RISING);
-  enableInterrupt(PIN_BUTTON_2, btn2Pressed, RISING);
-  enableInterrupt(PIN_BUTTON_3, btn3Pressed, RISING);
-  enableInterrupt(PIN_BUTTON_4, btn4Pressed, RISING);
+  enableInterrupt(PIN_BUTTON_1, []() { turnOnLed(PIN_BUTTON_1); }, RISING);
+  enableInterrupt(PIN_BUTTON_2, []() { turnOnLed(PIN_BUTTON_2); }, RISING);
+  enableInterrupt(PIN_BUTTON_3, []() { turnOnLed(PIN_BUTTON_3); }, RISING);
+  enableInterrupt(PIN_BUTTON_4, []() { turnOnLed(PIN_BUTTON_4); }, RISING);
 
   /*LED SETUP*/
   pinMode(PIN_LED_R, OUTPUT);
@@ -103,7 +94,9 @@ void setup() {
   pinMode(PIN_LED_G4, OUTPUT);
 
   /* I2C SETUP */
-  i2cScan(i2cScanCallback);
+  i2cScan([](const uint8_t address) {
+    lcd = createDisplay(address, LCD_DISPLAY_WIDTH, LCD_DISPLAY_HEIGHT);
+  });
   interrupts();
 }
 
