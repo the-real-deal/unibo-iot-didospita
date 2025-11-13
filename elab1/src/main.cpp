@@ -4,17 +4,17 @@
 
 #include "config.hpp"
 #include "core/button.hpp"
+#include "core/sequence.hpp"
 #include "lib/display.hpp"
 #include "lib/i2c.hpp"
 #include "lib/led.hpp"
-#include "lib/sequence.hpp"
 #include "lib/utils.hpp"
 #include <Arduino.h>
 #include <EnableInterrupt.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 
-int seq[SEQUENCE_LENGTH];
+Sequence sequence;
 LiquidCrystal_I2C *lcd;
 
 void setup() {
@@ -56,10 +56,5 @@ void loop() {
   /*Shuffle List di quella clonata*/
   /*Display sequence*/
   /*Interrupts*/
-  generateSequence(seq, SEQUENCE_LENGTH);
-  lcd->setCursor(0, 0);
-  for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
-    lcd->print(seq[i]);
-  }
-  delay(1000);
+  generateSequence(&sequence);
 }
