@@ -7,6 +7,6 @@
 typedef void (*debounce_func_t)();
 
 bool check_debounce(uint64_t interval_ms);
-bool check_default_debounce();
+bool check_debounce();
 
 #endif // DEBOUNCE_H

@@ -10,4 +10,4 @@ bool check_debounce(const uint64_t interval_ms) {
   }
   return true;
 }
-bool check_default_debounce() { return check_debounce(DEFAULT_DEBOUNCE_MS); }
+bool check_debounce() { return check_debounce(DEFAULT_DEBOUNCE_MS); }

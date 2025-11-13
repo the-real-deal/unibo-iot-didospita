@@ -38,7 +38,7 @@ void turn_off_leds() {
 }
 
 void turn_on_specific_led(const int pinButton) {
-  if (check_default_debounce()) {
+  if (check_debounce()) {
     return;
   }
   /*Spegni tutti i led accessi
