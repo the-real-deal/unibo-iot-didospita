@@ -10,16 +10,15 @@
 /*int prevts = 0;
 int numFiltered = 0;*/
 
-const int numb[] = {1, 2, 3, 4};
-int seq[sizeof(numb) / sizeof(numb[0])];
+int seq[SEQUENCE_LENGTH];
 LiquidCrystal_I2C *lcd;
 
-void generateSequence() {
-  bool gen[5] = {0};
-  for (int i = 0; i < 4; i++) {
+void generateSequence(int *const seq, const size_t length) {
+  bool gen[length + 1] = {0};
+  for (size_t i = 0; i < length; i++) {
     int val;
     do {
-      val = (rand() % 4) + 1;
+      val = (rand() % length) + 1;
     } while (gen[val]);
     gen[val] = true;
     seq[i] = val;
@@ -109,9 +108,9 @@ void loop() {
   /*Shuffle List di quella clonata*/
   /*Display sequence*/
   /*Interrupts*/
-  generateSequence();
+  generateSequence(seq, SEQUENCE_LENGTH);
   lcd->setCursor(0, 0);
-  for (size_t i = 0; i < 4; i++) {
+  for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
     lcd->print(seq[i]);
   }
   delay(1000);

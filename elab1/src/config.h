@@ -1,6 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <stdint.h>
+
+#define SEQUENCE_LENGTH 4
+
 #define PIN_BUTTON_1 2
 #define PIN_BUTTON_2 3
 #define PIN_BUTTON_3 4
