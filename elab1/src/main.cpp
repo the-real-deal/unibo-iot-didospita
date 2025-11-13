@@ -2,7 +2,9 @@
 #include "debounce.hpp"
 #include "display.hpp"
 #include "i2c.hpp"
+#include "utils.hpp"
 #include <Arduino.h>
+#define EI_ARDUINO_INTERRUPTED_PIN
 #include <EnableInterrupt.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
@@ -26,16 +28,12 @@ void generateSequence(int *const seq, const size_t length) {
 }
 
 void turnOffLeds() {
-  digitalWrite(PIN_LED_G1, LOW);
-  digitalWrite(PIN_LED_G2, LOW);
-  digitalWrite(PIN_LED_G3, LOW);
-  digitalWrite(PIN_LED_G4, LOW);
+  for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
+    digitalWrite(GAME_LEDS_PINS[i], LOW);
+  }
 }
 
-void turnOnLed(const int pinButton) {
-  if (checkDebounce()) {
-    return;
-  }
+void turnOnLed(const uint8_t pin) {
   /*Spegni tutti i led accessi
   (L'idea è quella di lasciare il led accesso fino
   al prossimo click, se non si vuole così allora si mette
@@ -48,28 +46,25 @@ void turnOnLed(const int pinButton) {
   /*Se non va che i define usare i numeri o trovare un altro
   modo*/
 
-  Serial.print("Button pressed: ");
-  Serial.println(pinButton);
-
   turnOffLeds();
-  switch (pinButton) {
-  case PIN_BUTTON_1:
-    Serial.println("1");
-    digitalWrite(PIN_LED_G1, HIGH);
-    break;
-  case PIN_BUTTON_2:
-    Serial.println("2");
-    digitalWrite(PIN_LED_G2, HIGH);
-    break;
-  case PIN_BUTTON_3:
-    Serial.println("3");
-    digitalWrite(PIN_LED_G3, HIGH);
-    break;
-  case PIN_BUTTON_4:
-    Serial.println("4");
-    digitalWrite(PIN_LED_G4, HIGH);
-    break;
+
+  Serial.println("Turning on led at pin " + String(pin));
+  digitalWrite(pin, HIGH);
+}
+
+void buttonPressed(const uint8_t pin) {
+  if (checkDebounce()) {
+    return;
   }
+
+  const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
+  if (index == -1ul) {
+    Serial.println("Unknown button " + String(pin) + " pressed!");
+    return;
+  }
+
+  Serial.println("Pressed button at pin " + String(pin));
+  turnOnLed(GAME_LEDS_PINS[index]);
 }
 
 void setup() {
@@ -78,23 +73,26 @@ void setup() {
   while (!Serial)
     ;
 
-  /*BUTTON SETUP*/
-  /*al posto di inc ci va turn_on_led*/
-  enableInterrupt(PIN_BUTTON_1, []() { turnOnLed(PIN_BUTTON_1); }, RISING);
-  enableInterrupt(PIN_BUTTON_2, []() { turnOnLed(PIN_BUTTON_2); }, RISING);
-  enableInterrupt(PIN_BUTTON_3, []() { turnOnLed(PIN_BUTTON_3); }, RISING);
-  enableInterrupt(PIN_BUTTON_4, []() { turnOnLed(PIN_BUTTON_4); }, RISING);
+  for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
+    /*BUTTON SETUP*/
+    /*al posto di inc ci va turn_on_led*/
+    enableInterrupt(
+        BUTTON_PINS[i],
+        []() {
+          Serial.println("Interrupt on pin " + String(arduinoInterruptedPin));
+          buttonPressed(arduinoInterruptedPin);
+        },
+        RISING);
 
-  /*LED SETUP*/
-  pinMode(PIN_LED_R, OUTPUT);
-  pinMode(PIN_LED_G1, OUTPUT);
-  pinMode(PIN_LED_G2, OUTPUT);
-  pinMode(PIN_LED_G3, OUTPUT);
-  pinMode(PIN_LED_G4, OUTPUT);
+    /*LED SETUP*/
+    pinMode(GAME_LEDS_PINS[i], OUTPUT);
+  }
+
+  pinMode(CONTROL_LED_PIN, OUTPUT);
 
   /* I2C SETUP */
   i2cScan([](const uint8_t address) {
-    lcd = createDisplay(address, LCD_DISPLAY_WIDTH, LCD_DISPLAY_HEIGHT);
+    lcd = createDisplay(address, LCD_DISPLAY_SIZE[0], LCD_DISPLAY_SIZE[1]);
   });
   interrupts();
 }

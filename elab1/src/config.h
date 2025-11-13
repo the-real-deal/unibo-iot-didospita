@@ -1,27 +1,21 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <Arduino.h>
 #include <stdint.h>
 
-#define SEQUENCE_LENGTH 4
+const uint8_t SEQUENCE_LENGTH = 4;
 
-#define PIN_BUTTON_1 2
-#define PIN_BUTTON_2 3
-#define PIN_BUTTON_3 4
-#define PIN_BUTTON_4 5
+const uint8_t BUTTON_PINS[SEQUENCE_LENGTH] = {2, 3, 4, 5};
 
-#define PIN_LED_R 7
-#define PIN_LED_G1 8
-#define PIN_LED_G2 9
-#define PIN_LED_G3 10
-#define PIN_LED_G4 11
+const uint8_t CONTROL_LED_PIN = 7;
+const uint8_t GAME_LEDS_PINS[SEQUENCE_LENGTH] = {8, 9, 10, 11};
 
-#define PIN_POTENTIOMETER A0
+const uint8_t POTENTIOMETER_LED = A0;
 
-#define LCD_DISPLAY_WIDTH 16
-#define LCD_DISPLAY_HEIGHT 2
+const uint8_t LCD_DISPLAY_SIZE[2] = {16, 2};
 
-#define DEFAULT_DEBOUNCE_MS 40
-#define SERIAL_BAUD_RATE 9600
+const uint64_t DEFAULT_DEBOUNCE_MS = 40;
+const uint64_t SERIAL_BAUD_RATE = 9600;
 
 #endif // CONFIG_H
