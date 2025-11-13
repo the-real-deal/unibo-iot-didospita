@@ -1,71 +1,22 @@
+// define before EnableInterrupt.h to provide arduinoInterruptedPin
+// https://github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
+#define EI_ARDUINO_INTERRUPTED_PIN
+
+#include "button.hpp"
 #include "config.h"
 #include "debounce.hpp"
 #include "display.hpp"
 #include "i2c.hpp"
+#include "led.hpp"
+#include "sequence.hpp"
 #include "utils.hpp"
 #include <Arduino.h>
-#define EI_ARDUINO_INTERRUPTED_PIN
 #include <EnableInterrupt.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 
-/*int prevts = 0;
-int numFiltered = 0;*/
-
 int seq[SEQUENCE_LENGTH];
 LiquidCrystal_I2C *lcd;
-
-void generateSequence(int *const seq, const size_t length) {
-  bool gen[length + 1] = {0};
-  for (size_t i = 0; i < length; i++) {
-    int val;
-    do {
-      val = (rand() % length) + 1;
-    } while (gen[val]);
-    gen[val] = true;
-    seq[i] = val;
-  }
-}
-
-void turnOffLeds() {
-  for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
-    digitalWrite(GAME_LEDS_PINS[i], LOW);
-  }
-}
-
-void turnOnLed(const uint8_t pin) {
-  /*Spegni tutti i led accessi
-  (L'idea è quella di lasciare il led accesso fino
-  al prossimo click, se non si vuole così allora si mette
-  un delay)*/
-  /*Controlli il pinPremuto con il primo numero nella lista.
-  Se non è corretto cambi stato della partita a game over
-  Se è la lista diventa vuota allora vuol dire che si ha vinto
-  e quindi si mette lo stato in vittoria*/
-
-  /*Se non va che i define usare i numeri o trovare un altro
-  modo*/
-
-  turnOffLeds();
-
-  Serial.println("Turning on led at pin " + String(pin));
-  digitalWrite(pin, HIGH);
-}
-
-void buttonPressed(const uint8_t pin) {
-  if (checkDebounce()) {
-    return;
-  }
-
-  const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
-  if (index == -1ul) {
-    Serial.println("Unknown button " + String(pin) + " pressed!");
-    return;
-  }
-
-  Serial.println("Pressed button at pin " + String(pin));
-  turnOnLed(GAME_LEDS_PINS[index]);
-}
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
