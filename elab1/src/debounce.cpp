@@ -1,7 +1,7 @@
 #include "debounce.hpp"
 #include <Arduino.h>
 
-bool check_debounce(const uint64_t interval_ms) {
+bool checkDebounce(const uint64_t interval_ms) {
   static uint64_t prevts = 0;
   const uint64_t ts = millis();
   if ((ts - prevts) > interval_ms) {
@@ -10,4 +10,4 @@ bool check_debounce(const uint64_t interval_ms) {
   }
   return true;
 }
-bool check_debounce() { return check_debounce(DEFAULT_DEBOUNCE_MS); }
+bool checkDebounce() { return checkDebounce(DEFAULT_DEBOUNCE_MS); }

@@ -14,11 +14,11 @@ const int numb[] = {1, 2, 3, 4};
 int seq[sizeof(numb) / sizeof(numb[0])];
 LiquidCrystal_I2C *lcd;
 
-void i2c_callback(const uint8_t address) {
-  lcd = create_display(address, LCD_DISPLAY_WIDTH, LCD_DISPLAY_HEIGHT);
+void i2cScanCallback(const uint8_t address) {
+  lcd = createDisplay(address, LCD_DISPLAY_WIDTH, LCD_DISPLAY_HEIGHT);
 }
 
-void generate_sequence() {
+void generateSequence() {
   bool gen[5] = {0};
   for (int i = 0; i < 4; i++) {
     int val;
@@ -30,15 +30,15 @@ void generate_sequence() {
   }
 }
 
-void turn_off_leds() {
+void turnOffLeds() {
   digitalWrite(PIN_LED_G1, LOW);
   digitalWrite(PIN_LED_G2, LOW);
   digitalWrite(PIN_LED_G3, LOW);
   digitalWrite(PIN_LED_G4, LOW);
 }
 
-void turn_on_specific_led(const int pinButton) {
-  if (check_debounce()) {
+void turnOnLed(const int pinButton) {
+  if (checkDebounce()) {
     return;
   }
   /*Spegni tutti i led accessi
@@ -56,7 +56,7 @@ void turn_on_specific_led(const int pinButton) {
   Serial.print("Button pressed: ");
   Serial.println(pinButton);
 
-  turn_off_leds();
+  turnOffLeds();
   switch (pinButton) {
   case PIN_BUTTON_1:
     Serial.println("1");
@@ -77,10 +77,10 @@ void turn_on_specific_led(const int pinButton) {
   }
 }
 
-void btn1_pressed() { turn_on_specific_led(PIN_BUTTON_1); }
-void btn2_pressed() { turn_on_specific_led(PIN_BUTTON_2); }
-void btn3_pressed() { turn_on_specific_led(PIN_BUTTON_3); }
-void btn4_pressed() { turn_on_specific_led(PIN_BUTTON_4); }
+void btn1Pressed() { turnOnLed(PIN_BUTTON_1); }
+void btn2Pressed() { turnOnLed(PIN_BUTTON_2); }
+void btn3Pressed() { turnOnLed(PIN_BUTTON_3); }
+void btn4Pressed() { turnOnLed(PIN_BUTTON_4); }
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -90,10 +90,10 @@ void setup() {
 
   /*BUTTON SETUP*/
   /*al posto di inc ci va turn_on_led*/
-  enableInterrupt(PIN_BUTTON_1, btn1_pressed, RISING);
-  enableInterrupt(PIN_BUTTON_2, btn2_pressed, RISING);
-  enableInterrupt(PIN_BUTTON_3, btn3_pressed, RISING);
-  enableInterrupt(PIN_BUTTON_4, btn4_pressed, RISING);
+  enableInterrupt(PIN_BUTTON_1, btn1Pressed, RISING);
+  enableInterrupt(PIN_BUTTON_2, btn2Pressed, RISING);
+  enableInterrupt(PIN_BUTTON_3, btn3Pressed, RISING);
+  enableInterrupt(PIN_BUTTON_4, btn4Pressed, RISING);
 
   /*LED SETUP*/
   pinMode(PIN_LED_R, OUTPUT);
@@ -103,7 +103,7 @@ void setup() {
   pinMode(PIN_LED_G4, OUTPUT);
 
   /* I2C SETUP */
-  i2c_scan(i2c_callback);
+  i2cScan(i2cScanCallback);
   interrupts();
 }
 
@@ -116,7 +116,7 @@ void loop() {
   /*Shuffle List di quella clonata*/
   /*Display sequence*/
   /*Interrupts*/
-  generate_sequence();
+  generateSequence();
   lcd->setCursor(0, 0);
   for (size_t i = 0; i < 4; i++) {
     lcd->print(seq[i]);

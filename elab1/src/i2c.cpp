@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-void i2c_scan(const i2c_func_t callback) {
+void i2cScan(const i2cScanCallback_t callback) {
   Serial.println("\nI2C Scanner");
   int found = 0;
   while (found == 0) {
