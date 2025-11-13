@@ -1,7 +1,17 @@
 #include "button.hpp"
-#include "debounce.hpp"
-#include "led.hpp"
-#include "utils.hpp"
+#include "../config.hpp"
+#include "lib/led.hpp"
+#include "lib/utils.hpp"
+
+bool checkDebounce(const uint64_t interval_ms = DEFAULT_DEBOUNCE_MS) {
+  static uint64_t prevts = 0;
+  const uint64_t ts = millis();
+  if ((ts - prevts) > interval_ms) {
+    prevts = ts;
+    return false;
+  }
+  return true;
+}
 
 void buttonPressed(const uint8_t pin) {
   if (checkDebounce()) {

@@ -1,5 +1,5 @@
 #include "display.hpp"
-#include "config.h"
+#include "../config.hpp"
 
 LiquidCrystal_I2C *createDisplay(const uint8_t address, const uint8_t cols,
                                  const uint8_t rows) {

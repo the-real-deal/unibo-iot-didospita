@@ -2,14 +2,13 @@
 // https://github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
 #define EI_ARDUINO_INTERRUPTED_PIN
 
-#include "button.hpp"
-#include "config.h"
-#include "debounce.hpp"
-#include "display.hpp"
-#include "i2c.hpp"
-#include "led.hpp"
-#include "sequence.hpp"
-#include "utils.hpp"
+#include "config.hpp"
+#include "core/button.hpp"
+#include "lib/display.hpp"
+#include "lib/i2c.hpp"
+#include "lib/led.hpp"
+#include "lib/sequence.hpp"
+#include "lib/utils.hpp"
 #include <Arduino.h>
 #include <EnableInterrupt.h>
 #include <LiquidCrystal_I2C.h>

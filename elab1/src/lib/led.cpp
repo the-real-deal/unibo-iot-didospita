@@ -1,5 +1,5 @@
 #include "led.hpp"
-#include "config.h"
+#include "../config.hpp"
 #include <Arduino.h>
 
 void turnOnLed(const size_t index) {
