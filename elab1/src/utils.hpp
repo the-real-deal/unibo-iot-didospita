@@ -1,5 +1,4 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#pragma once
 
 #include <Arduino.h>
 #include <stdlib.h>
@@ -13,5 +12,3 @@ size_t indexOf(const T *arr, const size_t length, const T value) {
   }
   return (size_t)-1; // Not found
 }
-
-#endif // UTILS_HPP

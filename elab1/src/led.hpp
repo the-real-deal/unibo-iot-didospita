@@ -1,5 +1,4 @@
-#ifndef LED_HPP
-#define LED_HPP
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -9,5 +8,3 @@ void turnOnAllLeds();
 
 void turnOffLed(const size_t index);
 void turnOffAllLeds();
-
-#endif // LED_HPP

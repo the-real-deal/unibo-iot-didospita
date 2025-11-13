@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -17,5 +16,3 @@ const uint8_t LCD_DISPLAY_SIZE[2] = {16, 2};
 
 const uint64_t DEFAULT_DEBOUNCE_MS = 40;
 const uint64_t SERIAL_BAUD_RATE = 9600;
-
-#endif // CONFIG_H
