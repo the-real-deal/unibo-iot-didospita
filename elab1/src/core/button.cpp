@@ -5,47 +5,49 @@
 #include "../lib/utils.hpp"
 #include <assert.h>
 
-bool checkDebounce(const uint64_t interval_ms) {
+bool checkDebounce(const uint64_t interval_ms)
+{
   static uint64_t prevts = 0;
   const uint64_t ts = millis();
-  if ((ts - prevts) > interval_ms) {
+  if ((ts - prevts) > interval_ms)
+  {
     prevts = ts;
     return false;
   }
   return true;
 }
 
-void buttonPressed(const uint8_t pin, Game *const game) {
-  if (checkDebounce(DEFAULT_DEBOUNCE_MS)) {
+void buttonPressed(const uint8_t pin, Game *const game)
+{
+  if (checkDebounce(DEFAULT_DEBOUNCE_MS))
+  {
     return;
   }
-
-  Serial.println("Game state: " + String(game->state));
-  Serial.println("Pin: " + String(pin));
-  switch (game->state) {
-  case SLEEP:
-    Serial.println("SLEEP");
-    if (pin == BUTTON_PINS[WAKE_BTN_INDEX]) {
-      Serial.println("wake btn");
-      Serial.flush();
+  if (pin == BUTTON_PINS[WAKE_BTN_INDEX])
+  {
+    switch (game->state)
+    {
+    case SLEEP:
       disableSleep();
       /*
-       cannot change state directly after deepSleep() in game step
-       because you cannot init deep sleeping again inside an interrupt.
+        cannot change state directly after deepSleep() in game step
+        because you cannot init deep sleeping again inside an interrupt.
       */
       game->state = INITIAL;
+      break;
+    case IDLE_WAIT:
+      game->state = INIT_GAME;
+      break;
+    default:
+      break;
     }
-    break;
-  default:
-    Serial.println("DEFAULT");
+  }
+  
+  if (game->state == PLAYING){
     const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
     assert(index != -1ul);
-
-    Serial.println("Pressed button at pin " + String(pin));
     turnOffAllGameLeds();
     turnOnLed(GAME_LEDS_PINS[index]);
-    break;
+    advanceSequence(&game->sequence,index+1);
   }
-  Serial.println("New state: " + String(game->state));
-  Serial.flush();
 }

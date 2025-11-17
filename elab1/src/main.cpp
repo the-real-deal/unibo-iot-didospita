@@ -35,7 +35,6 @@ void setup() {
     enableInterrupt(
         BUTTON_PINS[i],
         []() {
-          Serial.println("Interrupt on pin " + String(arduinoInterruptedPin));
           buttonPressed(arduinoInterruptedPin, &game);
         },
         RISING);
@@ -63,6 +62,6 @@ void loop() {
   /*Shuffle List di quella clonata*/
   /*Display sequence*/
   /*Interrupts*/
-  gameStep(&game);
+  gameStep(&game, lcd);
   delay(LOOP_DELAY_MS);
 }

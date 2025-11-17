@@ -6,12 +6,10 @@
 #define LED_FADE_UPPER_BOUND 255
 
 void turnOnLed(const uint8_t pin) {
-  Serial.println("Turning on led at pin " + String(pin));
   digitalWrite(pin, HIGH);
 };
 
 void turnOffLed(const uint8_t pin) {
-  Serial.println("Turning off led at pin " + String(pin));
   digitalWrite(pin, LOW);
 };
 
