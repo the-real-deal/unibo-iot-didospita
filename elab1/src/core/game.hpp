@@ -25,4 +25,4 @@ struct Game {
 };
 
 Game initGame();
-void gameStep(Game *const game, LiquidCrystal_I2C* const lcd);
+void gameStep(Game *const game, LiquidCrystal_I2C *const lcd);

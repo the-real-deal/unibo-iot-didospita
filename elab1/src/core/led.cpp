@@ -1,5 +1,5 @@
-#include "../config.hpp"
 #include "../lib/led.hpp"
+#include "../config.hpp"
 
 void turnOnAllGameLeds() {
   for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {

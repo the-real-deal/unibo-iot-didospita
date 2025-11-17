@@ -33,10 +33,7 @@ void setup() {
     /*BUTTON SETUP*/
     /*al posto di inc ci va turn_on_led*/
     enableInterrupt(
-        BUTTON_PINS[i],
-        []() {
-          buttonPressed(arduinoInterruptedPin, &game);
-        },
+        BUTTON_PINS[i], []() { buttonPressed(arduinoInterruptedPin, &game); },
         RISING);
 
     /*LED SETUP*/
