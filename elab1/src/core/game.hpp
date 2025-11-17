@@ -6,10 +6,10 @@
 
 enum GameState {
   INITIAL,
-  IDLE_WAIT,
+  MENU,
   SLEEP,
   INIT_GAME,
-  GO_WAITING,
+  STARTING_GAME,
   INIT_ROUND,
   PLAYING,
   WIN,
@@ -22,6 +22,7 @@ struct Game {
   Sequence sequence;
   uint8_t score;
   Timer timer;
+  size_t difficulty;
 };
 
 Game initGame();

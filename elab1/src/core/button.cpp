@@ -29,7 +29,7 @@ void buttonPressed(const uint8_t pin, Game *const game) {
       */
       game->state = INITIAL;
       break;
-    case IDLE_WAIT:
+    case MENU:
       game->state = INIT_GAME;
       break;
     default:

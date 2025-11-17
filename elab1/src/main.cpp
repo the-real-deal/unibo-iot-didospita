@@ -41,11 +41,13 @@ void setup() {
   }
 
   pinMode(CONTROL_LED_PIN, OUTPUT);
+  pinMode(POTENTIOMETER_PIN, INPUT);
 
   /* I2C SETUP */
   i2cScan([](const uint8_t address) {
     lcd = createDisplay(address, LCD_DISPLAY_SIZE[0], LCD_DISPLAY_SIZE[1]);
   });
+
   game = initGame();
   interrupts();
 }

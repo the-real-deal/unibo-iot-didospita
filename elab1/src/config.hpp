@@ -11,7 +11,7 @@ const uint8_t CONTROL_LED_PIN = 11;
 const uint8_t CONTROL_LED_FADE_AMOUNT = 25;
 const uint8_t GAME_LEDS_PINS[SEQUENCE_LENGTH] = {7, 8, 9, 10};
 
-const uint8_t POTENTIOMETER_LED = A0;
+const uint8_t POTENTIOMETER_PIN = A0;
 
 const uint8_t LCD_DISPLAY_SIZE[2] = {16, 2};
 

@@ -1,6 +1,7 @@
 #include "game.hpp"
 #include "../config.hpp"
 #include "../lib/led.hpp"
+#include "../lib/potentiometer.hpp"
 #include "../lib/timer.hpp"
 #include "../lib/utils.hpp"
 #include "led.hpp"
@@ -25,9 +26,9 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     lcd->setCursor(0, 1);
     lcd->print("Press B1 to start");
     lcd->flush();
-    game->state = IDLE_WAIT;
+    game->state = MENU;
     break;
-  case IDLE_WAIT:
+  case MENU:
     fadeLed(CONTROL_LED_PIN, &controlLedFade);
     if (timerEnded(&game->timer)) {
       game->state = SLEEP;
@@ -45,15 +46,14 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     break;
   case INIT_GAME:
     turnOffLed(CONTROL_LED_PIN);
-    /*DA CAMBIARE FORSE*/
     lcd->clear();
     lcd->setCursor(0, 0);
     lcd->print("GO!");
     lcd->flush();
     game->timer = initTimer(INIT_GAME_PERIOD_MS);
-    game->state = GO_WAITING;
+    game->state = STARTING_GAME;
     break;
-  case GO_WAITING:
+  case STARTING_GAME:
     if (timerEnded(&game->timer)) {
       game->state = INIT_ROUND;
     }
