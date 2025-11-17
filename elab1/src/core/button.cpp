@@ -26,6 +26,7 @@ void buttonPressed(const uint8_t pin, Game *const game) {
     Serial.println("SLEEP");
     if (pin == BUTTON_PINS[WAKE_BTN_INDEX]) {
       Serial.println("wake btn");
+      Serial.flush();
       disableSleep();
       /*
        cannot change state directly after deepSleep() in game step

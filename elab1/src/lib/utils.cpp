@@ -3,8 +3,8 @@
 #include <stdint.h>
 
 void deepSleep() {
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_mode();
 }
 
