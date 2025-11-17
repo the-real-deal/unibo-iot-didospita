@@ -7,8 +7,9 @@ const uint8_t SEQUENCE_LENGTH = 4;
 
 const uint8_t BUTTON_PINS[SEQUENCE_LENGTH] = {2, 3, 4, 5};
 
-const uint8_t CONTROL_LED_PIN = 7;
-const uint8_t GAME_LEDS_PINS[SEQUENCE_LENGTH] = {8, 9, 10, 11};
+const uint8_t CONTROL_LED_PIN = 11;
+const uint8_t CONTROL_LED_FADE_AMOUNT = 15;
+const uint8_t GAME_LEDS_PINS[SEQUENCE_LENGTH] = {7, 8, 9, 10};
 
 const uint8_t POTENTIOMETER_LED = A0;
 
@@ -17,7 +18,7 @@ const uint8_t LCD_DISPLAY_SIZE[2] = {16, 2};
 const uint64_t DEFAULT_DEBOUNCE_MS = 40;
 const uint64_t SERIAL_BAUD_RATE = 9600;
 
-const uint64_t IDLE_PERIOD_MS = 3 * 1000;
+const uint64_t IDLE_PERIOD_MS = 10 * 1000;
 const size_t WAKE_BTN_INDEX = 0;
 
 const uint64_t LOOP_DELAY_MS = 50;

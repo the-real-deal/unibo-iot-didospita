@@ -2,6 +2,7 @@
 #include "../config.hpp"
 #include "../lib/timer.hpp"
 #include "../lib/utils.hpp"
+#include "../lib/led.hpp"
 
 Game initGame() {
   return {
@@ -10,8 +11,10 @@ Game initGame() {
 }
 
 void gameStep(Game *const game) {
+  static int32_t controlLedFade;
   switch (game->state) {
   case INITIAL:
+    controlLedFade = 0;
     game->timer = initTimer(IDLE_PERIOD_MS);
     Serial.println("Started idle wait timer: " + String((int)IDLE_PERIOD_MS) +
                    "ms");
@@ -19,6 +22,9 @@ void gameStep(Game *const game) {
     break;
   case IDLE_WAIT:
     Serial.println("Idle wait check");
+    fadeLed(CONTROL_LED_PIN, &controlLedFade);
+    Serial.println(controlLedFade);
+    Serial.flush();
     if (timerEnded(&game->timer)) {
       Serial.println("Idle finished");
       game->state = SLEEP;
@@ -27,6 +33,7 @@ void gameStep(Game *const game) {
   case SLEEP:
     Serial.println("Starting deep sleeping");
     Serial.flush();
+    turnOffLed(CONTROL_LED_PIN);
     deepSleep();
     break;
   case PLAYING:

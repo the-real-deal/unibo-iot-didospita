@@ -1,7 +1,8 @@
 #include "button.hpp"
 #include "../config.hpp"
+#include "led.hpp"
 #include "lib/led.hpp"
-#include "lib/utils.hpp"
+#include "../lib/utils.hpp"
 #include <assert.h>
 
 bool checkDebounce(const uint64_t interval_ms) {
@@ -41,8 +42,8 @@ void buttonPressed(const uint8_t pin, Game *const game) {
     assert(index != -1ul);
 
     Serial.println("Pressed button at pin " + String(pin));
-    turnOffAllLeds();
-    turnOnLed(index);
+    turnOffAllGameLeds();
+    turnOnLed(GAME_LEDS_PINS[index]);
     break;
   }
   Serial.println("New state: " + String(game->state));
