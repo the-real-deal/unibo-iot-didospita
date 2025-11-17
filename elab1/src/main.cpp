@@ -1,13 +1,17 @@
 // define before EnableInterrupt.h to provide arduinoInterruptedPin
-// https://github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
+//
+// https://
+// github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
 #define EI_ARDUINO_INTERRUPTED_PIN
 
 #include "config.hpp"
 #include "core/button.hpp"
+#include "core/game.hpp"
 #include "core/sequence.hpp"
 #include "lib/display.hpp"
 #include "lib/i2c.hpp"
 #include "lib/led.hpp"
+#include "lib/timer.hpp"
 #include "lib/utils.hpp"
 #include <Arduino.h>
 #include <EnableInterrupt.h>
@@ -15,6 +19,8 @@
 #include <Wire.h>
 
 Sequence sequence;
+Timer timer;
+Game game;
 LiquidCrystal_I2C *lcd;
 
 void setup() {
@@ -30,7 +36,7 @@ void setup() {
         BUTTON_PINS[i],
         []() {
           Serial.println("Interrupt on pin " + String(arduinoInterruptedPin));
-          buttonPressed(arduinoInterruptedPin);
+          buttonPressed(arduinoInterruptedPin, &game);
         },
         RISING);
 
@@ -44,6 +50,7 @@ void setup() {
   i2cScan([](const uint8_t address) {
     lcd = createDisplay(address, LCD_DISPLAY_SIZE[0], LCD_DISPLAY_SIZE[1]);
   });
+  game = initGame();
   interrupts();
 }
 
@@ -56,5 +63,6 @@ void loop() {
   /*Shuffle List di quella clonata*/
   /*Display sequence*/
   /*Interrupts*/
-  generateSequence(&sequence);
+  gameStep(&game);
+  delay(LOOP_DELAY_MS);
 }

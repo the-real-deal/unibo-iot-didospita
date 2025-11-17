@@ -12,3 +12,6 @@ size_t indexOf(const T *arr, const size_t length, const T value) {
   }
   return (size_t)-1; // Not found
 }
+
+void deepSleep();
+void disableSleep();
