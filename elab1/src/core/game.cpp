@@ -36,6 +36,11 @@ void gameStep(Game *const game, LiquidCrystal_I2C* const lcd) {
     case SLEEP:
       turnOffLed(CONTROL_LED_PIN);
       turnOffAllGameLeds();
+      lcd->clear();
+      lcd->setCursor(0,0);
+      lcd->print("Press B1 to");
+      lcd->setCursor(0,1);
+      lcd->print("wake up");
       deepSleep();
       break;
     case INIT_GAME: 
@@ -52,6 +57,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C* const lcd) {
       if(timerEnded(&game->timer)) {
         game->state = INIT_ROUND;
       }
+      break;
     case INIT_ROUND:
       turnOffLed(CONTROL_LED_PIN);
       turnOffAllGameLeds();
@@ -67,6 +73,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C* const lcd) {
       if(timerEnded(&game->timer)){
         game->state = INIT_GAME_OVER;
         turnOnLed(CONTROL_LED_PIN);
+        turnOffAllGameLeds();
         game->timer = initTimer(INIT_GAME_OVER_PERIOD_MS);
       }
       else {
@@ -77,9 +84,11 @@ void gameStep(Game *const game, LiquidCrystal_I2C* const lcd) {
           lcd->print("GOOD! Score: " + String(game->score));
           lcd->flush();
           game->timer = initTimer(WIN_PERIOD_MS);
+          turnOnAllGameLeds();
           game->state = WIN;
         } else if (game->sequence.status == FAIL) {
           turnOnLed(CONTROL_LED_PIN);
+          turnOffAllGameLeds();
           game->timer = initTimer(INIT_GAME_OVER_PERIOD_MS);
           game->state = INIT_GAME_OVER;
         } else {
@@ -102,6 +111,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C* const lcd) {
         lcd->setCursor(0,1);
         lcd->print("Score: " + String(game->score));
         lcd->flush();
+        turnOffLed(CONTROL_LED_PIN);
         game->timer = initTimer(GAME_OVER_PERIOD_MS);
               game->state = GAME_OVER; 
       }

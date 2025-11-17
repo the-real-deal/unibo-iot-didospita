@@ -19,14 +19,14 @@ void generateSequence(Sequence *const sequence) {
 void advanceSequence(Sequence *const sequence, const sequenceVal_t value) {
   assert(sequence->status == CONTINUE);
   assert(sequence->index >= 0 && sequence->index < SEQUENCE_LENGTH);
-  Serial.println(value);
-  Serial.println(sequence->values[sequence->index]);
+  Serial.println("Valore pulsante premuto: " + String(value));
+  Serial.println("Valore della sequenza: " + String(sequence->values[sequence->index]));
   const bool correct = sequence->values[sequence->index] == value;
   if (!correct) {
     sequence->status = FAIL;
   } else {
     sequence->index++;
-    Serial.println(sequence->index);
+    Serial.println("Indice della sequenza: " + String(sequence->index));
     if (sequence->index == SEQUENCE_LENGTH) {
       Serial.println(sequence->index);
       sequence->status = COMPLETE;
