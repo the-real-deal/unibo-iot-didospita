@@ -24,8 +24,8 @@ void buttonPressed(const uint8_t pin, Game *const game, const size_t index) {
     case SLEEP:
       disableSleep();
       /*
-        cannot change state directly after deepSleep() in game step
-        because you cannot init deep sleeping again inside an interrupt.
+      cannot change state directly after deepSleep() in game step
+      because you cannot init deep sleeping again inside an interrupt.
       */
       game->state = INITIAL;
       break;

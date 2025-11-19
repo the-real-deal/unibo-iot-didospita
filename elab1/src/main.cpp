@@ -1,6 +1,7 @@
-// define before EnableInterrupt.h to provide arduinoInterruptedPin
-//
-// https://github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
+/*
+define before EnableInterrupt.h to provide arduinoInterruptedPin
+https://github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
+*/
 #define EI_ARDUINO_INTERRUPTED_PIN
 
 #include "config.hpp"
@@ -32,7 +33,6 @@ void setup() {
     ;
 
   for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
-    /*BUTTON SETUP*/
     const uint8_t pin = BUTTON_PINS[i];
     enableInterrupt(
         pin,
@@ -43,10 +43,9 @@ void setup() {
         },
         RISING);
 
-    /*LED SETUP*/
     pinMode(GAME_LEDS_PINS[i], OUTPUT);
 
-    /* cache button indexes */
+    // cache button indexes
     const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
     assert(index != -1ul);
     buttonIndexes.put(pin, index);
@@ -55,24 +54,18 @@ void setup() {
   pinMode(CONTROL_LED_PIN, OUTPUT);
   pinMode(POTENTIOMETER_PIN, INPUT);
 
-  /* I2C SETUP */
   i2cScan([](const uint8_t address) {
     lcd = createDisplay(address, LCD_DISPLAY_SIZE[0], LCD_DISPLAY_SIZE[1]);
   });
+
+  pinMode(RANDOM_SEED_PIN, INPUT);
+  srand(analogRead(RANDOM_SEED_PIN));
 
   game = initGame();
   interrupts();
 }
 
 void loop() {
-  /*AIUTO SPITA COME CAZZO DEVO GESTIRE TUTTO??*/
-  /*Questione del deepsleep*/
-  /*Usare uno switch con enum o state variable*/
-
-  /*Cloni la lista con dentro 1234*/
-  /*Shuffle List di quella clonata*/
-  /*Display sequence*/
-  /*Interrupts*/
   gameStep(&game, lcd);
   delay(LOOP_DELAY_MS);
 }

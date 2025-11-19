@@ -34,8 +34,10 @@ void advanceSequence(Sequence *const sequence, const sequenceVal_t value) {
 String getSequenceString(Sequence *const sequence) {
   char seq[SEQUENCE_LENGTH + 1];
   for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
-    // Sequence values are always single digit, so we can use buff[2] to store
-    // the digit and the null terminator
+    /*
+    sequence values are always single digit, so we can use buff[2] to store
+    the digit and the null terminator
+    */
     char buff[2];
     sprintf(buff, "%d", sequence->values[i]);
     seq[i] = buff[0];

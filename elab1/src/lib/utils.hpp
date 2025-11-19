@@ -10,7 +10,7 @@ size_t indexOf(const T *arr, const size_t length, const T value) {
       return i;
     }
   }
-  return (size_t)-1; // Not found
+  return (size_t)-1; // not found
 }
 
 void deepSleep();

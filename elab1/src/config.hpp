@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 const uint64_t LOOP_DELAY_MS = 200;
+const uint8_t RANDOM_SEED_PIN = A1;
 
 const uint8_t SEQUENCE_LENGTH = 4;
 
