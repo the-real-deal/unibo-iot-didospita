@@ -76,7 +76,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
   case STARTING_GAME:
     if (timerEnded(&game->timer)) {
       game->score = 0;
-      game->round = 20;
+      game->round = 0;
       game->state = INIT_ROUND;
     }
     break;
