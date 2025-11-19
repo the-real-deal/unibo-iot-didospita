@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <stdint.h>
 
-const uint64_t LOOP_DELAY_MS = 200;
+const uint64_t LOOP_DELAY_MS = 50;
 const uint8_t RANDOM_SEED_PIN = A1;
 
 const uint8_t SEQUENCE_LENGTH = 4;
@@ -11,8 +11,7 @@ const uint8_t SEQUENCE_LENGTH = 4;
 const uint8_t BUTTON_PINS[SEQUENCE_LENGTH] = {2, 3, 4, 5};
 
 const uint8_t CONTROL_LED_PIN = 11;
-// this value is divided by LOOP_DELAY_MS
-const uint16_t CONTROL_LED_FADE_AMOUNT = 5000;
+const uint16_t CONTROL_LED_FADE_AMOUNT = 20;
 
 const uint8_t GAME_LEDS_PINS[SEQUENCE_LENGTH] = {7, 8, 9, 10};
 
