@@ -19,28 +19,23 @@ void generateSequence(Sequence *const sequence) {
 void advanceSequence(Sequence *const sequence, const sequenceVal_t value) {
   assert(sequence->status == CONTINUE);
   assert(sequence->index >= 0 && sequence->index < SEQUENCE_LENGTH);
-  Serial.println("Valore pulsante premuto: " + String(value));
-  Serial.println("Valore della sequenza: " +
-                 String(sequence->values[sequence->index]));
   const bool correct = sequence->values[sequence->index] == value;
-  if (!correct) {
-    sequence->status = FAIL;
-  } else {
+  if (correct) {
     sequence->index++;
-    Serial.println("Indice della sequenza: " + String(sequence->index));
     if (sequence->index == SEQUENCE_LENGTH) {
-      Serial.println(sequence->index);
       sequence->status = COMPLETE;
     }
     // else remain in CONTINUE
+  } else {
+    sequence->status = FAIL;
   }
 }
 
-String getSequence(Sequence *const sequence) {
+String getSequenceString(Sequence *const sequence) {
   char seq[SEQUENCE_LENGTH + 1];
   for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
-    /* Sequence values are always single digit, so we can use buff[2] to store
-     * the digit and the null terminator */
+    // Sequence values are always single digit, so we can use buff[2] to store
+    // the digit and the null terminator
     char buff[2];
     sprintf(buff, "%d", sequence->values[i]);
     seq[i] = buff[0];

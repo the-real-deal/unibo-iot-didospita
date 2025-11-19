@@ -3,7 +3,6 @@
 #include "../lib/utils.hpp"
 #include "led.hpp"
 #include "lib/led.hpp"
-#include <assert.h>
 
 bool checkDebounce(const uint64_t interval_ms, const size_t index) {
   static uint64_t prevts[SEQUENCE_LENGTH] = {0};
@@ -19,6 +18,7 @@ void buttonPressed(const uint8_t pin, Game *const game, const size_t index) {
   if (checkDebounce(DEFAULT_DEBOUNCE_MS, index)) {
     return;
   }
+
   if (pin == BUTTON_PINS[WAKE_BTN_INDEX]) {
     switch (game->state) {
     case SLEEP:
@@ -36,9 +36,7 @@ void buttonPressed(const uint8_t pin, Game *const game, const size_t index) {
       break;
     }
   }
-
   if (game->state == PLAYING) {
-    assert(index != -1ul);
     turnOffAllGameLeds();
     turnOnLed(GAME_LEDS_PINS[index]);
     advanceSequence(&game->sequence, index + 1);

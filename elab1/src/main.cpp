@@ -18,6 +18,7 @@
 #include <Hashtable.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
+#include <assert.h>
 
 Sequence sequence;
 Timer timer;
@@ -48,6 +49,7 @@ void setup() {
 
     /* cache button indexes */
     const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
+    assert(index != -1ul);
     buttonIndexes.put(pin, index);
   }
 

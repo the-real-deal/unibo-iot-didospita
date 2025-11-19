@@ -20,4 +20,4 @@ struct Sequence {
 
 void generateSequence(Sequence *const sequence);
 void advanceSequence(Sequence *const sequence, const sequenceVal_t value);
-String getSequence(Sequence *const sequence);
+String getSequenceString(Sequence *const sequence);

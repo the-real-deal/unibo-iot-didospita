@@ -15,7 +15,7 @@ void i2cScan(const i2cScanCallback_t callback) {
         if (address < 16)
           Serial.print("0");
         Serial.print(address, HEX);
-        Serial.println(" !");
+        Serial.println("!");
         callback(address);
         found = 1;
       } else if (error == 4) {
@@ -25,5 +25,6 @@ void i2cScan(const i2cScanCallback_t callback) {
         Serial.println(address, HEX);
       }
     }
+    Serial.flush();
   }
 }

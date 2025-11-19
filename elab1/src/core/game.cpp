@@ -15,7 +15,10 @@ Game initGame() {
 
 void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
   static int32_t controlLedFade;
-  size_t difficulty;
+  const size_t difficulty =
+      readPotentiometer(POTENTIOMETER_PIN, N_DIFFICULTIES);
+  const bool isTimerEnded = timerEnded(&game->timer);
+
   switch (game->state) {
   case INITIAL:
     controlLedFade = 0;
@@ -24,8 +27,6 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     game->state = MENU;
     break;
   case MENU:
-    difficulty = readPotentiometer(POTENTIOMETER_PIN, N_DIFFICULTIES);
-
     if (difficulty != game->difficulty) {
       game->difficulty = difficulty;
       game->timer = initTimer(DIFFICULTY_SHOW_PERIOD_MS);
@@ -38,7 +39,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
       lcd->print("Press B1 to start");
       lcd->flush();
     }
-    if (timerEnded(&game->timer)) {
+    if (isTimerEnded) {
       game->state = SLEEP;
     }
     fadeLed(CONTROL_LED_PIN, &controlLedFade);
@@ -47,7 +48,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     lcd->setCursor(0, 0);
     lcd->print("Difficulty: " + String(game->difficulty + 1));
     lcd->flush();
-    if (timerEnded(&game->timer)) {
+    if (isTimerEnded) {
       game->state = INITIAL;
     }
     fadeLed(CONTROL_LED_PIN, &controlLedFade);
@@ -75,7 +76,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
   case STARTING_GAME:
     if (timerEnded(&game->timer)) {
       game->score = 0;
-      game->round = 0;
+      game->round = 20;
       game->state = INIT_ROUND;
     }
     break;
@@ -83,53 +84,55 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     turnOffLed(CONTROL_LED_PIN);
     turnOffAllGameLeds();
     generateSequence(&game->sequence);
+    game->timer = initTimer(
+        max(ROUND_PERIOD_MS - ((int64_t)DIFFICULTY_FACTORS[game->difficulty] *
+                               (int64_t)game->round),
+            (int64_t)ROUND_TIME_LBOUND_MS[game->difficulty]));
     lcd->clear();
     lcd->setCursor(0, 0);
     lcd->print("Round: " + String(game->round + 1));
     lcd->setCursor(0, 1);
-    lcd->print(getSequence(&game->sequence));
+    lcd->print(getSequenceString(&game->sequence));
     lcd->flush();
-    game->timer = initTimer(max(
-        ROUND_PERIOD_MS - (DIFFICULTY_FACTORS[game->difficulty] * game->round),
-        ROUND_TIME_LBOUND_MS[game->difficulty]));
-    Serial.println((int32_t)game->timer.period);
-    Serial.flush();
     game->state = PLAYING;
     break;
   case PLAYING:
-    if (timerEnded(&game->timer)) {
-      game->state = INIT_GAME_OVER;
+    if (isTimerEnded) {
       turnOnLed(CONTROL_LED_PIN);
       turnOffAllGameLeds();
       game->timer = initTimer(GAME_OVER_LED_PERIOD_MS);
+      game->state = INIT_GAME_OVER;
     } else {
-      if (game->sequence.status == COMPLETE) {
+      switch (game->sequence.status) {
+      case COMPLETE:
+        turnOnAllGameLeds();
         game->score += WIN_POINTS;
         game->round++;
+        game->timer = initTimer(WIN_PERIOD_MS);
         lcd->clear();
         lcd->setCursor(0, 0);
         lcd->print("GOOD! Score: " + String(game->score));
         lcd->flush();
-        game->timer = initTimer(WIN_PERIOD_MS);
-        turnOnAllGameLeds();
         game->state = WIN;
-      } else if (game->sequence.status == FAIL) {
+        break;
+      case FAIL:
         turnOnLed(CONTROL_LED_PIN);
         turnOffAllGameLeds();
         game->timer = initTimer(GAME_OVER_LED_PERIOD_MS);
         game->state = INIT_GAME_OVER;
-      } else {
-        game->state = PLAYING;
+        break;
+      default:
+        break;
       }
     }
     break;
   case WIN:
-    if (timerEnded(&game->timer)) {
+    if (isTimerEnded) {
       game->state = INIT_ROUND;
     }
     break;
   case INIT_GAME_OVER:
-    if (timerEnded(&game->timer)) {
+    if (isTimerEnded) {
       lcd->clear();
       lcd->setCursor(0, 0);
       lcd->print("Game Over");
@@ -142,7 +145,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     }
     break;
   case GAME_OVER:
-    if (timerEnded(&game->timer)) {
+    if (isTimerEnded) {
       game->state = INITIAL;
     }
     break;
