@@ -5,18 +5,18 @@
 #include "lib/led.hpp"
 #include <assert.h>
 
-bool checkDebounce(const uint64_t interval_ms) {
-  static uint64_t prevts = 0;
+bool checkDebounce(const uint64_t interval_ms, const size_t index) {
+  static uint64_t prevts[SEQUENCE_LENGTH] = {0};
   const uint64_t ts = millis();
-  if ((ts - prevts) > interval_ms) {
-    prevts = ts;
+  if ((ts - prevts[index]) > interval_ms) {
+    prevts[index] = ts;
     return false;
   }
   return true;
 }
 
-void buttonPressed(const uint8_t pin, Game *const game) {
-  if (checkDebounce(DEFAULT_DEBOUNCE_MS)) {
+void buttonPressed(const uint8_t pin, Game *const game, const size_t index) {
+  if (checkDebounce(DEFAULT_DEBOUNCE_MS, index)) {
     return;
   }
   if (pin == BUTTON_PINS[WAKE_BTN_INDEX]) {
@@ -38,7 +38,6 @@ void buttonPressed(const uint8_t pin, Game *const game) {
   }
 
   if (game->state == PLAYING) {
-    const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
     assert(index != -1ul);
     turnOffAllGameLeds();
     turnOnLed(GAME_LEDS_PINS[index]);

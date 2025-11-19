@@ -15,6 +15,7 @@
 #include "lib/utils.hpp"
 #include <Arduino.h>
 #include <EnableInterrupt.h>
+#include <Hashtable.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 
@@ -22,6 +23,7 @@ Sequence sequence;
 Timer timer;
 Game game;
 LiquidCrystal_I2C *lcd;
+Hashtable<int16_t, size_t> buttonIndexes; // uint8_t not supported as key
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -31,13 +33,22 @@ void setup() {
 
   for (size_t i = 0; i < SEQUENCE_LENGTH; i++) {
     /*BUTTON SETUP*/
-    /*al posto di inc ci va turn_on_led*/
+    const uint8_t pin = BUTTON_PINS[i];
     enableInterrupt(
-        BUTTON_PINS[i], []() { buttonPressed(arduinoInterruptedPin, &game); },
+        pin,
+        []() {
+          const uint8_t pin = arduinoInterruptedPin;
+          const size_t index = *buttonIndexes.get((int16_t)pin);
+          buttonPressed(pin, &game, index);
+        },
         RISING);
 
     /*LED SETUP*/
     pinMode(GAME_LEDS_PINS[i], OUTPUT);
+
+    /* cache button indexes */
+    const size_t index = indexOf<uint8_t>(BUTTON_PINS, SEQUENCE_LENGTH, pin);
+    buttonIndexes.put(pin, index);
   }
 
   pinMode(CONTROL_LED_PIN, OUTPUT);

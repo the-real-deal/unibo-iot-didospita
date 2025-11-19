@@ -29,7 +29,6 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     if (difficulty != game->difficulty) {
       game->difficulty = difficulty;
       game->timer = initTimer(DIFFICULTY_SHOW_PERIOD_MS);
-
       lcd->clear();
       game->state = SHOW_DIFFICULTY;
     } else {
@@ -46,7 +45,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     break;
   case SHOW_DIFFICULTY:
     lcd->setCursor(0, 0);
-    lcd->print("Difficulty: " + String(game->difficulty));
+    lcd->print("Difficulty: " + String(game->difficulty + 1));
     lcd->flush();
     if (timerEnded(&game->timer)) {
       game->state = INITIAL;
@@ -76,6 +75,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
   case STARTING_GAME:
     if (timerEnded(&game->timer)) {
       game->score = 0;
+      game->round = 0;
       game->state = INIT_ROUND;
     }
     break;
@@ -85,9 +85,15 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     generateSequence(&game->sequence);
     lcd->clear();
     lcd->setCursor(0, 0);
+    lcd->print("Round: " + String(game->round + 1));
+    lcd->setCursor(0, 1);
     lcd->print(getSequence(&game->sequence));
     lcd->flush();
-    game->timer = initTimer(ROUND_PERIOD_MS);
+    game->timer = initTimer(max(
+        ROUND_PERIOD_MS - (DIFFICULTY_FACTORS[game->difficulty] * game->round),
+        ROUND_TIME_LBOUND_MS[game->difficulty]));
+    Serial.println((int32_t)game->timer.period);
+    Serial.flush();
     game->state = PLAYING;
     break;
   case PLAYING:
@@ -95,12 +101,13 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
       game->state = INIT_GAME_OVER;
       turnOnLed(CONTROL_LED_PIN);
       turnOffAllGameLeds();
-      game->timer = initTimer(INIT_GAME_OVER_PERIOD_MS);
+      game->timer = initTimer(GAME_OVER_LED_PERIOD_MS);
     } else {
       if (game->sequence.status == COMPLETE) {
+        game->score += WIN_POINTS;
+        game->round++;
         lcd->clear();
         lcd->setCursor(0, 0);
-        game->score += 1;
         lcd->print("GOOD! Score: " + String(game->score));
         lcd->flush();
         game->timer = initTimer(WIN_PERIOD_MS);
@@ -109,7 +116,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
       } else if (game->sequence.status == FAIL) {
         turnOnLed(CONTROL_LED_PIN);
         turnOffAllGameLeds();
-        game->timer = initTimer(INIT_GAME_OVER_PERIOD_MS);
+        game->timer = initTimer(GAME_OVER_LED_PERIOD_MS);
         game->state = INIT_GAME_OVER;
       } else {
         game->state = PLAYING;

@@ -22,7 +22,8 @@ struct Game {
   GameState state;
   size_t difficulty;
   Sequence sequence;
-  uint8_t score;
+  uint8_t round;
+  uint32_t score;
   Timer timer;
 };
 
