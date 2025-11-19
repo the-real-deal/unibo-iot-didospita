@@ -7,32 +7,51 @@
 #include "led.hpp"
 
 Game initGame() {
-  return {
+  return Game{
       .state = INITIAL,
+      .difficulty = 0,
   };
 }
 
 void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
   static int32_t controlLedFade;
+  size_t difficulty;
   switch (game->state) {
   case INITIAL:
     controlLedFade = 0;
-    game->score = 0;
     game->timer = initTimer(IDLE_PERIOD_MS);
-
     lcd->clear();
-    lcd->setCursor(0, 0);
-    lcd->print("Welcome to TOS!");
-    lcd->setCursor(0, 1);
-    lcd->print("Press B1 to start");
-    lcd->flush();
     game->state = MENU;
     break;
   case MENU:
-    fadeLed(CONTROL_LED_PIN, &controlLedFade);
+    difficulty = readPotentiometer(POTENTIOMETER_PIN, N_DIFFICULTIES);
+
+    if (difficulty != game->difficulty) {
+      game->difficulty = difficulty;
+      game->timer = initTimer(DIFFICULTY_SHOW_PERIOD_MS);
+
+      lcd->clear();
+      game->state = SHOW_DIFFICULTY;
+    } else {
+      lcd->setCursor(0, 0);
+      lcd->print("Welcome to TOS!");
+      lcd->setCursor(0, 1);
+      lcd->print("Press B1 to start");
+      lcd->flush();
+    }
     if (timerEnded(&game->timer)) {
       game->state = SLEEP;
     }
+    fadeLed(CONTROL_LED_PIN, &controlLedFade);
+    break;
+  case SHOW_DIFFICULTY:
+    lcd->setCursor(0, 0);
+    lcd->print("Difficulty: " + String(game->difficulty));
+    lcd->flush();
+    if (timerEnded(&game->timer)) {
+      game->state = INITIAL;
+    }
+    fadeLed(CONTROL_LED_PIN, &controlLedFade);
     break;
   case SLEEP:
     turnOffLed(CONTROL_LED_PIN);
@@ -42,6 +61,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     lcd->print("Press B1 to");
     lcd->setCursor(0, 1);
     lcd->print("wake up");
+    lcd->flush();
     deepSleep();
     break;
   case INIT_GAME:
@@ -55,6 +75,7 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
     break;
   case STARTING_GAME:
     if (timerEnded(&game->timer)) {
+      game->score = 0;
       game->state = INIT_ROUND;
     }
     break;
@@ -112,13 +133,11 @@ void gameStep(Game *const game, LiquidCrystal_I2C *const lcd) {
       game->timer = initTimer(GAME_OVER_PERIOD_MS);
       game->state = GAME_OVER;
     }
+    break;
   case GAME_OVER:
     if (timerEnded(&game->timer)) {
       game->state = INITIAL;
     }
-    break;
-  default:
-    game->state = INITIAL;
     break;
   }
 }

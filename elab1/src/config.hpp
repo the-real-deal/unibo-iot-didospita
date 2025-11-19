@@ -26,8 +26,9 @@ const uint64_t IDLE_PERIOD_MS = 10 * 1000;
 const size_t WAKE_BTN_INDEX = 0;
 
 const uint64_t ROUND_PERIOD_MS = 10 * 1000;
-const uint64_t N_DIFFICULTIES = 4;
+const size_t N_DIFFICULTIES = 4;
 const uint64_t DIFFICULTY_FACTORS[N_DIFFICULTIES] = {250, 500, 750, 1000};
+const uint64_t DIFFICULTY_SHOW_PERIOD_MS = 500;
 
 const uint64_t INIT_GAME_PERIOD_MS = 2 * 1000;
 const uint64_t WIN_PERIOD_MS = 5 * 1000;

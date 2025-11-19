@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 Timer initTimer(const uint64_t period) {
-  return {
+  return Timer{
       .period = period,
       .startTime = millis(),
   };
