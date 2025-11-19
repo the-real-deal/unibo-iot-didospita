@@ -1,7 +1,6 @@
 // define before EnableInterrupt.h to provide arduinoInterruptedPin
 //
-// https://
-// github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
+// https://github.com/GreyGnome/EnableInterrupt?tab=readme-ov-file#determine-the-pin-that-was-interrupted
 #define EI_ARDUINO_INTERRUPTED_PIN
 
 #include "config.hpp"
