@@ -29,6 +29,10 @@
               arduino
               arduino-core
               avrdude
+              # java
+              javaPackages.compiler.openjdk21
+              # build tools
+              make
             ];
             shellHook = ''
               set -a
