@@ -10,9 +10,9 @@ enum class PinType : uint8_t {
 
 class BasePin {
 protected:
-  const uint8_t pin;
-  const PinType type;
-  BasePin(const uint8_t pin, const PinType type);
+  uint8_t pin;
+  PinType type;
+  BasePin(uint8_t pin, PinType type);
 
 public:
   uint8_t getPin();
@@ -26,29 +26,30 @@ enum class DigitalValue : uint8_t {
 
 class DigitalOutputPin : public BasePin {
 public:
-  DigitalOutputPin(const uint8_t pin);
-  void write(const DigitalValue status);
+  DigitalOutputPin(uint8_t pin);
+  void write(DigitalValue status);
 };
 
 class DigitalInputPin : public BasePin {
 public:
-  DigitalInputPin(const uint8_t pin);
+  DigitalInputPin(uint8_t pin);
   DigitalValue read();
 };
 
 class AnalogOutputPin : public BasePin {
 public:
-  AnalogOutputPin(const uint8_t pin);
-  void write(const uint8_t value);
+  AnalogOutputPin(uint8_t pin);
+  void write(uint8_t value);
 };
 
 class AnalogInputPin : public BasePin {
 private:
   static const uint64_t MAX_READ_VALUE = 1023;
-  const size_t scale;
+  size_t scale;
 
 public:
-  AnalogInputPin(const uint8_t pin, const size_t scale);
+  static const size_t NO_SCALE = 0;
+  AnalogInputPin(uint8_t pin, size_t scale = AnalogInputPin::NO_SCALE);
   double read();
   size_t scaledRead();
 };

@@ -1,14 +1,21 @@
 #pragma once
 
-#include "../core/tasks.hpp"
+#include "TestSensor.hpp"
+#include "core/tasks.hpp"
+
+class TestTaskAction;
 
 class TestTask : public Task<TestTask> {
+  friend TestTaskAction;
+
+private:
+  TestSensor *testSensor;
+
 public:
-  TestTask();
+  TestTask(TestSensor *testSensor);
 };
 
 class TestTaskAction : public TaskAction<TestTask> {
 public:
-  TestTaskAction();
-  void step(const TestTask *task, const uint64_t elapsedTime) override;
+  void step(TestTask *task, uint64_t elapsedTime) override;
 };

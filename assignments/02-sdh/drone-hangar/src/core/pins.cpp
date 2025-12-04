@@ -1,6 +1,7 @@
 #include "pins.hpp"
+#include <assert.h>
 
-BasePin::BasePin(const uint8_t pin, const PinType type) : pin(pin), type(type) {
+BasePin::BasePin(uint8_t pin, PinType type) : pin(pin), type(type) {
   pinMode(this->pin, static_cast<uint8_t>(type));
 }
 
@@ -8,28 +9,24 @@ uint8_t BasePin::getPin() { return this->pin; }
 
 PinType BasePin::getType() { return this->type; }
 
-DigitalOutputPin::DigitalOutputPin(const uint8_t pin)
+DigitalOutputPin::DigitalOutputPin(uint8_t pin)
     : BasePin(pin, PinType::Output) {}
 
-void DigitalOutputPin::write(const DigitalValue value) {
+void DigitalOutputPin::write(DigitalValue value) {
   digitalWrite(this->pin, static_cast<uint8_t>(value));
 }
 
-DigitalInputPin::DigitalInputPin(const uint8_t pin)
-    : BasePin(pin, PinType::Input) {}
+DigitalInputPin::DigitalInputPin(uint8_t pin) : BasePin(pin, PinType::Input) {}
 
 DigitalValue DigitalInputPin::read() {
   return static_cast<DigitalValue>(digitalRead(this->pin));
 }
 
-AnalogOutputPin::AnalogOutputPin(const uint8_t pin)
-    : BasePin(pin, PinType::Output) {}
+AnalogOutputPin::AnalogOutputPin(uint8_t pin) : BasePin(pin, PinType::Output) {}
 
-void AnalogOutputPin::write(const uint8_t value) {
-  analogWrite(this->pin, value);
-}
+void AnalogOutputPin::write(uint8_t value) { analogWrite(this->pin, value); }
 
-AnalogInputPin::AnalogInputPin(const uint8_t pin, const size_t scale)
+AnalogInputPin::AnalogInputPin(uint8_t pin, size_t scale)
     : BasePin(pin, PinType::Input), scale(scale) {}
 
 double AnalogInputPin::read() {
@@ -38,5 +35,6 @@ double AnalogInputPin::read() {
 }
 
 size_t AnalogInputPin::scaledRead() {
+  assert(this->scale != AnalogInputPin::NO_SCALE);
   return floor(this->read() * this->scale);
 }

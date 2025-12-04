@@ -1,5 +1,19 @@
+#include "core/scheduler.hpp"
+#include "tasks/TestTask.hpp"
 #include <Arduino.h>
 
-void setup() {}
+Scheduler *scheduler;
+TestSensor *sensor;
 
-void loop() {}
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) {
+  }
+
+  scheduler = new Scheduler(500);
+  sensor = new TestSensor(A0);
+  scheduler->addInput(sensor);
+  scheduler->addThread(new TestTask(sensor));
+}
+
+void loop() { scheduler->advance(); }
