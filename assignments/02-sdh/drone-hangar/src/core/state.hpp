@@ -1,12 +1,12 @@
 #pragma once
 
-#include <Arduino.h>
 #include "serial.hpp"
+#include <Arduino.h>
 
 enum class StateType {
-    INSIDE,
-    OUTSIDE,
-    ALARM,
+  INSIDE,
+  OUTSIDE,
+  ALARM,
 };
 const String STATE_TYPE_STRINGS[] = {
     "INSIDE",
@@ -14,14 +14,13 @@ const String STATE_TYPE_STRINGS[] = {
     "ALARM",
 };
 
-
 class StateManager {
 private:
-    StateType state;
-    SerialManager* serialManager;
-public:
-    StateManager(StateType state, SerialManager* serialManager);
-    void setState(StateType state);
-    StateType getState();
-};
+  StateType state;
+  SerialManager *serialManager;
 
+public:
+  StateManager(StateType state, SerialManager *serialManager);
+  void setState(StateType state);
+  StateType getState();
+};

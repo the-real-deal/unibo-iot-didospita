@@ -1,32 +1,32 @@
-#pragma once 
+#pragma once
 
+#include "scheduler.hpp"
 #include <Arduino.h>
 #include <LinkedList.h>
-#include "scheduler.hpp"
 
 enum class MessageType {
-    STATE,
-    DISTANCE,
+  STATE,
+  DISTANCE,
 };
 const String MESSAGE_TYPE_STRINGS[] = {
-  "STATE",
-  "DISTANCE",
+    "STATE",
+    "DISTANCE",
 };
 
 class Message {
 private:
-    String content;
-    MessageType type;
-public:
-    static const char DELIMITER = '|';
-    static const char TERMINATOR = '\n';
+  String content;
+  MessageType type;
 
-    Message(String message);
-    Message(MessageType type, String content);
-    MessageType getType();
-    String getContent();
-    String toString();
-    
+public:
+  static const char DELIMITER = '|';
+  static const char TERMINATOR = '\n';
+
+  Message(String message);
+  Message(MessageType type, String content);
+  MessageType getType();
+  String getContent();
+  String toString();
 };
 
 class SerialManager : public ExternalInput {
@@ -37,7 +37,5 @@ public:
   Message getMessage();
   bool messageAvailable();
   void read() override;
-  void send(Message* message);
+  void send(Message *message);
 };
-
-

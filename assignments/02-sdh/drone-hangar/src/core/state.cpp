@@ -1,11 +1,8 @@
 #include "state.hpp"
 
-StateManager::StateManager(StateType state, SerialManager* serialManager) : state(state), serialManager(serialManager) {}
+StateManager::StateManager(StateType state, SerialManager *serialManager)
+    : state(state), serialManager(serialManager) {}
 
-void StateManager::setState(StateType state) {
-    this->state = state;
-}
+void StateManager::setState(StateType state) { this->state = state; }
 
-StateType StateManager::getState() {
-    return this->state;
-}
+StateType StateManager::getState() { return this->state; }
