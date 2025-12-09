@@ -32,7 +32,7 @@
               # java
               javaPackages.compiler.openjdk21
               # build tools
-              make
+              gnumake
             ];
             shellHook = ''
               set -a
