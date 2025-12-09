@@ -86,6 +86,8 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
             		
             		msg = msg.replaceAll("\r", "");
             		
+					/* VERIFICARE SE IL MESSAGGIO INIZIA IN UN CERTO MODO ALLORA LO CONSIDERA
+					ALTRIMENTI LO SCARTA  */
             		currentMsg.append(msg);
             		
             		boolean goAhead = true;
