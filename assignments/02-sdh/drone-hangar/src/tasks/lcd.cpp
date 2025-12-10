@@ -1,6 +1,6 @@
 #include "lcd.hpp"
 #include "blocking.hpp"
-#include "core/utils.hpp"
+#include "utils.hpp"
 
 LCDTask::LCDTask(LiquidCrystal_I2C *lcd)
     : Task<LCDTask>(new LCDTask::PrintStateAction()), lcd(lcd) {
