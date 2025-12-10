@@ -7,7 +7,7 @@ template <typename T, typename B, typename A>
 class BlockedTaskAction : public TaskAction<T> {
 private:
   B blockingState;
-  A *returningAction;
+  A *returningAction; // just holds the reference to pass to switchAction
 
 public:
   BlockedTaskAction(B blockingState, A *returningAction)
@@ -20,3 +20,12 @@ public:
     task->switchAction(returningAction);
   }
 };
+
+template <typename T>
+void blockOnAlarm(T *task, StateManager *stateManager,
+                  TaskAction<T> *returnAction) {
+  if (stateManager->getState() == StateType::ALARM) {
+    task->switchAction(new BlockedTaskAction<T, StateType, TaskAction<T>>(
+        StateType::ALARM, returnAction));
+  }
+}

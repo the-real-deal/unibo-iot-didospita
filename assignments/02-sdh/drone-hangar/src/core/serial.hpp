@@ -30,10 +30,10 @@ public:
 
 class SerialManager : public ExternalInput {
 private:
-  LinkedList<Message *> *queue;
+  LinkedList<Message *> queue;
 
 public:
-  SerialManager();
+  SerialManager(unsigned long baud);
   Message *getMessage(MessageType type);
   bool messageAvailable();
   void read() override;

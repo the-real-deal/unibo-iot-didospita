@@ -28,13 +28,19 @@ String Message::toString() {
          Message::DELIMITER + this->content + Message::DELIMITER;
 }
 
+SerialManager::SerialManager(unsigned long baud) : queue() {
+  Serial.begin(baud);
+  while (!Serial) {
+  }
+}
+
 Message *SerialManager::getMessage(MessageType type) {
   if (!this->messageAvailable()) {
     return nullptr;
   }
   int index = -1;
-  for (int i = 0; i < this->queue->size(); i++) {
-    Message *message = this->queue->get(i);
+  for (int i = 0; i < this->queue.size(); i++) {
+    Message *message = this->queue.get(i);
     if (message->getType() == type) {
       index = i;
       break;
@@ -43,14 +49,12 @@ Message *SerialManager::getMessage(MessageType type) {
   if (index == -1) {
     return nullptr;
   }
-  Message *message = this->queue->get(index);
-  this->queue->remove(index);
+  Message *message = this->queue.get(index);
+  this->queue.remove(index);
   return message;
 }
 
-SerialManager::SerialManager() : queue(new LinkedList<Message *>()) {}
-
-bool SerialManager::messageAvailable() { return this->queue->size() != 0; }
+bool SerialManager::messageAvailable() { return this->queue.size() != 0; }
 
 void SerialManager::read() {
   String content;
@@ -65,7 +69,7 @@ void SerialManager::read() {
       content += ch;
     }
     if (delimiters == 3) {
-      this->queue->add(new Message(content));
+      this->queue.add(new Message(content));
       content = String();
       delimiters = 0;
     }

@@ -14,11 +14,15 @@ template <class T> class Task : public LogicThread {
 public:
   TaskAction<T> *action;
 
-  Task(TaskAction<T> *initialAction) { this->switchAction(initialAction); };
+  Task(TaskAction<T> *initialAction) : action(initialAction) {};
+  ~Task() { delete this->action; };
 
   void step(uint64_t elapsedTime, StateManager *stateManager) override {
     this->action->step(static_cast<T *>(this), elapsedTime, stateManager);
   };
 
-  void switchAction(TaskAction<T> *action) { this->action = action; }
+  void switchAction(TaskAction<T> *action) {
+    delete this->action;
+    this->action = action;
+  }
 };

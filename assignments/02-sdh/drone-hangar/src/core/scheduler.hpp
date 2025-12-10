@@ -22,10 +22,10 @@ public:
 
 class Scheduler {
 private:
-  Timer *timer;
-  StateManager *stateManager;
-  LinkedList<ExternalInput *> *inputs;
-  LinkedList<LogicThread *> *threads;
+  Timer timer;
+  StateManager stateManager;
+  LinkedList<ExternalInput *> inputs;
+  LinkedList<LogicThread *> threads;
 
 public:
   Scheduler(int period, StateType initialState);

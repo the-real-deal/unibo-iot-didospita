@@ -14,5 +14,4 @@ T enumFromString(const String &value, const String (&enumStrings)[N]) {
       return static_cast<T>(i);
   }
   assert(false);
-  return static_cast<T>(0); // avoid "no return" when asserts are disabled
 }

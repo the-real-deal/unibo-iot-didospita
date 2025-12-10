@@ -1,7 +1,6 @@
-#include "LCDTask.hpp"
-#include "BlockedTaskAction.hpp"
+#include "lcd.hpp"
+#include "blocking.hpp"
 #include "core/utils.hpp"
-#include "utils.hpp"
 
 LCDTask::LCDTask(LiquidCrystal_I2C *lcd)
     : Task<LCDTask>(new LCDTask::PrintStateAction()), lcd(lcd) {
@@ -21,7 +20,7 @@ void LCDTask::PrintStateAction::step(LCDTask *task, uint64_t elapsedTime,
 
 void LCDTask::IdleAction::step(LCDTask *task, uint64_t elapsedTime,
                                StateManager *stateManager) {
-  blockOnAlarm(task, stateManager, this);
+  blockOnAlarm(task, stateManager, new LCDTask::IdleAction());
   if (stateManager->hasPreviousState() &&
       stateManager->getPreviousState() != stateManager->getState()) {
     task->switchAction(new LCDTask::PrintStateAction());
