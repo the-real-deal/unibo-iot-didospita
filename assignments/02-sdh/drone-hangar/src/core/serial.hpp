@@ -15,12 +15,11 @@ const String MESSAGE_TYPE_STRINGS[] = {
 
 class Message {
 private:
-  String content;
   MessageType type;
+  String content;
 
 public:
   static const char DELIMITER = '|';
-  static const char TERMINATOR = '\n';
 
   Message(String message);
   Message(MessageType type, String content);
@@ -31,10 +30,11 @@ public:
 
 class SerialManager : public ExternalInput {
 private:
-  LinkedList<Message> queue;
+  LinkedList<Message *> *queue;
 
 public:
-  Message getMessage();
+  SerialManager();
+  Message *getMessage(MessageType type);
   bool messageAvailable();
   void read() override;
   void send(Message *message);

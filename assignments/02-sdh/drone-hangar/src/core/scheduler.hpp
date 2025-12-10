@@ -1,5 +1,6 @@
 #pragma once
 
+#include "state.hpp"
 #include "timer.hpp"
 #include <LinkedList.h>
 #include <stdint.h>
@@ -9,7 +10,7 @@ class Scheduler;
 // interfaces to not work directly with tasks and sensors to avoid generics
 class LogicThread {
 public:
-  virtual void step(uint64_t elapsedTime) = 0;
+  virtual void step(uint64_t elapsedTime, StateManager *stateManager) = 0;
   virtual ~LogicThread() = default;
 };
 
@@ -21,12 +22,13 @@ public:
 
 class Scheduler {
 private:
-  Timer timer;
-  LinkedList<ExternalInput *> inputs;
-  LinkedList<LogicThread *> threads;
+  Timer *timer;
+  StateManager *stateManager;
+  LinkedList<ExternalInput *> *inputs;
+  LinkedList<LogicThread *> *threads;
 
 public:
-  Scheduler(int period);
+  Scheduler(int period, StateType initialState);
   void addInput(ExternalInput *input);
   void addThread(LogicThread *thread);
   void advance();

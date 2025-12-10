@@ -1,26 +1,30 @@
 #pragma once
 
-#include "serial.hpp"
 #include <Arduino.h>
 
 enum class StateType {
   INSIDE,
   OUTSIDE,
   ALARM,
+  TAKEOFF,
+  LANDING,
 };
 const String STATE_TYPE_STRINGS[] = {
-    "INSIDE",
-    "OUTSIDE",
-    "ALARM",
+    "DRONE INSIDE", "DRONE OUTSIDE", "ALARM", "TAKEOFF", "LANDING",
 };
 
 class StateManager {
 private:
   StateType state;
-  SerialManager *serialManager;
+  StateType previousState;
+  StateType stateCandidate;
+  bool hasPrevious;
 
 public:
-  StateManager(StateType state, SerialManager *serialManager);
-  void setState(StateType state);
+  StateManager(StateType initialState);
   StateType getState();
+  bool hasPreviousState();
+  StateType getPreviousState();
+  void setState(StateType state);
+  void switchState();
 };

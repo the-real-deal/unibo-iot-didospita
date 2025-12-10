@@ -1,24 +1,25 @@
+#include "core/i2c.hpp"
 #include "core/scheduler.hpp"
-#include "tasks/TestTask.hpp"
 #include "core/serial.hpp"
 #include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+#include <assert.h>
 
 Scheduler *scheduler;
-TestSensor *sensor;
 SerialManager *serialManager;
+LiquidCrystal_I2C *lcd;
 
 void setup() {
   Serial.begin(9600);
   while (!Serial) {
   }
 
-  scheduler = new Scheduler(500);
-  sensor = new TestSensor(A0);
+  int lcdAddress = i2cScan();
+  assert(lcdAddress != -1);
+  lcd = new LiquidCrystal_I2C(lcdAddress, 16, 2);
+  scheduler = new Scheduler(500, StateType::INSIDE);
   serialManager = new SerialManager();
-  scheduler->addInput(sensor);
   scheduler->addInput(serialManager);
-  scheduler->addThread(new TestTask(sensor));
-
 }
 
 void loop() { scheduler->advance(); }
