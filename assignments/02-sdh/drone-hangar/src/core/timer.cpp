@@ -12,12 +12,17 @@ void Timer::start() {
 
 void Timer::stop() { this->running = false; }
 
+uint64_t Timer::elapsed() {
+  assert(this->running);
+  millis() - this->startTime;
+}
+
 uint64_t Timer::wait() {
   assert(this->running);
-  uint64_t elapsed;
+  uint64_t total;
   do {
-    elapsed = millis() - this->startTime;
-  } while (elapsed < this->period);
+    total = this->elapsed();
+  } while (total < this->period);
   this->startTime = millis();
-  return elapsed;
+  return total;
 }

@@ -12,5 +12,6 @@ public:
   Timer(uint64_t period);
   void start();
   void stop();
+  uint64_t elapsed();
   uint64_t wait();
 };
