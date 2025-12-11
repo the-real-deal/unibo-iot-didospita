@@ -18,9 +18,6 @@ private:
   T _stateCandidate;
   bool _hasPreviousState;
   uint64_t _elapsed;
-  Context(int period, T initialState)
-      : _timer(period), _state(initialState), _previousState(initialState),
-        _hasPreviousState(false), _elapsed(0) {}
 
   void waitTimer() { this->_elapsed = this->_timer.wait(); }
 
@@ -31,6 +28,10 @@ private:
   };
 
 public:
+  Context(int period, T initialState)
+      : _timer(period), _state(initialState), _previousState(initialState),
+        _hasPreviousState(false), _elapsed(0) {}
+
   T state() { return this->_state; };
   T previousState() {
     assert(this->hasPreviousState());
