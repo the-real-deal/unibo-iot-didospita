@@ -25,6 +25,7 @@ template <typename T>
 void blockOnAlarm(T *task, StateManager *stateManager,
                   TaskAction<T> *returnAction) {
   if (stateManager->getState() == StateType::ALARM) {
+    Serial.println("ALARM");
     task->switchAction(new BlockedTaskAction<T, StateType, TaskAction<T>>(
         StateType::ALARM, returnAction));
   }

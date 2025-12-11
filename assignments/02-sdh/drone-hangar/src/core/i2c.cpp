@@ -13,7 +13,7 @@ int i2cScan() {
       if (address < 16) {
         Serial.print("0");
       }
-      Serial.print(address, HEX);
+      Serial.println(address, HEX);
       startAddress = address + 1;
       return address;
     } else if (error == 4) {

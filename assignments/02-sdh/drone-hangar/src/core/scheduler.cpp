@@ -1,4 +1,5 @@
 #include "scheduler.hpp"
+#include "utils.hpp"
 #include <Arduino.h>
 
 Scheduler::Scheduler(int period, StateType initialState)
@@ -9,7 +10,11 @@ void Scheduler::addInput(ExternalInput *sensor) { this->inputs.add(sensor); }
 void Scheduler::addThread(LogicThread *thread) { this->threads.add(thread); }
 void Scheduler::advance() {
   uint64_t elapsed = this->timer.wait();
-  Serial.println("Elapsed: " + String((unsigned long)elapsed));
+  Serial.print("Elapsed: ");
+  Serial.println((unsigned long)elapsed);
+  Serial.print("State: ");
+  Serial.println(
+      enumToString(this->stateManager.getState(), STATE_TYPE_STRINGS));
   noInterrupts();
   for (int i = 0; i < this->inputs.size(); i++) {
     ExternalInput *input = this->inputs.get(i);
