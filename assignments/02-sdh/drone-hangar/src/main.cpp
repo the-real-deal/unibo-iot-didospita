@@ -19,25 +19,25 @@ private:
   uint64_t total;
 
 public:
-  void step(uint64_t elapsedTime, StateManager *stateManager) override {
-    this->total += elapsedTime;
+  void step(SchedulerContext *context) override {
+    this->total += context->elapsed();
     Serial.print("Testing: ");
     Serial.println((int)this->total);
     if (this->total < 4 * 1000) {
       return;
     }
-    switch (stateManager->getState()) {
-    case StateType::INSIDE:
-      stateManager->setState(StateType::TAKEOFF);
+    switch (context->state()) {
+    case StateType::Inside:
+      context->setState(StateType::Takeoff);
       break;
-    case StateType::TAKEOFF:
-      stateManager->setState(StateType::OUTSIDE);
+    case StateType::Takeoff:
+      context->setState(StateType::Outside);
       break;
-    case StateType::OUTSIDE:
-      stateManager->setState(StateType::LANDING);
+    case StateType::Outside:
+      context->setState(StateType::Landing);
       break;
-    case StateType::LANDING:
-      stateManager->setState(StateType::INSIDE);
+    case StateType::Landing:
+      context->setState(StateType::Inside);
       break;
     default:
       break;
@@ -47,7 +47,7 @@ public:
 };
 
 void setup() {
-  scheduler = new Scheduler(SCHEDULER_PERIOD, StateType::INSIDE);
+  scheduler = new Scheduler(SCHEDULER_PERIOD, StateType::Inside);
 
   serialManager = new SerialManager(SERIAL_BAUD);
   scheduler->addInput(serialManager);

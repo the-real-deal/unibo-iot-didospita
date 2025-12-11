@@ -3,18 +3,17 @@
 #include <Arduino.h>
 
 Scheduler::Scheduler(int period, StateType initialState)
-    : timer(period), stateManager(initialState), inputs(), threads() {}
+    : context(period, initialState), inputs(), threads() {}
 
 void Scheduler::addInput(ExternalInput *sensor) { this->inputs.add(sensor); }
 
 void Scheduler::addThread(LogicThread *thread) { this->threads.add(thread); }
 void Scheduler::advance() {
-  uint64_t elapsed = this->timer.wait();
+  this->context.waitTimer();
   Serial.print("Elapsed: ");
-  Serial.println((unsigned long)elapsed);
+  Serial.println((unsigned long)this->context.elapsed());
   Serial.print("State: ");
-  Serial.println(
-      enumToString(this->stateManager.getState(), STATE_TYPE_STRINGS));
+  Serial.println(enumToString(this->context.state(), STATE_TYPE_STRINGS));
   noInterrupts();
   for (int i = 0; i < this->inputs.size(); i++) {
     ExternalInput *input = this->inputs.get(i);
@@ -23,8 +22,8 @@ void Scheduler::advance() {
   interrupts();
   for (int i = 0; i < this->threads.size(); i++) {
     LogicThread *thread = this->threads.get(i);
-    thread->step(elapsed, &this->stateManager);
+    thread->step(&this->context);
   }
-  this->stateManager.switchState();
+  this->context.switchState();
   Serial.println("------------");
 }

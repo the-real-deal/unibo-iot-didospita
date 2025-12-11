@@ -11,14 +11,12 @@ private:
 
   class OpenAction : public TaskAction<DoorTask> {
   public:
-    void step(DoorTask *task, uint64_t elapsedTime,
-              StateManager *stateManager) override;
+    void step(DoorTask *task, SchedulerContext *context) override;
   };
 
   class CloseAction : public TaskAction<DoorTask> {
   public:
-    void step(DoorTask *task, uint64_t elapsedTime,
-              StateManager *stateManager) override;
+    void step(DoorTask *task, SchedulerContext *context) override;
   };
 
 public:

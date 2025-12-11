@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/state.hpp"
 #include "core/tasks.hpp"
 
 template <typename T, typename B, typename A>
@@ -12,9 +11,8 @@ private:
 public:
   BlockedTaskAction(B blockingState, A *returningAction)
       : blockingState(blockingState), returningAction(returningAction) {}
-  void step(T *task, uint64_t elapsedTime,
-            StateManager *stateManager) override {
-    if (stateManager->getState() == blockingState) {
+  void step(T *task, SchedulerContext *context) override {
+    if (context->state() == blockingState) {
       return;
     }
     task->switchAction(returningAction);
@@ -22,11 +20,11 @@ public:
 };
 
 template <typename T>
-void blockOnAlarm(T *task, StateManager *stateManager,
+void blockOnAlarm(T *task, SchedulerContext *context,
                   TaskAction<T> *returnAction) {
-  if (stateManager->getState() == StateType::ALARM) {
+  if (context->state() == StateType::Alarm) {
     Serial.println("ALARM");
     task->switchAction(new BlockedTaskAction<T, StateType, TaskAction<T>>(
-        StateType::ALARM, returnAction));
+        StateType::Alarm, returnAction));
   }
 }

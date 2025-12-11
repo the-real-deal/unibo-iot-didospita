@@ -9,20 +9,18 @@ LCDTask::LCDTask(LiquidCrystal_I2C *lcd)
   this->lcd->clear();
 }
 
-void LCDTask::PrintStateAction::step(LCDTask *task, uint64_t elapsedTime,
-                                     StateManager *stateManager) {
+void LCDTask::PrintStateAction::step(LCDTask *task, SchedulerContext *context) {
   task->lcd->clear();
   task->lcd->setCursor(0, 0);
-  String message = enumToString(stateManager->getState(), STATE_TYPE_STRINGS);
+  String message = enumToString(context->state(), STATE_TYPE_STRINGS);
   task->lcd->println(message);
   task->switchAction(new LCDTask::IdleAction());
 }
 
-void LCDTask::IdleAction::step(LCDTask *task, uint64_t elapsedTime,
-                               StateManager *stateManager) {
-  blockOnAlarm(task, stateManager, new LCDTask::IdleAction());
-  if (stateManager->hasPreviousState() &&
-      stateManager->getPreviousState() != stateManager->getState()) {
+void LCDTask::IdleAction::step(LCDTask *task, SchedulerContext *context) {
+  blockOnAlarm(task, context, new LCDTask::IdleAction());
+  if (context->hasPreviousState() &&
+      context->previousState() != context->state()) {
     task->switchAction(new LCDTask::PrintStateAction());
   }
 }

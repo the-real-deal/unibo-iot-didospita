@@ -9,14 +9,12 @@ private:
 
   class PrintStateAction : public TaskAction<LCDTask> {
   public:
-    void step(LCDTask *task, uint64_t elapsedTime,
-              StateManager *stateManager) override;
+    void step(LCDTask *task, SchedulerContext *context) override;
   };
 
   class IdleAction : public TaskAction<LCDTask> {
   public:
-    void step(LCDTask *task, uint64_t elapsedTime,
-              StateManager *stateManager) override;
+    void step(LCDTask *task, SchedulerContext *context) override;
   };
 
 public:
