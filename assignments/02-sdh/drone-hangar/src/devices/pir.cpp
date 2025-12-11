@@ -1,5 +1,7 @@
 #include "pir.hpp"
 
-PIR::PIR(uint8_t pin) : pin(pin) {}
+PIRSensor::PIRSensor(uint8_t pin) : pin(pin), value(DigitalValue::Low) {}
 
-void PIR::read() { this->value = this->pin.read(); }
+void PIRSensor::read() { this->value = this->pin.read(); }
+
+bool PIRSensor::isPresent() { return this->value == DigitalValue::High; }

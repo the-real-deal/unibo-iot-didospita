@@ -3,25 +3,25 @@
 #include "scheduler.hpp"
 #include <stdint.h>
 
-template <class T> class TaskAction {
+template <class T> class TaskState {
 public:
   virtual void step(T *task, SchedulerContext *context) = 0;
-  virtual ~TaskAction() = default;
+  virtual ~TaskState() = default;
 };
 
 template <class T> class Task : public LogicThread {
 public:
-  TaskAction<T> *action;
+  TaskState<T> *state;
 
-  Task(TaskAction<T> *initialAction) : action(initialAction) {};
-  ~Task() { delete this->action; };
+  Task(TaskState<T> *initialState) : state(initialState) {};
+  ~Task() { delete this->state; };
 
   void step(SchedulerContext *context) override {
-    this->action->step(static_cast<T *>(this), context);
+    this->state->step(static_cast<T *>(this), context);
   };
 
-  void switchAction(TaskAction<T> *action) {
-    delete this->action;
-    this->action = action;
+  void switchTo(TaskState<T> *state) {
+    delete this->state;
+    this->state = state;
   }
 };

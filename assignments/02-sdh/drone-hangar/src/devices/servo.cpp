@@ -1,18 +1,17 @@
 #include "servo.hpp"
 #include <Arduino.h>
 
-ServoMotor::ServoMotor(uint8_t pin, int initialAngle, int min, int max)
-    : pin(pin), servo(), angle(initialAngle) {
+ArduinoServoMotor::ArduinoServoMotor(uint8_t pin, int initialAngle, int min,
+                                     int max)
+    : servo(), angle(initialAngle) {
   this->servo.attach(pin, min, max);
   while (!this->servo.attached())
     ;
+  this->setAngle(initialAngle);
 }
 
-int ServoMotor::getAngle() { return this->angle; }
+void ArduinoServoMotor::read() { this->angle = this->servo.read(); }
 
-void ServoMotor::setAngle(int angle) {
-  Serial.print("Servo: ");
-  Serial.println(angle);
-  this->angle = angle;
-  this->servo.write(angle);
-}
+int ArduinoServoMotor::getAngle() { return this->angle; }
+
+void ArduinoServoMotor::setAngle(int angle) { this->servo.write(angle); }

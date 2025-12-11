@@ -4,12 +4,12 @@
 
 class Timer {
 private:
-  uint64_t period;
+  uint64_t periodMillis;
   uint64_t startTime;
   bool running;
 
 public:
-  Timer(uint64_t period);
+  Timer(uint64_t periodMillis);
   void start();
   void stop();
   uint64_t elapsed();

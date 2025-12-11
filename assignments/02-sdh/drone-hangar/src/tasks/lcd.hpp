@@ -5,14 +5,14 @@
 
 class LCDTask : public Task<LCDTask> {
 private:
-  LiquidCrystal_I2C *lcd; // just holds the reference, does not own it
+  LiquidCrystal_I2C *lcd;
 
-  class PrintStateAction : public TaskAction<LCDTask> {
+  class PrintStateAction : public TaskState<LCDTask> {
   public:
     void step(LCDTask *task, SchedulerContext *context) override;
   };
 
-  class IdleAction : public TaskAction<LCDTask> {
+  class IdleAction : public TaskState<LCDTask> {
   public:
     void step(LCDTask *task, SchedulerContext *context) override;
   };

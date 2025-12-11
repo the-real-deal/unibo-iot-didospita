@@ -34,6 +34,8 @@ class DigitalInputPin : public BasePin {
 public:
   DigitalInputPin(uint8_t pin);
   DigitalValue read();
+  uint64_t readPulse(DigitalValue value);
+  uint64_t readPulse(DigitalValue value, uint64_t timeout);
 };
 
 class AnalogOutputPin : public BasePin {

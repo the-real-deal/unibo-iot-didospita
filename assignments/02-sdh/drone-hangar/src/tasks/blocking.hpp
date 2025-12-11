@@ -3,28 +3,27 @@
 #include "core/tasks.hpp"
 
 template <typename T, typename B, typename A>
-class BlockedTaskAction : public TaskAction<T> {
+class BlockedTaskState : public TaskState<T> {
 private:
   B blockingState;
-  A *returningAction; // just holds the reference to pass to switchAction
+  A *returnTo;
 
 public:
-  BlockedTaskAction(B blockingState, A *returningAction)
-      : blockingState(blockingState), returningAction(returningAction) {}
+  BlockedTaskState(B blockingState, A *returnTo)
+      : blockingState(blockingState), returnTo(returnTo) {}
   void step(T *task, SchedulerContext *context) override {
-    if (context->state() == blockingState) {
+    if (context->getState() == blockingState) {
       return;
     }
-    task->switchAction(returningAction);
+    task->switchTo(returnTo);
   }
 };
 
 template <typename T>
-void blockOnAlarm(T *task, SchedulerContext *context,
-                  TaskAction<T> *returnAction) {
-  if (context->state() == StateType::Alarm) {
+void blockOnAlarm(T *task, SchedulerContext *context, TaskState<T> *returnTo) {
+  if (context->getState() == GlobalState::Alarm) {
     Serial.println("ALARM");
-    task->switchAction(new BlockedTaskAction<T, StateType, TaskAction<T>>(
-        StateType::Alarm, returnAction));
+    task->switchTo(new BlockedTaskState<T, GlobalState, TaskState<T>>(
+        GlobalState::Alarm, returnTo));
   }
 }

@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-enum class StateType {
+enum class GlobalState {
   Inside,
   Outside,
   Alarm,

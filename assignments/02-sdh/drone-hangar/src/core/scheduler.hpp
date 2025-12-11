@@ -12,37 +12,37 @@ template <typename T> class Context {
   friend Scheduler;
 
 private:
-  Timer _timer;
-  T _state;
-  T _previousState;
-  T _stateCandidate;
+  Timer timer;
+  T state;
+  T previousState;
+  T stateCandidate;
   bool _hasPreviousState;
-  uint64_t _elapsed;
+  uint64_t elapsedTime;
 
-  void waitTimer() { this->_elapsed = this->_timer.wait(); }
+  void waitTimer() { this->elapsedTime = this->timer.wait(); }
 
   void switchState() {
-    this->_previousState = this->_state;
-    this->_state = this->_stateCandidate;
+    this->previousState = this->state;
+    this->state = this->stateCandidate;
     this->_hasPreviousState = true;
   };
 
 public:
   Context(int period, T initialState)
-      : _timer(period), _state(initialState), _previousState(initialState),
-        _hasPreviousState(false), _elapsed(0) {}
+      : timer(period), state(initialState), previousState(initialState),
+        _hasPreviousState(false), elapsedTime(0) {}
 
-  T state() { return this->_state; };
-  T previousState() {
+  T getState() { return this->state; };
+  T getPreviousState() {
     assert(this->hasPreviousState());
-    return this->_previousState;
+    return this->previousState;
   };
   bool hasPreviousState() { return this->_hasPreviousState; };
-  void setState(T state) { this->_stateCandidate = state; };
-  uint64_t elapsed() { return this->_elapsed; };
+  void setState(T state) { this->stateCandidate = state; };
+  uint64_t getElapsedTime() { return this->elapsedTime; };
 };
 
-using SchedulerContext = Context<StateType>;
+using SchedulerContext = Context<GlobalState>;
 
 // interfaces to not work directly with tasks and sensors to avoid generics
 class LogicThread {
@@ -52,8 +52,12 @@ public:
 };
 
 class ExternalInput {
-public:
+  friend Scheduler;
+
+protected:
   virtual void read() = 0;
+
+public:
   virtual ~ExternalInput() = default;
 };
 
@@ -64,7 +68,7 @@ private:
   LinkedList<LogicThread *> threads;
 
 public:
-  Scheduler(int period, StateType initialState);
+  Scheduler(int period, GlobalState initialState);
   void addInput(ExternalInput *input);
   void addThread(LogicThread *thread);
   void advance();

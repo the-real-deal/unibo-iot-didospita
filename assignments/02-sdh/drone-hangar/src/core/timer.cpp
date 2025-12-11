@@ -3,7 +3,8 @@
 #include <Arduino.h>
 #include <assert.h>
 
-Timer::Timer(uint64_t period) : period(period), startTime(0) {}
+Timer::Timer(uint64_t periodMillis)
+    : periodMillis(periodMillis), startTime(0) {}
 
 void Timer::start() {
   this->startTime = millis();
@@ -14,7 +15,7 @@ void Timer::stop() { this->running = false; }
 
 uint64_t Timer::elapsed() {
   assert(this->running);
-  millis() - this->startTime;
+  return millis() - this->startTime;
 }
 
 uint64_t Timer::wait() {
@@ -22,7 +23,7 @@ uint64_t Timer::wait() {
   uint64_t total;
   do {
     total = this->elapsed();
-  } while (total < this->period);
+  } while (total < this->periodMillis);
   this->startTime = millis();
   return total;
 }

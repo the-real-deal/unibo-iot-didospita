@@ -1,13 +1,18 @@
 #pragma once
 
 #include "core/pins.hpp"
-#include "core/sensors.hpp"
+#include "core/scheduler.hpp"
+#include "io/presence.hpp"
 
-class PIR : public Sensor<DigitalValue> {
+class PIRSensor : public PresenceSensor, public ExternalInput {
 private:
   DigitalInputPin pin;
+  DigitalValue value;
+
+protected:
+  void read() override;
 
 public:
-  PIR(uint8_t pin);
-  void read() override;
+  PIRSensor(uint8_t pin);
+  bool isPresent() override;
 };

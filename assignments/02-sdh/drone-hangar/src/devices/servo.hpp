@@ -1,17 +1,21 @@
 #pragma once
 
 #include "core/pins.hpp"
+#include "core/scheduler.hpp"
+#include "io/servo.hpp"
 #include <Servo.h>
 #include <stdint.h>
 
-class ServoMotor {
+class ArduinoServoMotor : public ServoMotor, public ExternalInput {
 private:
-  DigitalOutputPin pin;
   Servo servo;
   int angle;
 
+protected:
+  void read() override;
+
 public:
-  ServoMotor(uint8_t pin, int initialAngle, int min, int max);
-  int getAngle();
-  void setAngle(int angle);
+  ArduinoServoMotor(uint8_t pin, int initialAngle, int min, int max);
+  int getAngle() override;
+  void setAngle(int angle) override;
 };

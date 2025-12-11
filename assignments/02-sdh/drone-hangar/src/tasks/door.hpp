@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/tasks.hpp"
-#include "devices/servo.hpp"
+#include "io/servo.hpp"
 
 class DoorTask : public Task<DoorTask> {
 private:
@@ -9,12 +9,12 @@ private:
   int closedAngle;
   int openAngle;
 
-  class OpenAction : public TaskAction<DoorTask> {
+  class OpenState : public TaskState<DoorTask> {
   public:
     void step(DoorTask *task, SchedulerContext *context) override;
   };
 
-  class CloseAction : public TaskAction<DoorTask> {
+  class ClosedState : public TaskState<DoorTask> {
   public:
     void step(DoorTask *task, SchedulerContext *context) override;
   };
