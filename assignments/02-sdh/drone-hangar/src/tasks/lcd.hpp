@@ -7,12 +7,12 @@ class LCDTask : public Task<LCDTask> {
 private:
   LiquidCrystal_I2C *lcd;
 
-  class PrintStateAction : public TaskState<LCDTask> {
+  class PrintState : public TaskState<LCDTask> {
   public:
     void step(LCDTask *task, SchedulerContext *context) override;
   };
 
-  class IdleAction : public TaskState<LCDTask> {
+  class IdleState : public TaskState<LCDTask> {
   public:
     void step(LCDTask *task, SchedulerContext *context) override;
   };
