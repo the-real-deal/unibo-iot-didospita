@@ -6,6 +6,7 @@
 #include "devices/pir.hpp"
 #include "devices/servo.hpp"
 #include "devices/sonar.hpp"
+#include "tasks/ddd.hpp"
 #include "tasks/door.hpp"
 #include "tasks/lcd.hpp"
 #include <Arduino.h>
@@ -76,11 +77,15 @@ void setup() {
 #endif
   );
 
+  // temperature reading must be performed before distance reading if not using
+  // the static temperature
   scheduler->addInput(dht);
   scheduler->addInput(pir);
   scheduler->addInput(sonar);
 
   scheduler->addThread(new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE));
+  scheduler->addThread(new DDDTask(sonar, OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
+                                   INSIDE_DISTANCE, INSIDE_TIME_MS));
   scheduler->addThread(new Testing());
 }
 
