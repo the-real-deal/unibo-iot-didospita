@@ -5,12 +5,11 @@
 enum class GlobalState {
   Inside,
   Outside,
+  Prealarm,
   Alarm,
   Takeoff,
   Landing,
-  RequestLanding,
 };
 const String GLOBAL_STATE_STRINGS[] = {
-    "DRONE INSIDE", "DRONE OUTSIDE", "ALARM",
-    "TAKEOFF",      "LANDING",       "REQUEST LANDING",
+    "DRONE INSIDE", "DRONE OUTSIDE", "PREALARM", "ALARM", "TAKEOFF", "LANDING",
 };

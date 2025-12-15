@@ -3,30 +3,31 @@
 #include "utils.hpp"
 
 LCDTask::LCDTask(LiquidCrystal_I2C *lcd)
-    : Task<LCDTask>(new LCDTask::PrintState()), lcd(lcd) {
+    : Task<LCDTask>(new PrintState()), lcd(lcd) {
   this->lcd->init();
   this->lcd->backlight();
   this->lcd->clear();
 }
 
-void LCDTask::IdleState::step(LCDTask *task, SchedulerContext *context) {
-  blockOnAlarm<LCDTask, LCDTask::IdleState>(task, context);
+void LCDTask::IdleState::step(LCDTask *task, Context *context) {
+  blockOnAlarm<LCDTask, IdleState>(task, context);
+
   GlobalState state = context->getState();
   switch (state) {
-  case GlobalState::RequestLanding:
+  case GlobalState::Prealarm:
     break;
   default:
     if (context->getPreviousState() != state) {
-      task->switchState(new LCDTask::PrintState());
+      task->switchState(new PrintState());
     }
     break;
   }
 }
 
-void LCDTask::PrintState::step(LCDTask *task, SchedulerContext *context) {
+void LCDTask::PrintState::step(LCDTask *task, Context *context) {
   task->lcd->clear();
   task->lcd->setCursor(0, 0);
   String message = enumToString(context->getState(), GLOBAL_STATE_STRINGS);
   task->lcd->println(message);
-  task->switchState(new LCDTask::IdleState());
+  task->switchState(new IdleState());
 }

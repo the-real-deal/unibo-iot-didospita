@@ -3,24 +3,21 @@
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                                    uint64_t readTimeoutMicros,
                                    uint64_t readDelayMicros,
-                                   TemperatureSensor *temperatureSensor)
+                                   TemperatureSensor *tempSensor)
     : echoPin(echoPin), triggerPin(triggerPin),
       readTimeoutMicros(readTimeoutMicros), readDelayMicros(readDelayMicros),
-      temperatureSensor(temperatureSensor), staticTemperature(NAN),
-      distance(NAN) {}
+      tempSensor(tempSensor), staticTemperature(NAN), distance(NAN) {}
 
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                                    uint64_t readTimeoutMicros,
                                    uint64_t readDelayMicros, float temperature)
     : echoPin(echoPin), triggerPin(triggerPin),
       readTimeoutMicros(readTimeoutMicros), readDelayMicros(readDelayMicros),
-      temperatureSensor(nullptr), staticTemperature(temperature),
-      distance(NAN) {}
+      tempSensor(nullptr), staticTemperature(temperature), distance(NAN) {}
 
 float UltrasonicSensor::getTemperature() {
-  return this->temperatureSensor == nullptr
-             ? this->staticTemperature
-             : this->temperatureSensor->getTemperature();
+  return this->tempSensor == nullptr ? this->staticTemperature
+                                     : this->tempSensor->getTemperature();
 }
 
 float UltrasonicSensor::getSoundSpeed() {
@@ -53,11 +50,3 @@ void UltrasonicSensor::read() {
 }
 
 float UltrasonicSensor::getDistance() { return this->distance; }
-
-bool UltrasonicSensor::isTooNear() {
-  return this->distance == UltrasonicSensor::DISTANCE_OOO_MIN;
-}
-
-bool UltrasonicSensor::isTooFar() {
-  return this->distance == UltrasonicSensor::DISTANCE_OOO_MAX;
-}

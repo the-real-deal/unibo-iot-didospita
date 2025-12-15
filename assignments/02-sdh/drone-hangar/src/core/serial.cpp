@@ -2,59 +2,31 @@
 #include "utils.hpp"
 #include <assert.h>
 
-Message::Message(String message) {
-  assert(message.length() >= 3);            // start, type delimiter, terminator
-  assert(message[0] == Message::DELIMITER); // start with delimiter
-  int typeDelimiterIndex = message.indexOf(Message::DELIMITER);
-  assert(typeDelimiterIndex != -1);
-  int terminatorIndex =
-      message.indexOf(Message::DELIMITER, typeDelimiterIndex + 1);
-  assert(terminatorIndex == ((int)message.length()) - 1);
-  this->type = enumFromString<MessageType>(
-      message.substring(0, typeDelimiterIndex), MESSAGE_TYPE_STRINGS);
-  this->content = message.substring(typeDelimiterIndex, terminatorIndex);
-}
-
-Message::Message(MessageType type, String content)
-    : type(type), content(content) {}
-
-MessageType Message::getType() { return this->type; }
-
-String Message::getContent() { return this->content; }
-
-String Message::toString() {
-  return Message::DELIMITER +
-         enumToString<MessageType>(this->type, MESSAGE_TYPE_STRINGS) +
-         Message::DELIMITER + this->content + Message::DELIMITER;
-}
-
 SerialManager::SerialManager(unsigned long baud) : queue() {
   Serial.begin(baud);
   while (!Serial) {
   }
 }
 
-Message *SerialManager::getMessage(MessageType type) {
-  if (!this->messageAvailable()) {
-    return nullptr;
-  }
-  int index = -1;
-  for (int i = 0; i < this->queue.size(); i++) {
-    Message *message = this->queue.get(i);
-    if (message->getType() == type) {
-      index = i;
-      break;
-    }
-  }
-  if (index == -1) {
-    return nullptr;
-  }
-  Message *message = this->queue.get(index);
-  this->queue.remove(index);
-  return message;
+Message *SerialManager::getMessage() { return this->currentMessage; }
+
+bool SerialManager::messageAvailable() {
+  return this->currentMessage != nullptr;
 }
 
-bool SerialManager::messageAvailable() { return this->queue.size() != 0; }
+Message *SerialManager::decodeSerialMessage(String message) {
+  assert(message.length() >= 3);           // start, type delimiter, terminator
+  assert(message[0] == MESSAGE_DELIMITER); // start with delimiter
+  int typeDelimiterIndex = message.indexOf(MESSAGE_DELIMITER);
+  assert(typeDelimiterIndex != -1);
+  int terminatorIndex =
+      message.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
+  assert(terminatorIndex == ((int)message.length()) - 1);
+  MessageType type = enumFromString<MessageType>(
+      message.substring(0, typeDelimiterIndex), MESSAGE_TYPE_STRINGS);
+  String content = message.substring(typeDelimiterIndex, terminatorIndex);
+  return new Message(type, content);
+}
 
 void SerialManager::read() {
   String content;
@@ -62,20 +34,24 @@ void SerialManager::read() {
 
   while (Serial.available()) {
     char ch = (char)Serial.read();
-    if (ch == Message::DELIMITER) {
+    if (ch == MESSAGE_DELIMITER) {
       delimiters++;
     }
     if (delimiters > 0) {
       content += ch;
     }
     if (delimiters == 3) {
-      this->queue.add(new Message(content));
+      this->queue.add(SerialManager::decodeSerialMessage(content));
       content = String();
       delimiters = 0;
     }
   }
+  this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
 }
 
 void SerialManager::send(Message *message) {
-  Serial.print(message->toString());
+  Serial.print(
+      MESSAGE_DELIMITER +
+      enumToString<MessageType>(message->getType(), MESSAGE_TYPE_STRINGS) +
+      MESSAGE_DELIMITER + message->getContent() + MESSAGE_DELIMITER);
 }

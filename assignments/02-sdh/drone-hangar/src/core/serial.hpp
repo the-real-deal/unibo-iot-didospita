@@ -1,41 +1,21 @@
 #pragma once
 
+#include "io/message.hpp"
 #include "scheduler.hpp"
 #include <Arduino.h>
 #include <LinkedList.h>
 
-enum class MessageType {
-  STATE,
-  DISTANCE,
-};
-const String MESSAGE_TYPE_STRINGS[] = {
-    "STATE",
-    "DISTANCE",
-};
-
-class Message {
+class SerialManager : public MessageService, public ExternalInput {
 private:
-  MessageType type;
-  String content;
-
-public:
-  static const char DELIMITER = '|';
-
-  Message(String message);
-  Message(MessageType type, String content);
-  MessageType getType();
-  String getContent();
-  String toString();
-};
-
-class SerialManager : public ExternalInput {
-private:
+  static const char MESSAGE_DELIMITER = '|';
   LinkedList<Message *> queue;
+  Message *currentMessage;
+  static Message *decodeSerialMessage(String message);
 
 public:
   SerialManager(unsigned long baud);
-  Message *getMessage(MessageType type);
-  bool messageAvailable();
+  Message *getMessage() override;
+  bool messageAvailable() override;
+  void send(Message *message) override;
   void read() override;
-  void send(Message *message);
 };

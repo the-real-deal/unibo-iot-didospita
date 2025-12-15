@@ -13,35 +13,35 @@ private:
 
   class IdleState : public TaskState<DDDTask> {
   public:
-    void step(DDDTask *task, SchedulerContext *context) override;
+    void step(DDDTask *task, Context *context) override;
   };
 
   class TakeoffReadingState : public TaskState<DDDTask> {
   public:
-    void step(DDDTask *task, SchedulerContext *context) override;
+    void step(DDDTask *task, Context *context) override;
   };
 
-  class TakeoffMaintainDistanceState : public TaskState<DDDTask> {
+  class TakeoffDistanceCheckingState : public TaskState<DDDTask> {
   private:
     Timer timer;
 
   public:
-    TakeoffMaintainDistanceState(DDDTask *task);
-    void step(DDDTask *task, SchedulerContext *context) override;
+    TakeoffDistanceCheckingState(DDDTask *task);
+    void step(DDDTask *task, Context *context) override;
   };
 
   class LandingReadingState : public TaskState<DDDTask> {
   public:
-    void step(DDDTask *task, SchedulerContext *context) override;
+    void step(DDDTask *task, Context *context) override;
   };
 
-  class LandingMaintainDistanceState : public TaskState<DDDTask> {
+  class LandingDistanceCheckingState : public TaskState<DDDTask> {
   private:
     Timer timer;
 
   public:
-    LandingMaintainDistanceState(DDDTask *task);
-    void step(DDDTask *task, SchedulerContext *context) override;
+    LandingDistanceCheckingState(DDDTask *task);
+    void step(DDDTask *task, Context *context) override;
   };
 
 public:

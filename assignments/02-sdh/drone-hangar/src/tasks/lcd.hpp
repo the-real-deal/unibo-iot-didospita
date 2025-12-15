@@ -9,12 +9,12 @@ private:
 
   class IdleState : public TaskState<LCDTask> {
   public:
-    void step(LCDTask *task, SchedulerContext *context) override;
+    void step(LCDTask *task, Context *context) override;
   };
 
   class PrintState : public TaskState<LCDTask> {
   public:
-    void step(LCDTask *task, SchedulerContext *context) override;
+    void step(LCDTask *task, Context *context) override;
   };
 
 public:

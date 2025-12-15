@@ -2,6 +2,27 @@
 #include "utils.hpp"
 #include <Arduino.h>
 
+Context::Context(int period, GlobalState initialState)
+    : timer(period), state(initialState), previousState(initialState),
+      elapsedMillis(0) {}
+
+void Context::waitTimer() { this->elapsedMillis = this->timer.wait(); }
+
+void Context::switchState() {
+  if (this->stateCandidate != this->state) {
+    this->previousState = this->state;
+    this->state = this->stateCandidate;
+  }
+}
+
+GlobalState Context::getState() { return this->state; }
+
+GlobalState Context::getPreviousState() { return this->previousState; }
+
+void Context::setState(GlobalState state) { this->stateCandidate = state; }
+
+uint64_t Context::getElapsedMillis() { return this->elapsedMillis; }
+
 Scheduler::Scheduler(int period, GlobalState initialState)
     : context(period, initialState), inputs(), threads() {}
 

@@ -8,43 +8,31 @@
 
 class Scheduler;
 
-template <typename T> class Context {
+class Context {
   friend Scheduler;
 
 private:
   Timer timer;
-  T state;
-  T previousState;
-  T stateCandidate;
+  GlobalState state;
+  GlobalState previousState;
+  GlobalState stateCandidate;
   uint64_t elapsedMillis;
 
-  void waitTimer() { this->elapsedMillis = this->timer.wait(); }
-
-  void switchState() {
-    this->previousState = this->state;
-    this->state = this->stateCandidate;
-  };
+  void waitTimer();
+  void switchState();
 
 public:
-  Context(int period, T initialState)
-      : timer(period), state(initialState), previousState(initialState),
-        elapsedMillis(0) {}
-
-  T getState() { return this->state; };
-
-  T getPreviousState() { return this->previousState; };
-
-  void setState(T state) { this->stateCandidate = state; };
-
-  uint64_t getElapsedMillis() { return this->elapsedMillis; };
+  Context(int period, GlobalState initialState);
+  GlobalState getState();
+  GlobalState getPreviousState();
+  void setState(GlobalState state);
+  uint64_t getElapsedMillis();
 };
-
-using SchedulerContext = Context<GlobalState>;
 
 // interfaces to not work directly with tasks and sensors to avoid generics
 class LogicThread {
 public:
-  virtual void step(SchedulerContext *context) = 0;
+  virtual void step(Context *context) = 0;
   virtual ~LogicThread() = default;
 };
 
@@ -60,7 +48,7 @@ public:
 
 class Scheduler {
 private:
-  SchedulerContext context;
+  Context context;
   LinkedList<ExternalInput *> inputs;
   LinkedList<LogicThread *> threads;
 

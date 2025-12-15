@@ -1,29 +1,37 @@
 #include "door.hpp"
 #include "blocking.hpp"
 
-DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle)
-    : Task<DoorTask>(new DoorTask::ClosedState()), servo(servo),
-      closedAngle(closedAngle), openAngle(openAngle) {
+DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle,
+                   MessageService *messageService)
+    : Task<DoorTask>(new ClosedState()), servo(servo), closedAngle(closedAngle),
+      openAngle(openAngle), messageService(messageService) {
   servo->setAngle(closedAngle);
 }
 
-void DoorTask::ClosedState::step(DoorTask *task, SchedulerContext *context) {
-  blockOnAlarm<DoorTask, DoorTask::ClosedState>(task, context);
+void DoorTask::ClosedState::step(DoorTask *task, Context *context) {
+  blockOnAlarm<DoorTask, ClosedState>(task, context);
 
   switch (context->getState()) {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    task->switchState(new DoorTask::OpenState());
+    task->switchState(new OpenState());
+    break;
+  case GlobalState::Prealarm:
     break;
   default:
     if (task->servo->getAngle() > task->closedAngle) {
       task->servo->setAngle(task->closedAngle);
     }
+    if (task->messageService->messageAvailable() &&
+        task->messageService->getMessage()->getType() ==
+            MessageType::REQUEST_TAKEOFF) {
+      context->setState(GlobalState::Takeoff);
+    }
     break;
   }
 }
 
-void DoorTask::OpenState::step(DoorTask *task, SchedulerContext *context) {
+void DoorTask::OpenState::step(DoorTask *task, Context *context) {
   switch (context->getState()) {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
@@ -32,7 +40,7 @@ void DoorTask::OpenState::step(DoorTask *task, SchedulerContext *context) {
     }
     break;
   default:
-    task->switchState(new DoorTask::ClosedState());
+    task->switchState(new ClosedState());
     break;
   }
 }
