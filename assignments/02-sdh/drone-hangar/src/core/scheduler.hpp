@@ -17,9 +17,9 @@ private:
   T previousState;
   T stateCandidate;
   bool _hasPreviousState;
-  uint64_t elapsedTime;
+  uint64_t elapsedMillis;
 
-  void waitTimer() { this->elapsedTime = this->timer.wait(); }
+  void waitTimer() { this->elapsedMillis = this->timer.wait(); }
 
   void switchState() {
     this->previousState = this->state;
@@ -30,7 +30,7 @@ private:
 public:
   Context(int period, T initialState)
       : timer(period), state(initialState), previousState(initialState),
-        _hasPreviousState(false), elapsedTime(0) {}
+        _hasPreviousState(false), elapsedMillis(0) {}
 
   T getState() { return this->state; };
   T getPreviousState() {
@@ -39,7 +39,7 @@ public:
   };
   bool hasPreviousState() { return this->_hasPreviousState; };
   void setState(T state) { this->stateCandidate = state; };
-  uint64_t getElapsedTime() { return this->elapsedTime; };
+  uint64_t getElapsedMillis() { return this->elapsedMillis; };
 };
 
 using SchedulerContext = Context<GlobalState>;

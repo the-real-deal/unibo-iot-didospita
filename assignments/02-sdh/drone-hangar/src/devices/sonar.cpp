@@ -1,17 +1,21 @@
 #include "sonar.hpp"
 
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
+                                   uint64_t readTimeoutMicros,
                                    uint64_t readDelayMicros,
                                    TemperatureSensor *temperatureSensor)
     : echoPin(echoPin), triggerPin(triggerPin),
-      readDelayMicros(readDelayMicros), temperatureSensor(temperatureSensor),
-      staticTemperature(NAN), distance(NAN) {}
+      readTimeoutMicros(readTimeoutMicros), readDelayMicros(readDelayMicros),
+      temperatureSensor(temperatureSensor), staticTemperature(NAN),
+      distance(NAN) {}
 
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
+                                   uint64_t readTimeoutMicros,
                                    uint64_t readDelayMicros, float temperature)
     : echoPin(echoPin), triggerPin(triggerPin),
-      readDelayMicros(readDelayMicros), temperatureSensor(nullptr),
-      staticTemperature(temperature), distance(NAN) {}
+      readTimeoutMicros(readTimeoutMicros), readDelayMicros(readDelayMicros),
+      temperatureSensor(nullptr), staticTemperature(temperature),
+      distance(NAN) {}
 
 float UltrasonicSensor::getTemperature() {
   return this->temperatureSensor == nullptr
@@ -24,8 +28,8 @@ float UltrasonicSensor::getSoundSpeed() {
 }
 
 // https://github.com/pslab-unibo/esiot-2025-2026/blob/18463be0de31a90caf9740de2df1c6108cb350b3/lab-activities/lab-activity-08/sweeping-system/arduino/sweeping-system/src/devices/Sonar.cpp#L29-L30
-float UltrasonicSensor::pulseToDistance(float pulse) {
-  return pulse / 1000.0 / 1000.0 / 2 * this->getSoundSpeed();
+float UltrasonicSensor::pulseToDistance(uint64_t pulse) {
+  return ((float)pulse) / 1000.0 / 1000.0 / 2 * this->getSoundSpeed();
 }
 
 void UltrasonicSensor::read() {
@@ -35,10 +39,25 @@ void UltrasonicSensor::read() {
   delayMicroseconds(this->readDelayMicros);
   this->triggerPin.write(DigitalValue::Low);
 
-  float pulse = this->echoPin.readPulse(DigitalValue::High);
-  this->distance = pulse == 0 ? NAN : this->pulseToDistance(pulse);
+  uint8_t readStart = micros();
+  uint64_t pulse =
+      this->echoPin.readPulse(DigitalValue::High, this->readTimeoutMicros);
+  uint64_t readTime = micros() - readStart;
+  if (pulse == 0) {
+    this->distance = readTime < this->readTimeoutMicros
+                         ? UltrasonicSensor::DISTANCE_OOO_MIN
+                         : UltrasonicSensor::DISTANCE_OOO_MAX;
+  } else {
+    this->distance = this->pulseToDistance(pulse);
+  }
 }
 
 float UltrasonicSensor::getDistance() { return this->distance; }
 
-bool UltrasonicSensor::isOutOfRange() { return this->distance == NAN; }
+bool UltrasonicSensor::isTooNear() {
+  return this->distance == UltrasonicSensor::DISTANCE_OOO_MIN;
+}
+
+bool UltrasonicSensor::isTooFar() {
+  return this->distance == UltrasonicSensor::DISTANCE_OOO_MAX;
+}

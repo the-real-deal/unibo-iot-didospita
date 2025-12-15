@@ -6,12 +6,10 @@ class Timer {
 private:
   uint64_t periodMillis;
   uint64_t startTime;
-  bool running;
 
 public:
   Timer(uint64_t periodMillis);
-  void start();
-  void stop();
-  uint64_t elapsed();
+  uint64_t getElapsedMillis();
+  bool isFinished();
   uint64_t wait();
 };

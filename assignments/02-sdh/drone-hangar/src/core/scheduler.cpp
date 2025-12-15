@@ -12,7 +12,7 @@ void Scheduler::addThread(LogicThread *thread) { this->threads.add(thread); }
 void Scheduler::advance() {
   this->context.waitTimer();
   Serial.print("Elapsed: ");
-  Serial.println((unsigned long)this->context.getElapsedTime());
+  Serial.println((unsigned long)this->context.getElapsedMillis());
   Serial.print("State: ");
   Serial.println(enumToString(this->context.getState(), STATE_TYPE_STRINGS));
   noInterrupts();

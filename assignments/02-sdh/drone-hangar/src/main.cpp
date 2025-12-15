@@ -26,7 +26,7 @@ private:
 
 public:
   void step(SchedulerContext *context) override {
-    this->total += context->getElapsedTime();
+    this->total += context->getElapsedMillis();
     Serial.print("Testing: ");
     Serial.println((int)this->total);
     if (this->total < 4 * 1000) {
@@ -68,7 +68,13 @@ void setup() {
   servo = new ArduinoServoMotor(SERVO_PIN, DOOR_CLOSED_ANGLE, SERVO_MIN_FREQ,
                                 SERVO_MAX_FREQ);
   sonar = new UltrasonicSensor(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN,
-                               SONAR_READ_DELAY_US, dht);
+                               SONAR_READ_TIMEOUT_US, SONAR_READ_DELAY_US,
+#ifdef SONAR_USE_TEMP_SENSOR
+                               dht
+#else
+                               SONAR_TEMP
+#endif
+  );
 
   scheduler->addInput(dht);
   scheduler->addInput(pir);

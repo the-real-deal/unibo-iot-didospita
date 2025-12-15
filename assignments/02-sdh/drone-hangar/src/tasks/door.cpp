@@ -9,23 +9,30 @@ DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle)
 
 void DoorTask::ClosedState::step(DoorTask *task, SchedulerContext *context) {
   blockOnAlarm(task, context, new DoorTask::ClosedState());
-  Serial.print("Door close: ");
-  Serial.println(task->servo->getAngle());
-  if (context->getState() == GlobalState::Takeoff ||
-      context->getState() == GlobalState::Landing) {
+
+  switch (context->getState()) {
+  case GlobalState::Takeoff:
+  case GlobalState::Landing:
     task->switchTo(new DoorTask::OpenState());
-  } else if (task->servo->getAngle() > task->closedAngle) {
-    task->servo->setAngle(task->closedAngle);
+    break;
+  default:
+    if (task->servo->getAngle() > task->closedAngle) {
+      task->servo->setAngle(task->closedAngle);
+    }
+    break;
   }
 }
 
 void DoorTask::OpenState::step(DoorTask *task, SchedulerContext *context) {
-  Serial.print("Door open: ");
-  Serial.println(task->servo->getAngle());
-  if (context->getState() != GlobalState::Takeoff &&
-      context->getState() != GlobalState::Landing) {
+  switch (context->getState()) {
+  case GlobalState::Takeoff:
+  case GlobalState::Landing:
+    if (task->servo->getAngle() < task->openAngle) {
+      task->servo->setAngle(task->openAngle);
+    }
+    break;
+  default:
     task->switchTo(new DoorTask::ClosedState());
-  } else if (task->servo->getAngle() < task->openAngle) {
-    task->servo->setAngle(task->openAngle);
+    break;
   }
 }
