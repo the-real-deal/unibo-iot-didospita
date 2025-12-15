@@ -9,12 +9,15 @@
 #define PREALARM_TIME_MS 2000 // T3
 #define ALARM_TEMP 35         // Temp2
 #define ALARM_TIME_MS 1000    // T4
+#define ON_LED_PIN 7          // L1
+#define IN_ACTION_LED_PIN 8   // L2
+#define ALARM_LED_PIN 8       // L3
+
+// scheduler
+#define SCHEDULER_PERIOD_MS 50
 
 // serial
 #define SERIAL_BAUD 9600
-
-// scheduler
-#define SCHEDULER_PERIOD 50
 
 // lcd
 #define LCD_COLS 16
@@ -43,3 +46,6 @@
 // door
 #define DOOR_CLOSED_ANGLE 0
 #define DOOR_OPEN_ANGLE 180
+
+// blink
+#define BLINK_PERIOD_MS 500

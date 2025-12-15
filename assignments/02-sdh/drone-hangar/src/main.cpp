@@ -3,9 +3,11 @@
 #include "core/scheduler.hpp"
 #include "core/serial.hpp"
 #include "devices/dht.hpp"
+#include "devices/led.hpp"
 #include "devices/pir.hpp"
 #include "devices/servo.hpp"
 #include "devices/sonar.hpp"
+#include "tasks/blink.hpp"
 #include "tasks/ddd.hpp"
 #include "tasks/door.hpp"
 #include "tasks/dpd.hpp"
@@ -13,14 +15,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <assert.h>
-
-Scheduler *scheduler;
-SerialManager *serialManager;
-LiquidCrystal_I2C *lcd;
-DHTSensor *dht;
-PIRSensor *pir;
-ArduinoServoMotor *servo;
-UltrasonicSensor *sonar;
 
 class Testing : public LogicThread {
 private:
@@ -54,8 +48,18 @@ public:
   }
 };
 
+Scheduler *scheduler;
+SerialManager *serialManager;
+LiquidCrystal_I2C *lcd;
+DHTSensor *dht;
+PIRSensor *pir;
+ArduinoServoMotor *servo;
+UltrasonicSensor *sonar;
+Led *onLed;
+Led *inActionLed;
+
 void setup() {
-  scheduler = new Scheduler(SCHEDULER_PERIOD, GlobalState::Inside);
+  scheduler = new Scheduler(SCHEDULER_PERIOD_MS, GlobalState::Inside);
 
   // int lcdAddress = i2cScan();
   // assert(lcdAddress != -1);
@@ -75,6 +79,8 @@ void setup() {
                                SONAR_TEMP
 #endif
   );
+  onLed = new Led(ON_LED_PIN);
+  inActionLed = new Led(IN_ACTION_LED_PIN);
 
   scheduler->addInput(serialManager);
   scheduler->addInput(pir);
@@ -88,7 +94,9 @@ void setup() {
   scheduler->addThread(new DDDTask(sonar, OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
                                    INSIDE_DISTANCE, INSIDE_TIME_MS));
   scheduler->addThread(new DPDTask(pir, serialManager));
-  scheduler->addThread(new Testing());
+  scheduler->addThread(new BlinkTask(inActionLed, BLINK_PERIOD_MS));
+
+  onLed->turnOn();
 }
 
 void loop() { scheduler->advance(); }

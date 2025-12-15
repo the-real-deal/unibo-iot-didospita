@@ -5,12 +5,7 @@ public:
   virtual void turnOn() = 0;
   virtual void turnOff() = 0;
   virtual bool isOn() = 0;
-  virtual void toggle() {
-    if (this->isOn()) {
-      this->turnOff();
-    } else {
-      this->turnOff();
-    }
-  };
+  virtual bool isOff() = 0; // just for readability
+
   virtual ~Indicator() = default;
 };

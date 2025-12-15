@@ -22,7 +22,7 @@ private:
   void switchState();
 
 public:
-  Context(int period, GlobalState initialState);
+  Context(int periodMillis, GlobalState initialState);
   GlobalState getState();
   GlobalState getPreviousState();
   void setState(GlobalState state);
@@ -53,7 +53,7 @@ private:
   LinkedList<LogicThread *> threads;
 
 public:
-  Scheduler(int period, GlobalState initialState);
+  Scheduler(int periodMillis, GlobalState initialState);
   void addInput(ExternalInput *input);
   void addThread(LogicThread *thread);
   void advance();

@@ -15,4 +15,5 @@ public:
   void turnOn() override;
   void turnOff() override;
   bool isOn() override;
+  bool isOff() override;
 };
