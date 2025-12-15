@@ -8,6 +8,7 @@
 #include "devices/sonar.hpp"
 #include "tasks/ddd.hpp"
 #include "tasks/door.hpp"
+#include "tasks/dpd.hpp"
 #include "tasks/lcd.hpp"
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
@@ -60,7 +61,7 @@ void setup() {
   scheduler->addInput(serialManager);
 
   // int lcdAddress = i2cScan();
-  // assert(lcdAddress != I2C_NOT_FOUND);
+  // assert(lcdAddress != -1);
   // lcd = new LiquidCrystal_I2C(lcdAddress, LCD_COLS, LCD_ROWS);
   // scheduler->addThread(new LCDTask(lcd));
 
@@ -86,6 +87,7 @@ void setup() {
   scheduler->addThread(new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE));
   scheduler->addThread(new DDDTask(sonar, OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
                                    INSIDE_DISTANCE, INSIDE_TIME_MS));
+  scheduler->addThread(new DPDTask(pir));
   scheduler->addThread(new Testing());
 }
 

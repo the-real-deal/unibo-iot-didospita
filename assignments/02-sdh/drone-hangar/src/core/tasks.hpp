@@ -20,7 +20,7 @@ public:
     this->state->step(static_cast<T *>(this), context);
   };
 
-  void switchTo(TaskState<T> *state) {
+  void switchState(TaskState<T> *state) {
     delete this->state;
     this->state = state;
   }

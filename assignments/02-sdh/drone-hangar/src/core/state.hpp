@@ -8,7 +8,9 @@ enum class GlobalState {
   Alarm,
   Takeoff,
   Landing,
+  RequestLanding,
 };
-const String STATE_TYPE_STRINGS[] = {
-    "DRONE INSIDE", "DRONE OUTSIDE", "ALARM", "TAKEOFF", "LANDING",
+const String GLOBAL_STATE_STRINGS[] = {
+    "DRONE INSIDE", "DRONE OUTSIDE", "ALARM",
+    "TAKEOFF",      "LANDING",       "REQUEST LANDING",
 };

@@ -14,7 +14,7 @@ void Scheduler::advance() {
   Serial.print("Elapsed: ");
   Serial.println((unsigned long)this->context.getElapsedMillis());
   Serial.print("State: ");
-  Serial.println(enumToString(this->context.getState(), STATE_TYPE_STRINGS));
+  Serial.println(enumToString(this->context.getState(), GLOBAL_STATE_STRINGS));
   noInterrupts();
   for (int i = 0; i < this->inputs.size(); i++) {
     ExternalInput *input = this->inputs.get(i);

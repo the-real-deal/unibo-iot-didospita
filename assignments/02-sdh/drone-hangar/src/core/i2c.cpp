@@ -3,8 +3,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define I2C_NOT_FOUND -1
-
 int i2cScan() {
   static uint8_t startAddress = 0; // continue search from when you left off
   for (uint8_t address = startAddress; address <= 127; address++) {
@@ -26,5 +24,5 @@ int i2cScan() {
       Serial.println(address, HEX);
     }
   }
-  return I2C_NOT_FOUND; // no device found
+  return -1; // no device found
 }

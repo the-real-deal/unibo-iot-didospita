@@ -16,7 +16,6 @@ private:
   T state;
   T previousState;
   T stateCandidate;
-  bool _hasPreviousState;
   uint64_t elapsedMillis;
 
   void waitTimer() { this->elapsedMillis = this->timer.wait(); }
@@ -24,21 +23,19 @@ private:
   void switchState() {
     this->previousState = this->state;
     this->state = this->stateCandidate;
-    this->_hasPreviousState = true;
   };
 
 public:
   Context(int period, T initialState)
       : timer(period), state(initialState), previousState(initialState),
-        _hasPreviousState(false), elapsedMillis(0) {}
+        elapsedMillis(0) {}
 
   T getState() { return this->state; };
-  T getPreviousState() {
-    assert(this->hasPreviousState());
-    return this->previousState;
-  };
-  bool hasPreviousState() { return this->_hasPreviousState; };
+
+  T getPreviousState() { return this->previousState; };
+
   void setState(T state) { this->stateCandidate = state; };
+
   uint64_t getElapsedMillis() { return this->elapsedMillis; };
 };
 

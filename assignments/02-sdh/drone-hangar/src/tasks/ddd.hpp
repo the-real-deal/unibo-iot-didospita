@@ -5,7 +5,7 @@
 
 class DDDTask : public Task<DDDTask> {
 private:
-  DistanceSensor *distanceSensor;
+  DistanceSensor *droneDistanceSensor;
   float outsideDistance;
   uint64_t outsideTimeMillis;
   float insideDistance;
@@ -45,7 +45,7 @@ private:
   };
 
 public:
-  DDDTask(DistanceSensor *distanceSensor, float outsideDistance,
+  DDDTask(DistanceSensor *droneDistanceSensor, float outsideDistance,
           uint64_t outsideTimeMillis, float insideDistance,
           uint64_t insideTimeMillis);
 };

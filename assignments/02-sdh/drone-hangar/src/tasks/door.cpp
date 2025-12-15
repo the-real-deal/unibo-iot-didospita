@@ -8,12 +8,12 @@ DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle)
 }
 
 void DoorTask::ClosedState::step(DoorTask *task, SchedulerContext *context) {
-  blockOnAlarm(task, context, new DoorTask::ClosedState());
+  blockOnAlarm<DoorTask, DoorTask::ClosedState>(task, context);
 
   switch (context->getState()) {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    task->switchTo(new DoorTask::OpenState());
+    task->switchState(new DoorTask::OpenState());
     break;
   default:
     if (task->servo->getAngle() > task->closedAngle) {
@@ -32,7 +32,7 @@ void DoorTask::OpenState::step(DoorTask *task, SchedulerContext *context) {
     }
     break;
   default:
-    task->switchTo(new DoorTask::ClosedState());
+    task->switchState(new DoorTask::ClosedState());
     break;
   }
 }

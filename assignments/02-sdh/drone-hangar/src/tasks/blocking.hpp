@@ -2,28 +2,33 @@
 
 #include "core/tasks.hpp"
 
-template <typename T, typename B, typename A>
+template <typename T, typename B, typename S>
 class BlockedTaskState : public TaskState<T> {
+
 private:
   B blockingState;
-  A *returnTo;
+  S *(*returnStateCreator)();
 
 public:
-  BlockedTaskState(B blockingState, A *returnTo)
-      : blockingState(blockingState), returnTo(returnTo) {}
+  BlockedTaskState(B blockingState, S *(*returnStateCreator)())
+      : blockingState(blockingState), returnStateCreator(returnStateCreator) {}
   void step(T *task, SchedulerContext *context) override {
     if (context->getState() == blockingState) {
       return;
     }
-    task->switchTo(returnTo);
+    task->switchState(returnStateCreator());
   }
 };
 
-template <typename T>
-void blockOnAlarm(T *task, SchedulerContext *context, TaskState<T> *returnTo) {
+template <typename T, typename S>
+void blockOnAlarm(T *task, SchedulerContext *context,
+                  S *(*returnStateCreator)()) {
   if (context->getState() == GlobalState::Alarm) {
-    Serial.println("ALARM");
-    task->switchTo(new BlockedTaskState<T, GlobalState, TaskState<T>>(
-        GlobalState::Alarm, returnTo));
+    task->switchState(new BlockedTaskState<T, GlobalState, S>(
+        GlobalState::Alarm, returnStateCreator));
   }
+}
+template <typename T, typename S>
+void blockOnAlarm(T *task, SchedulerContext *context) {
+  blockOnAlarm(task, context, static_cast<S *(*)()>([]() { return new S(); }));
 }

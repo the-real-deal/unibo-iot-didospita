@@ -1,22 +1,23 @@
 #include "ddd.hpp"
 #include "blocking.hpp"
 
-DDDTask::DDDTask(DistanceSensor *distanceSensor, float outsideDistance,
+DDDTask::DDDTask(DistanceSensor *droneDistanceSensor, float outsideDistance,
                  uint64_t outsideTimeMillis, float insideDistance,
                  uint64_t insideTimeMillis)
-    : Task<DDDTask>(new DDDTask::IdleState()), distanceSensor(distanceSensor),
+    : Task<DDDTask>(new DDDTask::IdleState()),
+      droneDistanceSensor(droneDistanceSensor),
       outsideDistance(outsideDistance), outsideTimeMillis(outsideTimeMillis),
       insideDistance(insideDistance), insideTimeMillis(insideTimeMillis) {}
 
 void DDDTask::IdleState::step(DDDTask *task, SchedulerContext *context) {
-  blockOnAlarm(task, context, new DDDTask::IdleState());
+  blockOnAlarm<DDDTask, DDDTask::IdleState>(task, context);
 
   switch (context->getState()) {
   case GlobalState::Takeoff:
-    task->switchTo(new DDDTask::TakeoffReadingState());
+    task->switchState(new DDDTask::TakeoffReadingState());
     break;
   case GlobalState::Landing:
-    task->switchTo(new DDDTask::LandingReadingState());
+    task->switchState(new DDDTask::LandingReadingState());
     break;
   default:
     break;
@@ -25,11 +26,11 @@ void DDDTask::IdleState::step(DDDTask *task, SchedulerContext *context) {
 
 void DDDTask::TakeoffReadingState::step(DDDTask *task,
                                         SchedulerContext *context) {
-  if (task->distanceSensor->isTooNear() ||
-      task->distanceSensor->getDistance() < task->outsideDistance) {
+  if (task->droneDistanceSensor->isTooNear() ||
+      task->droneDistanceSensor->getDistance() < task->outsideDistance) {
     return;
   }
-  task->switchTo(new TakeoffMaintainDistanceState(task));
+  task->switchState(new TakeoffMaintainDistanceState(task));
 }
 
 DDDTask::TakeoffMaintainDistanceState::TakeoffMaintainDistanceState(
@@ -40,20 +41,20 @@ void DDDTask::TakeoffMaintainDistanceState::step(DDDTask *task,
                                                  SchedulerContext *context) {
   if (this->timer.isFinished()) {
     context->setState(GlobalState::Outside);
-    task->switchTo(new DDDTask::IdleState());
-  } else if (task->distanceSensor->isTooNear() ||
-             task->distanceSensor->getDistance() < task->outsideDistance) {
-    task->switchTo(new DDDTask::TakeoffReadingState());
+    task->switchState(new DDDTask::IdleState());
+  } else if (task->droneDistanceSensor->isTooNear() ||
+             task->droneDistanceSensor->getDistance() < task->outsideDistance) {
+    task->switchState(new DDDTask::TakeoffReadingState());
   }
 }
 
 void DDDTask::LandingReadingState::step(DDDTask *task,
                                         SchedulerContext *context) {
-  if (task->distanceSensor->isTooFar() ||
-      task->distanceSensor->getDistance() > task->insideDistance) {
+  if (task->droneDistanceSensor->isTooFar() ||
+      task->droneDistanceSensor->getDistance() > task->insideDistance) {
     return;
   }
-  task->switchTo(new LandingMaintainDistanceState(task));
+  task->switchState(new LandingMaintainDistanceState(task));
 }
 
 DDDTask::LandingMaintainDistanceState::LandingMaintainDistanceState(
@@ -64,9 +65,9 @@ void DDDTask::LandingMaintainDistanceState::step(DDDTask *task,
                                                  SchedulerContext *context) {
   if (this->timer.isFinished()) {
     context->setState(GlobalState::Inside);
-    task->switchTo(new DDDTask::IdleState());
-  } else if (task->distanceSensor->isTooFar() ||
-             task->distanceSensor->getDistance() > task->insideDistance) {
-    task->switchTo(new DDDTask::LandingReadingState());
+    task->switchState(new DDDTask::IdleState());
+  } else if (task->droneDistanceSensor->isTooFar() ||
+             task->droneDistanceSensor->getDistance() > task->insideDistance) {
+    task->switchState(new DDDTask::LandingReadingState());
   }
 }
