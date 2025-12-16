@@ -2,6 +2,7 @@
 #include "core/i2c.hpp"
 #include "core/scheduler.hpp"
 #include "core/serial.hpp"
+#include "devices/button.hpp"
 #include "devices/dht.hpp"
 #include "devices/led.hpp"
 #include "devices/pir.hpp"
@@ -55,6 +56,7 @@ DHTSensor *dht;
 PIRSensor *pir;
 ArduinoServoMotor *servo;
 UltrasonicSensor *sonar;
+PushButton *resetButton;
 Led *onLed;
 Led *inActionLed;
 
@@ -79,6 +81,7 @@ void setup() {
                                SONAR_TEMP
 #endif
   );
+  resetButton = new PushButton(RESET_BUTTON_PIN);
   onLed = new Led(ON_LED_PIN);
   inActionLed = new Led(IN_ACTION_LED_PIN);
 
@@ -88,6 +91,7 @@ void setup() {
   // does not use a static temperature
   scheduler->addInput(dht);
   scheduler->addInput(sonar);
+  scheduler->addInput(resetButton);
 
   scheduler->addThread(
       new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE, serialManager));

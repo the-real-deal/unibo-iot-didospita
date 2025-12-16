@@ -9,9 +9,18 @@
 #define PREALARM_TIME_MS 2000 // T3
 #define ALARM_TEMP 35         // Temp2
 #define ALARM_TIME_MS 1000    // T4
-#define ON_LED_PIN 7          // L1
-#define IN_ACTION_LED_PIN 8   // L2
-#define ALARM_LED_PIN 8       // L3
+
+// leds
+#define ON_LED_PIN 7        // L1
+#define IN_ACTION_LED_PIN 8 // L2
+#define ALARM_LED_PIN 8     // L3
+
+// dht
+#define DHT_PIN A0 // TEMP
+#define DHT_TYPE 11
+
+// reset
+#define RESET_BUTTON_PIN 10 // RESET
 
 // scheduler
 #define SCHEDULER_PERIOD_MS 50
@@ -22,10 +31,6 @@
 // lcd
 #define LCD_COLS 16
 #define LCD_ROWS 2
-
-// dht
-#define DHT_PIN A0
-#define DHT_TYPE 11
 
 // pir
 #define PIR_PIN 6
