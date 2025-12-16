@@ -21,38 +21,6 @@
 #include "tasks/reset.hpp"
 #include "tasks/stateChange.hpp"
 
-class Testing : public LogicThread {
- private:
-  uint64_t total;
-
- public:
-  void step(Context* context) override {
-    this->total += context->getElapsedMillis();
-    Serial.print("Testing: ");
-    Serial.println((int)this->total);
-    if (this->total < 4 * 1000) {
-      return;
-    }
-    switch (context->getState()) {
-      case GlobalState::Inside:
-        context->setState(GlobalState::Takeoff);
-        break;
-      case GlobalState::Takeoff:
-        context->setState(GlobalState::Outside);
-        break;
-      case GlobalState::Outside:
-        context->setState(GlobalState::Landing);
-        break;
-      case GlobalState::Landing:
-        context->setState(GlobalState::Inside);
-        break;
-      default:
-        break;
-    }
-    this->total = 0;
-  }
-};
-
 Scheduler* scheduler;
 SerialManager* serialManager;
 LCD* lcd;
