@@ -9,12 +9,12 @@ enum class PinType : uint8_t {
 };
 
 class BasePin {
-protected:
+ protected:
   uint8_t pin;
   PinType type;
   BasePin(uint8_t pin, PinType type);
 
-public:
+ public:
   uint8_t getPin();
   PinType getType();
 };
@@ -25,13 +25,13 @@ enum class DigitalValue : uint8_t {
 };
 
 class DigitalOutputPin : public BasePin {
-public:
+ public:
   DigitalOutputPin(uint8_t pin);
   void write(DigitalValue status);
 };
 
 class DigitalInputPin : public BasePin {
-public:
+ public:
   DigitalInputPin(uint8_t pin);
   DigitalValue read();
   uint64_t readPulse(DigitalValue value);
@@ -39,17 +39,17 @@ public:
 };
 
 class AnalogOutputPin : public BasePin {
-public:
+ public:
   AnalogOutputPin(uint8_t pin);
   void write(uint8_t value);
 };
 
 class AnalogInputPin : public BasePin {
-private:
+ private:
   static const uint64_t MAX_READ_VALUE = 1023;
   size_t scale;
 
-public:
+ public:
   static const size_t NO_SCALE = 0;
   AnalogInputPin(uint8_t pin, size_t scale = AnalogInputPin::NO_SCALE);
   double read();

@@ -8,7 +8,7 @@ class PushButton : public Button, public ExternalInput {
   DigitalInputPin pin;
   bool pressed;
 
-public:
+ public:
   PushButton(uint8_t pin);
   void read() override;
   bool isPressed() override;

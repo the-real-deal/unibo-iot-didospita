@@ -5,6 +5,7 @@
 enum class MessageType {
   REQUEST_LANDING,
   REQUEST_TAKEOFF,
+  STATE,
   DISTANCE,
 };
 const String MESSAGE_TYPE_STRINGS[] = {
@@ -13,20 +14,21 @@ const String MESSAGE_TYPE_STRINGS[] = {
 };
 
 class Message {
-private:
+ private:
   MessageType type;
   String content;
 
-public:
+ public:
+  Message(MessageType type);
   Message(MessageType type, String content);
   MessageType getType();
   String getContent();
 };
 
 class MessageService {
-public:
-  virtual Message *getMessage() = 0;
+ public:
+  virtual Message* getMessage() = 0;
   virtual bool messageAvailable() = 0;
-  virtual void send(Message *message) = 0;
+  virtual void send(Message* message) = 0;
   virtual ~MessageService() = default;
 };

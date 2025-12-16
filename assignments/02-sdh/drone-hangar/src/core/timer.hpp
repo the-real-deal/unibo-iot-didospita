@@ -3,11 +3,11 @@
 #include <stdint.h>
 
 class Timer {
-private:
+ private:
   uint64_t periodMillis;
   uint64_t startTime;
 
-public:
+ public:
   Timer(uint64_t periodMillis);
   uint64_t getElapsedMillis();
   bool isFinished();

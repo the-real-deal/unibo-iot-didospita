@@ -1,7 +1,7 @@
 #pragma once
 
 class TemperatureSensor {
-public:
+ public:
   virtual float getTemperature() = 0;
   virtual ~TemperatureSensor() = default;
 };

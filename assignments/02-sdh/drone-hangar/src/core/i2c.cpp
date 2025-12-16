@@ -4,7 +4,7 @@
 #include <Wire.h>
 
 int i2cScan() {
-  static uint8_t startAddress = 0; // continue search from when you left off
+  static uint8_t startAddress = 0;  // continue search from when you left off
   for (uint8_t address = startAddress; address <= 127; address++) {
     Wire.beginTransmission(address);
     const uint8_t error = Wire.endTransmission();
@@ -24,5 +24,5 @@ int i2cScan() {
       Serial.println(address, HEX);
     }
   }
-  return -1; // no device found
+  return -1;  // no device found
 }

@@ -3,17 +3,25 @@
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                                    uint64_t readTimeoutMicros,
                                    uint64_t readDelayMicros,
-                                   TemperatureSensor *tempSensor)
-    : echoPin(echoPin), triggerPin(triggerPin),
-      readTimeoutMicros(readTimeoutMicros), readDelayMicros(readDelayMicros),
-      tempSensor(tempSensor), staticTemperature(NAN), distance(NAN) {}
+                                   TemperatureSensor* tempSensor)
+    : echoPin(echoPin),
+      triggerPin(triggerPin),
+      readTimeoutMicros(readTimeoutMicros),
+      readDelayMicros(readDelayMicros),
+      tempSensor(tempSensor),
+      staticTemperature(NAN),
+      distance(NAN) {}
 
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                                    uint64_t readTimeoutMicros,
                                    uint64_t readDelayMicros, float temperature)
-    : echoPin(echoPin), triggerPin(triggerPin),
-      readTimeoutMicros(readTimeoutMicros), readDelayMicros(readDelayMicros),
-      tempSensor(nullptr), staticTemperature(temperature), distance(NAN) {}
+    : echoPin(echoPin),
+      triggerPin(triggerPin),
+      readTimeoutMicros(readTimeoutMicros),
+      readDelayMicros(readDelayMicros),
+      tempSensor(nullptr),
+      staticTemperature(temperature),
+      distance(NAN) {}
 
 float UltrasonicSensor::getTemperature() {
   return this->tempSensor == nullptr ? this->staticTemperature

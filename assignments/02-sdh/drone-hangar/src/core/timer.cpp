@@ -13,8 +13,7 @@ bool Timer::isFinished() {
 }
 
 uint64_t Timer::wait() {
-  while (!this->isFinished())
-    ;
+  while (!this->isFinished());
   uint64_t total = this->getElapsedMillis();
   this->startTime = millis();
   return total;

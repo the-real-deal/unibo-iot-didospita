@@ -1,4 +1,5 @@
 #include "dht.hpp"
+
 #include <assert.h>
 
 DHTSensor::DHTSensor(uint8_t pin, DHTType type)

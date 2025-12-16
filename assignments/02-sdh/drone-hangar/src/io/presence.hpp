@@ -1,7 +1,7 @@
 #pragma once
 
 class PresenceSensor {
-public:
+ public:
   virtual bool isPresent() = 0;
   virtual ~PresenceSensor() = default;
 };

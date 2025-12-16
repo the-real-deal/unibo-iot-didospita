@@ -5,14 +5,14 @@
 #include "io/presence.hpp"
 
 class PIRSensor : public PresenceSensor, public ExternalInput {
-private:
+ private:
   DigitalInputPin pin;
   DigitalValue value;
 
-protected:
+ protected:
   void read() override;
 
-public:
+ public:
   PIRSensor(uint8_t pin);
   bool isPresent() override;
 };

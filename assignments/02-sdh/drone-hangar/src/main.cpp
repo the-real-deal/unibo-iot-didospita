@@ -1,28 +1,32 @@
+#include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+#include <assert.h>
+
 #include "config.h"
 #include "core/i2c.hpp"
 #include "core/scheduler.hpp"
 #include "core/serial.hpp"
 #include "devices/button.hpp"
 #include "devices/dht.hpp"
+#include "devices/lcd.hpp"
 #include "devices/led.hpp"
 #include "devices/pir.hpp"
 #include "devices/servo.hpp"
 #include "devices/sonar.hpp"
+#include "tasks/alarm.hpp"
 #include "tasks/blink.hpp"
 #include "tasks/ddd.hpp"
 #include "tasks/door.hpp"
 #include "tasks/dpd.hpp"
-#include "tasks/lcd.hpp"
-#include <Arduino.h>
-#include <LiquidCrystal_I2C.h>
-#include <assert.h>
+#include "tasks/reset.hpp"
+#include "tasks/stateChange.hpp"
 
 class Testing : public LogicThread {
-private:
+ private:
   uint64_t total;
 
-public:
-  void step(Context *context) override {
+ public:
+  void step(Context* context) override {
     this->total += context->getElapsedMillis();
     Serial.print("Testing: ");
     Serial.println((int)this->total);
@@ -30,44 +34,45 @@ public:
       return;
     }
     switch (context->getState()) {
-    case GlobalState::Inside:
-      context->setState(GlobalState::Takeoff);
-      break;
-    case GlobalState::Takeoff:
-      context->setState(GlobalState::Outside);
-      break;
-    case GlobalState::Outside:
-      context->setState(GlobalState::Landing);
-      break;
-    case GlobalState::Landing:
-      context->setState(GlobalState::Inside);
-      break;
-    default:
-      break;
+      case GlobalState::Inside:
+        context->setState(GlobalState::Takeoff);
+        break;
+      case GlobalState::Takeoff:
+        context->setState(GlobalState::Outside);
+        break;
+      case GlobalState::Outside:
+        context->setState(GlobalState::Landing);
+        break;
+      case GlobalState::Landing:
+        context->setState(GlobalState::Inside);
+        break;
+      default:
+        break;
     }
     this->total = 0;
   }
 };
 
-Scheduler *scheduler;
-SerialManager *serialManager;
-LiquidCrystal_I2C *lcd;
-DHTSensor *dht;
-PIRSensor *pir;
-ArduinoServoMotor *servo;
-UltrasonicSensor *sonar;
-PushButton *resetButton;
-Led *onLed;
-Led *inActionLed;
+Scheduler* scheduler;
+SerialManager* serialManager;
+LCD* lcd;
+DHTSensor* dht;
+PIRSensor* pir;
+ArduinoServoMotor* servo;
+UltrasonicSensor* sonar;
+PushButton* resetButton;
+Led* onLed;
+Led* inActionLed;
+Led* alarmLed;
 
 void setup() {
-  scheduler = new Scheduler(SCHEDULER_PERIOD_MS, GlobalState::Inside);
+  GlobalState initialState = GlobalState::Inside;
+  int lcdAddress = i2cScan();
+  assert(lcdAddress != -1);
 
-  // int lcdAddress = i2cScan();
-  // assert(lcdAddress != -1);
-  // lcd = new LiquidCrystal_I2C(lcdAddress, LCD_COLS, LCD_ROWS);
-  // scheduler->addThread(new LCDTask(lcd));
+  scheduler = new Scheduler(SCHEDULER_PERIOD_MS, initialState);
 
+  lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);
   serialManager = new SerialManager(SERIAL_BAUD);
   dht = new DHTSensor(DHT_PIN, static_cast<DHTType>(DHT_TYPE));
   pir = new PIRSensor(PIR_PIN);
@@ -84,6 +89,7 @@ void setup() {
   resetButton = new PushButton(RESET_BUTTON_PIN);
   onLed = new Led(ON_LED_PIN);
   inActionLed = new Led(IN_ACTION_LED_PIN);
+  alarmLed = new Led(ALARM_LED_PIN);
 
   scheduler->addInput(serialManager);
   scheduler->addInput(pir);
@@ -95,10 +101,16 @@ void setup() {
 
   scheduler->addThread(
       new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE, serialManager));
-  scheduler->addThread(new DDDTask(sonar, OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
-                                   INSIDE_DISTANCE, INSIDE_TIME_MS));
+  scheduler->addThread(new DDDTask(sonar, serialManager, OUTSIDE_DISTANCE,
+                                   OUTSIDE_TIME_MS, INSIDE_DISTANCE,
+                                   INSIDE_TIME_MS));
   scheduler->addThread(new DPDTask(pir, serialManager));
   scheduler->addThread(new BlinkTask(inActionLed, BLINK_PERIOD_MS));
+  scheduler->addThread(new StateChangeTask(lcd, serialManager, initialState));
+  scheduler->addThread(new AlarmTask(dht, alarmLed, initialState, PREALARM_TEMP,
+                                     PREALARM_TIME_MS, ALARM_TEMP,
+                                     ALARM_TIME_MS));
+  scheduler->addThread(new ResetTask(resetButton, initialState));
 
   onLed->turnOn();
 }

@@ -1,4 +1,5 @@
 #include "pins.hpp"
+
 #include <assert.h>
 
 BasePin::BasePin(uint8_t pin, PinType type) : pin(pin), type(type) {

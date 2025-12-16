@@ -1,7 +1,7 @@
 #pragma once
 
 class DistanceSensor {
-public:
+ public:
   virtual float getDistance() = 0;
   virtual ~DistanceSensor() = default;
 };

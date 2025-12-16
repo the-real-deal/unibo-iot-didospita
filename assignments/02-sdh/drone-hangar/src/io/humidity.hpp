@@ -1,7 +1,7 @@
 #pragma once
 
 class HumiditySensor {
-public:
+ public:
   virtual float getHumidity() = 0;
   virtual ~HumiditySensor() = default;
 };
