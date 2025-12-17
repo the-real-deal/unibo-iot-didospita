@@ -9,6 +9,8 @@ enum class MessageType {
   DISTANCE,
 };
 const String MESSAGE_TYPE_STRINGS[] = {
+    "REQUEST LANDING",
+    "REQUEST_TAKEOFF",
     "STATE",
     "DISTANCE",
 };
