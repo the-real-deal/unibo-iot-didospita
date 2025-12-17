@@ -14,14 +14,13 @@ bool SerialMessageService::messageAvailable() {
 }
 
 Message* SerialMessageService::decodeSerialMessage(String message) {
-  // assert(message.length() >= 3);            // start, type delimiter,
-  // terminator assert(message[0] == MESSAGE_DELIMITER);  // start with
-  // delimiter
+  assert(message.length() >= 3);            // start, type delimiter, terminator
+  assert(message[0] == MESSAGE_DELIMITER);  // start with delimiter
   int typeDelimiterIndex = message.indexOf(MESSAGE_DELIMITER);
-  // assert(typeDelimiterIndex != -1);
+  assert(typeDelimiterIndex != -1);
   int terminatorIndex =
       message.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
-  // assert(terminatorIndex == ((int)message.length()) - 1);
+  assert(terminatorIndex == ((int)message.length()) - 1);
   MessageType type = enumFromString<MessageType>(
       message.substring(0, typeDelimiterIndex), MESSAGE_TYPE_STRINGS);
   String content = message.substring(typeDelimiterIndex, terminatorIndex);

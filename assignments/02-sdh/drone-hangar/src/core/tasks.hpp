@@ -30,7 +30,7 @@ class Task : public LogicThread {
   };
 
   void switchState(TaskState<T>* state) {
-    // assert(this->prevState == nullptr);  // prevent calling twice
+    assert(this->prevState == nullptr);  // prevent calling twice
     this->prevState =
         this->state;  // state deleted on next read to prevent
                       // deletion while the step is still executing

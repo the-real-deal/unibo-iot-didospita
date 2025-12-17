@@ -1,6 +1,6 @@
 #include "pins.hpp"
 
-// #include <assert.h>
+#include <assert.h>
 
 BasePin::BasePin(uint8_t pin, PinType type) : pin(pin), type(type) {
   pinMode(this->pin, static_cast<uint8_t>(type));
@@ -44,6 +44,6 @@ double AnalogInputPin::read() {
 }
 
 size_t AnalogInputPin::scaledRead() {
-  // assert(this->scale != AnalogInputPin::NO_SCALE);
+  assert(this->scale != AnalogInputPin::NO_SCALE);
   return floor(this->read() * this->scale);
 }
