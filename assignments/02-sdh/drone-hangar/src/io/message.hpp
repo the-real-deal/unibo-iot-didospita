@@ -8,7 +8,7 @@ enum class MessageType {
   STATE,
   DISTANCE,
 };
-const String MESSAGE_TYPE_STRINGS[] = {
+const char* const MESSAGE_TYPE_STRINGS[] = {
     "REQUEST LANDING",
     "REQUEST_TAKEOFF",
     "STATE",

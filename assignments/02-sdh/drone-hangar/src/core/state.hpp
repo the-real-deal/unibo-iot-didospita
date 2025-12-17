@@ -10,6 +10,6 @@ enum class GlobalState {
   Takeoff,
   Landing,
 };
-const String GLOBAL_STATE_STRINGS[] = {
+const char* const GLOBAL_STATE_STRINGS[] = {
     "DRONE INSIDE", "DRONE OUTSIDE", "PREALARM", "ALARM", "TAKEOFF", "LANDING",
 };

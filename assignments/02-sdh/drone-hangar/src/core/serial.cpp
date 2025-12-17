@@ -54,8 +54,11 @@ void SerialMessageService::read() {
 }
 
 void SerialMessageService::send(Message* message) {
-  Serial.print(
-      MESSAGE_DELIMITER +
-      enumToString<MessageType>(message->getType(), MESSAGE_TYPE_STRINGS) +
-      MESSAGE_DELIMITER + message->getContent() + MESSAGE_DELIMITER);
+  String typeString = String(
+      enumToString<MessageType>(message->getType(), MESSAGE_TYPE_STRINGS));
+  Serial.print(MESSAGE_DELIMITER);
+  Serial.print(typeString);
+  Serial.print(MESSAGE_DELIMITER);
+  Serial.print(message->getContent());
+  Serial.print(MESSAGE_DELIMITER);
 }
