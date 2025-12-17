@@ -5,6 +5,6 @@
 class Display {
  public:
   virtual void clear();
-  virtual void print(String message);
+  virtual void print(String* message);
   virtual ~Display() = default;
 };

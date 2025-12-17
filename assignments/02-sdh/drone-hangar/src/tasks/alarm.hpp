@@ -9,11 +9,11 @@ class AlarmTask : public Task<AlarmTask> {
  private:
   TemperatureSensor* hangarTempSensor;
   Indicator* alarmIndicator;
+  GlobalState prevState;
   float prealarmTemp;
   uint64_t prealarmTimeMillis;
   float alarmTemp;
   uint64_t alarmTimeMillis;
-  GlobalState prevState;
 
   class IdleState : public TaskState<AlarmTask> {
    public:

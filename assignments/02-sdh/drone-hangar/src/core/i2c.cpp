@@ -3,9 +3,11 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-int i2cScan() {
-  static uint8_t startAddress = 0;  // continue search from when you left off
-  for (uint8_t address = startAddress; address <= 127; address++) {
+I2CManager::I2CManager() : startAddress(MIN_ADDRESS) {}
+
+int I2CManager::scan() {
+  for (uint8_t address = this->startAddress; address <= MAX_ADDRESS;
+       address++) {
     Wire.beginTransmission(address);
     const uint8_t error = Wire.endTransmission();
     if (error == 0) {
@@ -14,7 +16,7 @@ int i2cScan() {
         Serial.print("0");
       }
       Serial.println(address, HEX);
-      startAddress = address + 1;
+      this->startAddress = address + 1;
       return address;
     } else if (error == 4) {
       Serial.print("Unknown error at address 0x");

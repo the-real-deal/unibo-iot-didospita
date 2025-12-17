@@ -22,14 +22,22 @@ void LCD::clear() {
   this->setCursor(0, 0);
 }
 
-void LCD::print(String message) {
+void LCD::print(String* message) {
   size_t start = 0;
-  size_t length = message.length();
+  size_t length = message->length();
   size_t end;
+  Serial.print("length: ");
+  Serial.println(length);
   do {
-    int newLineIndex = message.indexOf('\n');
+    int newLineIndex = message->indexOf('\n');
+    Serial.print("new line: ");
+    Serial.println(newLineIndex);
     end = newLineIndex == -1 ? length : newLineIndex;
-    String row = message.substring(start, end);
+    Serial.print("end: ");
+    Serial.println(end);
+    String row = message->substring(start, end);
+    Serial.print("row: ");
+    Serial.println(row);
     this->lcd.print(row);
     this->lcd.setCursor(0, this->row() + 1);
     start = end + 1;

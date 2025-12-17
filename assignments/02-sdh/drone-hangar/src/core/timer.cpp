@@ -1,7 +1,7 @@
 #include "timer.hpp"
 
 #include <Arduino.h>
-#include <assert.h>
+// #include <assert.h>
 
 Timer::Timer(uint64_t periodMillis)
     : periodMillis(periodMillis), startTime(millis()) {}

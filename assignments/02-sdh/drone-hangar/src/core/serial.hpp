@@ -6,7 +6,7 @@
 #include "io/message.hpp"
 #include "scheduler.hpp"
 
-class SerialManager : public MessageService, public ExternalInput {
+class SerialMessageService : public MessageService, public ExternalInput {
  private:
   static const char MESSAGE_DELIMITER = '|';
   LinkedList<Message*> queue;
@@ -14,7 +14,7 @@ class SerialManager : public MessageService, public ExternalInput {
   static Message* decodeSerialMessage(String message);
 
  public:
-  SerialManager(unsigned long baud);
+  SerialMessageService();
   Message* getMessage() override;
   bool messageAvailable() override;
   void send(Message* message) override;

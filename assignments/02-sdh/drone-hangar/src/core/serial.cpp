@@ -4,34 +4,31 @@
 
 #include "utils.hpp"
 
-SerialManager::SerialManager(unsigned long baud)
-    : queue(), currentMessage(nullptr) {
-  Serial.begin(baud);
-  while (!Serial) {
-  }
-}
+SerialMessageService::SerialMessageService()
+    : queue(), currentMessage(nullptr) {}
 
-Message* SerialManager::getMessage() { return this->currentMessage; }
+Message* SerialMessageService::getMessage() { return this->currentMessage; }
 
-bool SerialManager::messageAvailable() {
+bool SerialMessageService::messageAvailable() {
   return this->currentMessage != nullptr;
 }
 
-Message* SerialManager::decodeSerialMessage(String message) {
-  assert(message.length() >= 3);            // start, type delimiter, terminator
-  assert(message[0] == MESSAGE_DELIMITER);  // start with delimiter
+Message* SerialMessageService::decodeSerialMessage(String message) {
+  // assert(message.length() >= 3);            // start, type delimiter,
+  // terminator assert(message[0] == MESSAGE_DELIMITER);  // start with
+  // delimiter
   int typeDelimiterIndex = message.indexOf(MESSAGE_DELIMITER);
-  assert(typeDelimiterIndex != -1);
+  // assert(typeDelimiterIndex != -1);
   int terminatorIndex =
       message.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
-  assert(terminatorIndex == ((int)message.length()) - 1);
+  // assert(terminatorIndex == ((int)message.length()) - 1);
   MessageType type = enumFromString<MessageType>(
       message.substring(0, typeDelimiterIndex), MESSAGE_TYPE_STRINGS);
   String content = message.substring(typeDelimiterIndex, terminatorIndex);
   return new Message(type, content);
 }
 
-void SerialManager::read() {
+void SerialMessageService::read() {
   if (this->currentMessage != nullptr) {
     delete this->currentMessage;
     this->currentMessage = nullptr;
@@ -49,7 +46,7 @@ void SerialManager::read() {
       content += ch;
     }
     if (delimiters == 3) {
-      this->queue.add(SerialManager::decodeSerialMessage(content));
+      this->queue.add(SerialMessageService::decodeSerialMessage(content));
       content = String();
       delimiters = 0;
     }
@@ -57,7 +54,7 @@ void SerialManager::read() {
   this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
 }
 
-void SerialManager::send(Message* message) {
+void SerialMessageService::send(Message* message) {
   Serial.print(
       MESSAGE_DELIMITER +
       enumToString<MessageType>(message->getType(), MESSAGE_TYPE_STRINGS) +

@@ -16,5 +16,5 @@ class LCD : public Display {
  public:
   LCD(uint8_t address, uint8_t cols, uint8_t rows);
   void clear() override;
-  void print(String message) override;
+  void print(String* message) override;
 };
