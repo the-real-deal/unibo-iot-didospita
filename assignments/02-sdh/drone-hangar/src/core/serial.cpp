@@ -28,10 +28,7 @@ Message* SerialMessageService::decodeSerialMessage(String message) {
 }
 
 void SerialMessageService::read() {
-  if (this->currentMessage != nullptr) {
-    delete this->currentMessage;
-    this->currentMessage = nullptr;
-  }
+  safeDelete(&this->currentMessage);
 
   String content;
   uint8_t delimiters = 0;
@@ -53,12 +50,14 @@ void SerialMessageService::read() {
   this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
 }
 
-void SerialMessageService::send(Message* message) {
+void SerialMessageService::send(Message message) {
   String typeString = String(
-      enumToString<MessageType>(message->getType(), MESSAGE_TYPE_STRINGS));
+      enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS));
+  Serial.flush();
   Serial.print(MESSAGE_DELIMITER);
   Serial.print(typeString);
   Serial.print(MESSAGE_DELIMITER);
-  Serial.print(message->getContent());
+  Serial.print(message.getContent());
   Serial.print(MESSAGE_DELIMITER);
+  Serial.flush();
 }

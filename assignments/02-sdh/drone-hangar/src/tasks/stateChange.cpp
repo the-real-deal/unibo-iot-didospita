@@ -28,11 +28,10 @@ void StateChangeTask::IdleState::step(StateChangeTask* task, Context* context) {
 void StateChangeTask::PrintState::step(StateChangeTask* task,
                                        Context* context) {
   GlobalState state = context->getState();
-  String stateString = enumToString(state, GLOBAL_STATE_STRINGS);
-  Message message = Message(MessageType::STATE, stateString);
+  String stateString = String(enumToString(state, GLOBAL_STATE_STRINGS));
   task->internalDisplay->clear();
   task->internalDisplay->print(&stateString);
-  task->messageService->send(&message);
+  task->messageService->send(Message(MessageType::STATE, stateString));
   task->prevState = state;
   task->switchState(new IdleState());
 }

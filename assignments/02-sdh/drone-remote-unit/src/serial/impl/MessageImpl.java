@@ -3,12 +3,12 @@ package serial.impl;
 import serial.api.Message;
 import serial.api.MessageType;
 
-public class MessageImpl implements Message{
+public class MessageImpl implements Message {
     private MessageType type;
     private String content;
 
-    public MessageImpl(MessageType type){
-        this.type = type;
+    public MessageImpl(MessageType type) {
+        this(type, "");
     }
 
     public MessageImpl(MessageType type, String content) {

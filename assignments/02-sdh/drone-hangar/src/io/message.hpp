@@ -10,7 +10,7 @@ enum class MessageType {
 };
 const char* const MESSAGE_TYPE_STRINGS[] = {
     "REQUEST LANDING",
-    "REQUEST_TAKEOFF",
+    "REQUEST TAKEOFF",
     "STATE",
     "DISTANCE",
 };
@@ -31,6 +31,6 @@ class MessageService {
  public:
   virtual Message* getMessage() = 0;
   virtual bool messageAvailable() = 0;
-  virtual void send(Message* message) = 0;
+  virtual void send(Message message) = 0;
   virtual ~MessageService() = default;
 };

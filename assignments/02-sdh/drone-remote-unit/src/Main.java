@@ -4,13 +4,14 @@ import gui.impl.DroneControllerImpl;
 import gui.view.PanelViewImpl;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         PanelView mainView = new PanelViewImpl();
-        DroneController controller = new DroneControllerImpl(null, 0, mainView);
+        DroneController controller = new DroneControllerImpl("/dev/ttyACM0", 9600, mainView);
         controller.setView(mainView);
+        controller.initialize();
         mainView.setController(controller);
 
-        while(true) {
+        while (true) {
             controller.updateViewStatus();
         }
     }

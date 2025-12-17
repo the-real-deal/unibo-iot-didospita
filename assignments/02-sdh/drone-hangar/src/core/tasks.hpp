@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "scheduler.hpp"
+#include "utils.hpp"
 
 template <class T>
 class TaskState {
@@ -19,13 +20,12 @@ class Task : public LogicThread {
 
   Task(TaskState<T>* initialState) : state(initialState), prevState(nullptr) {};
   ~Task() {
-    delete this->state;
-    delete this->prevState;
+    safeDelete(&this->state);
+    safeDelete(&this->prevState);
   };
 
   void step(Context* context) override {
-    delete this->prevState;
-    this->prevState = nullptr;
+    safeDelete(&this->prevState);
     this->state->step(static_cast<T*>(this), context);
   };
 

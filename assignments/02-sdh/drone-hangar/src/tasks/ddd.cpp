@@ -15,8 +15,7 @@ DDDTask::DDDTask(DistanceSensor* droneDistanceSensor,
       insideTimeMillis(insideTimeMillis) {}
 
 void DDDTask::sendDistance(float distance) {
-  Message message = Message(MessageType::DISTANCE, String(distance));
-  this->messageService->send(&message);
+  this->messageService->send(Message(MessageType::DISTANCE, String(distance)));
 }
 
 void DDDTask::IdleState::step(DDDTask* task, Context* context) {

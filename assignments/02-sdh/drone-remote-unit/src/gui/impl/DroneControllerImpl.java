@@ -8,7 +8,7 @@ import serial.api.MessageType;
 import serial.impl.MessageImpl;
 import serial.impl.SerialCommChannel;
 
-public class DroneControllerImpl implements DroneController{
+public class DroneControllerImpl implements DroneController {
 
     private MessageService serialManager;
     private PanelView managerView;
@@ -26,13 +26,12 @@ public class DroneControllerImpl implements DroneController{
     }
 
     @Override
-    public void sendMessage(String msg) {
+    public void sendMessage(Message msg) {
         String statusMsg;
-        if(this.serialManager.send(new MessageImpl(MessageType.valueOf(msg)))){
+        if (this.serialManager.send(msg)) {
             statusMsg = "Message sent!!!";
-        }
-        else {
-            statusMsg = "Error in sending..."; 
+        } else {
+            statusMsg = "Error in sending...";
         }
         this.managerView.displayMessage(statusMsg, "MESSAGE STATUS");
     }
@@ -55,7 +54,7 @@ public class DroneControllerImpl implements DroneController{
     public void updateViewStatus() {
         if (serialManager.messageAvailable()) {
             Message msg = receiveMsg();
-            assert(msg.getType() != null && msg.getContent().isEmpty());
+            assert (msg.getType() != null && msg.getContent().isEmpty());
             if (msg.getType() == MessageType.STATE && msg.getContent() != "ALARM" && msg.getContent() != "NORMAL") {
                 managerView.updateDroneStatus(msg.getContent());
             }
@@ -64,7 +63,7 @@ public class DroneControllerImpl implements DroneController{
             }
             if (msg.getType() == MessageType.DISTANCE) {
                 managerView.updateDistance(msg.getContent());
-            }   
+            }
         }
     }
 }

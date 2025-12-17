@@ -18,8 +18,9 @@ class DHTSensor : public TemperatureSensor,
                   public HumiditySensor,
                   public ExternalInput {
  private:
-  DHT_Unified dht;
-  sensors_event_t event;
+  DHT dht;
+  float temperature;
+  float humidity;
 
  protected:
   void read() override;

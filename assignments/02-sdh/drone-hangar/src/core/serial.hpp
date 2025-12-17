@@ -17,6 +17,6 @@ class SerialMessageService : public MessageService, public ExternalInput {
   SerialMessageService();
   Message* getMessage() override;
   bool messageAvailable() override;
-  void send(Message* message) override;
+  void send(Message message) override;
   void read() override;
 };
