@@ -31,6 +31,7 @@ public class PanelViewImpl extends JFrame implements PanelView {
         initUI();
         
         setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void initUI() {
@@ -71,21 +72,14 @@ public class PanelViewImpl extends JFrame implements PanelView {
         btnTakeoff.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.sendMessage("TAKEOFF");
-                
-                setDroneStatus("TAKEOFF");
-                setHangarStatus(controller.receiveMsg());
+                controller.sendMessage("REQUEST_TAKEOFF");
             }
         });
 
         btnLanding.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.sendMessage("LANDING");
-                
-                setDroneStatus("LANDING");
-                setHangarStatus(controller.receiveMsg());
-                setDistance(controller.receiveMsg());
+                controller.sendMessage("REQUEST_LANDING");
             }
         });
 
@@ -94,18 +88,6 @@ public class PanelViewImpl extends JFrame implements PanelView {
 
         add(infoPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-    }
-
-    private void setDroneStatus(String status) {
-        lblStatusDroneVal.setText(status);
-    }
-
-    private void setHangarStatus(String status) {
-        lblStatusHangarVal.setText(status);
-    }
-
-    private void setDistance(String distance) {
-        lblDistanceVal.setText(distance);
     }
 
 
@@ -119,6 +101,19 @@ public class PanelViewImpl extends JFrame implements PanelView {
         this.controller = controller;
     }
 
+    @Override
+    public void updateDroneStatus(String status) {
+        lblStatusDroneVal.setText(status);
+    }
 
+    @Override
+    public void updateHangarStatus(String status) {
+        lblStatusHangarVal.setText(status);
+    }
+
+    @Override
+    public void updateDistance(String distance) {
+        lblDistanceVal.setText(distance);
+    }
 
 }

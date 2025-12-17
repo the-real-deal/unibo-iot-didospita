@@ -9,5 +9,9 @@ public class Main {
         DroneController controller = new DroneControllerImpl(null, 0, mainView);
         controller.setView(mainView);
         mainView.setController(controller);
+
+        while(true) {
+            controller.updateViewStatus();
+        }
     }
 }

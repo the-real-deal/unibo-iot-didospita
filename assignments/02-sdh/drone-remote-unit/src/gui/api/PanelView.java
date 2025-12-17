@@ -8,4 +8,7 @@ public interface PanelView {
      */
     void displayMessage(String messagge, String title); 
     void setController(DroneController controller);
+    void updateDroneStatus(String status);
+    void updateHangarStatus(String status);
+    void updateDistance(String distance);
 }

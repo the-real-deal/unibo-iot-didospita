@@ -1,6 +1,5 @@
 package gui.api;
 
-
 public interface DroneController {
     /**
      * A method that is invoked to display a specific message passed from the controller in response to certain actions.
@@ -9,5 +8,6 @@ public interface DroneController {
     void sendMessage(String msg);
     void initialize() throws Exception;
     void setView(PanelView view);
-    String receiveMsg();
+    void updateViewStatus();
+    
 }

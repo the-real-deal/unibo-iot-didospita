@@ -2,7 +2,9 @@ package serial.impl;
 
 import java.util.concurrent.*;
 import jssc.*;
-import serial.api.CommChannel;
+import serial.api.Message;
+import serial.api.MessageService;
+import serial.api.MessageType;
 
 /**
  * Comm channel implementation based on serial port.
@@ -10,14 +12,17 @@ import serial.api.CommChannel;
  * @author aricci
  *
  */
-public class SerialCommChannel implements CommChannel, SerialPortEventListener {
+public class SerialCommChannel implements MessageService, SerialPortEventListener {
 
+	private static final char  MESSAGE_DELIMITER = '|';
 	private SerialPort serialPort;
-	private BlockingQueue<String> queue;
-	private StringBuffer currentMsg = new StringBuffer("");
+	private BlockingQueue<Message> queue;
+	private Message currentMsg;
+	private StringBuffer decoderMsg = new StringBuffer("");
+	private int delimiters = 0;
 	
 	public SerialCommChannel(String port, int rate) throws Exception {
-		queue = new ArrayBlockingQueue<String>(100);
+		queue = new ArrayBlockingQueue<Message>(100);
 
 		serialPort = new SerialPort(port);
 		serialPort.openPort();
@@ -32,34 +37,6 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 
 		// serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
 		serialPort.addEventListener(this);
-	}
-
-	@Override
-	public boolean sendMsg(String msg) {
-		char[] array = (msg+"\n").toCharArray();
-		byte[] bytes = new byte[array.length];
-		for (int i = 0; i < array.length; i++){
-			bytes[i] = (byte) array[i];
-		}
-		try {
-			synchronized (serialPort) {
-				serialPort.writeBytes(bytes);
-			}
-		} catch(Exception ex){
-			ex.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public String receiveMsg() throws InterruptedException {
-		return queue.take();
-	}
-
-	@Override
-	public boolean isMsgAvailable() {
-		return !queue.isEmpty();
 	}
 
 	/**
@@ -77,39 +54,72 @@ public class SerialCommChannel implements CommChannel, SerialPortEventListener {
 		}
 	}
 
+	private Message decoderSerialMessage(StringBuffer message) {
+		assert(message.length() >= 3);            // start, type delimiter, terminator
+		assert(message.toString().charAt(0) == MESSAGE_DELIMITER);  // start with delimiter
+		int typeDelimiterIndex = message.toString().indexOf(MESSAGE_DELIMITER);
+		assert(typeDelimiterIndex != -1);
+		int terminatorIndex = message.toString().indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
+		assert(terminatorIndex == ((int)message.length()) - 1);
+		MessageType type = MessageType.valueOf(message.substring(0, typeDelimiterIndex));
+		String content = message.substring(typeDelimiterIndex, terminatorIndex);
+		return new MessageImpl(type, content);
+	}
 
 	public void serialEvent(SerialPortEvent event) {
 		/* if there are bytes received in the input buffer */
 		if (event.isRXCHAR()) {
             try {
-            		String msg = serialPort.readString(event.getEventValue());
+					this.decoderMsg = new StringBuffer();
+					String msg = serialPort.readString(event.getEventValue());
             		
-            		msg = msg.replaceAll("\r", "");
-            		
-					/* VERIFICARE SE IL MESSAGGIO INIZIA IN UN CERTO MODO ALLORA LO CONSIDERA
-					ALTRIMENTI LO SCARTA  */
-            		currentMsg.append(msg);
-            		
-            		boolean goAhead = true;
-            		
-        			while(goAhead) {
-        				String msg2 = currentMsg.toString();
-        				int index = msg2.indexOf("\n");
-            			if (index >= 0) {
-            				queue.put(msg2.substring(0, index));
-            				currentMsg = new StringBuffer("");
-            				if (index + 1 < msg2.length()) {
-            					currentMsg.append(msg2.substring(index + 1)); 
-            				}
-            			} else {
-            				goAhead = false;
-            			}
-        			}
-        			
+					for (char ch : msg.toCharArray()) {
+						if (ch == MESSAGE_DELIMITER) {
+							this.delimiters++;
+						}
+						if (this.delimiters > 0){
+							decoderMsg.append(ch); 
+						}
+						if (this.delimiters == 3) {
+							this.queue.add(decoderSerialMessage(decoderMsg));
+							this.decoderMsg = new StringBuffer();
+							this.delimiters = 0;
+						}
+					}
+					this.currentMsg = this.readMessage();			
             } catch (Exception ex) {
             		ex.printStackTrace();
                 System.out.println("Error in receiving string from COM-port: " + ex);
             }
         }
+	}
+
+	@Override
+	public Message readMessage() throws InterruptedException {
+		return this.currentMsg =  messageAvailable() ? this.queue.take() : null;
+	}
+
+	@Override
+	public boolean messageAvailable() {
+		return this.currentMsg != null;
+	}
+
+	@Override
+	public boolean send(Message message) {
+		
+		char[] array = ((MESSAGE_DELIMITER + message.getType().toString() + MESSAGE_DELIMITER + message.getContent() + MESSAGE_DELIMITER)).toCharArray();
+		byte[] bytes = new byte[array.length];
+		for (int i = 0; i < array.length; i++){
+			bytes[i] = (byte) array[i];
+		}
+		try {
+			synchronized (serialPort) {
+				serialPort.writeBytes(bytes);
+			}
+		} catch(Exception ex){
+			ex.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

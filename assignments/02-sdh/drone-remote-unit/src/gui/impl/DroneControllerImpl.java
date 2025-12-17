@@ -2,12 +2,15 @@ package gui.impl;
 
 import gui.api.DroneController;
 import gui.api.PanelView;
-import serial.api.CommChannel;
+import serial.api.Message;
+import serial.api.MessageService;
+import serial.api.MessageType;
+import serial.impl.MessageImpl;
 import serial.impl.SerialCommChannel;
 
 public class DroneControllerImpl implements DroneController{
 
-    private CommChannel serialManager;
+    private MessageService serialManager;
     private PanelView managerView;
     private String serialPort;
     private int rate;
@@ -25,7 +28,7 @@ public class DroneControllerImpl implements DroneController{
     @Override
     public void sendMessage(String msg) {
         String statusMsg;
-        if(this.serialManager.sendMsg(msg)){
+        if(this.serialManager.send(new MessageImpl(MessageType.valueOf(msg)))){
             statusMsg = "Message sent!!!";
         }
         else {
@@ -39,19 +42,29 @@ public class DroneControllerImpl implements DroneController{
         this.managerView = view;
     }
 
-    @Override
-    public String receiveMsg() {
-        String msg;
+    private Message receiveMsg() {
+        Message msg = new MessageImpl(null);
         try {
-            msg = this.serialManager.receiveMsg();
+            msg = this.serialManager.readMessage();
         } catch (InterruptedException e) {
-            msg = "ERROR";
             e.printStackTrace();
-        }
-        if(msg.isBlank()){
-            msg = "ERROR";
         }
         return msg;
     }
-    
+
+    public void updateViewStatus() {
+        if (serialManager.messageAvailable()) {
+            Message msg = receiveMsg();
+            assert(msg.getType() != null && msg.getContent().isEmpty());
+            if (msg.getType() == MessageType.STATE && msg.getContent() != "ALARM" && msg.getContent() != "NORMAL") {
+                managerView.updateDroneStatus(msg.getContent());
+            }
+            if (msg.getType() == MessageType.STATE && msg.getContent() == "ALARM" || msg.getContent() == "NORMAL") {
+                managerView.updateHangarStatus(msg.getContent());
+            }
+            if (msg.getType() == MessageType.DISTANCE) {
+                managerView.updateDistance(msg.getContent());
+            }   
+        }
+    }
 }
