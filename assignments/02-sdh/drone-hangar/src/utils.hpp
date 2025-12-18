@@ -14,11 +14,3 @@ T enumFromString(const String value, const char* const (&enumStrings)[N]) {
   }
   abort();
 }
-
-template <typename T>
-void safeDelete(T** ptr) {
-  if (*ptr == nullptr) {
-    delete *ptr;
-    *ptr = nullptr;
-  }
-}

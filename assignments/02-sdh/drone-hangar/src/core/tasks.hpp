@@ -16,24 +16,24 @@ template <class T>
 class Task : public LogicThread {
  public:
   TaskState<T>* state;
-  TaskState<T>* prevState;
+  TaskState<T>* stateCandidate;
 
-  Task(TaskState<T>* initialState) : state(initialState), prevState(nullptr) {};
+  Task(TaskState<T>* initialState)
+      : state(initialState), stateCandidate(nullptr) {};
   ~Task() {
-    safeDelete(&this->state);
-    safeDelete(&this->prevState);
+    delete this->state;
+    delete this->stateCandidate;
   };
 
   void step(Context* context) override {
-    safeDelete(&this->prevState);
+    // TODO: check if state candidate works
+    this->stateCandidate = nullptr;
     this->state->step(static_cast<T*>(this), context);
+    if (this->stateCandidate != nullptr) {
+      delete this->state;
+      this->state = this->stateCandidate;
+    }
   };
 
-  void switchState(TaskState<T>* state) {
-    assert(this->prevState == nullptr);  // prevent calling twice
-    this->prevState =
-        this->state;  // state deleted on next read to prevent
-                      // deletion while the step is still executing
-    this->state = state;
-  }
+  void switchState(TaskState<T>* state) { this->stateCandidate = this->state; }
 };

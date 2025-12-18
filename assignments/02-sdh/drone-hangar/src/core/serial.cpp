@@ -28,8 +28,6 @@ Message* SerialMessageService::decodeSerialMessage(String message) {
 }
 
 void SerialMessageService::read() {
-  safeDelete(&this->currentMessage);
-
   String content;
   uint8_t delimiters = 0;
 
@@ -47,6 +45,7 @@ void SerialMessageService::read() {
       delimiters = 0;
     }
   }
+  delete this->currentMessage;
   this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
 }
 
