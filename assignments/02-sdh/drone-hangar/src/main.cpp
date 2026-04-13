@@ -21,22 +21,24 @@
 #include "tasks/reset.hpp"
 #include "tasks/stateChange.hpp"
 
-I2CManager* i2c;
-Scheduler* scheduler;
-SerialMessageService* serialMessageService;
-LCD* lcd;
-PIRSensor* pir;
-ArduinoServoMotor* servo;
-DHTSensor* dht;
-UltrasonicSensor* sonar;
-PushButton* resetButton;
-Led* onLed;
-Led* inActionLed;
-Led* alarmLed;
+I2CManager *i2c;
+Scheduler *scheduler;
+SerialMessageService *serialMessageService;
+LCD *lcd;
+PIRSensor *pir;
+ArduinoServoMotor *servo;
+DHTSensor *dht;
+UltrasonicSensor *sonar;
+PushButton *resetButton;
+Led *onLed;
+Led *inActionLed;
+Led *alarmLed;
 
-void setup() {
+void setup()
+{
   Serial.begin(SERIAL_BAUD);
-  while (!Serial);
+  while (!Serial)
+    ;
   Wire.begin();
 
   GlobalState initialState = GlobalState::Inside;
@@ -66,13 +68,14 @@ void setup() {
   alarmLed = new Led(ALARM_LED_PIN);
 
   scheduler->addInput(serialMessageService);
+  Serial.println("ADDED SERIAL MESSAGE SERVICE");
   scheduler->addInput(pir);
   // temperature reading must be performed before distance reading if the
   // sonar does not use a static temperature
   scheduler->addInput(dht);
   scheduler->addInput(sonar);
   scheduler->addInput(resetButton);
-
+  
   scheduler->addThread(new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE,
                                     serialMessageService));
   scheduler->addThread(new DDDTask(sonar, serialMessageService,
