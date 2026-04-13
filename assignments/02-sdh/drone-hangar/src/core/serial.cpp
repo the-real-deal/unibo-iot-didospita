@@ -28,27 +28,72 @@ Message* SerialMessageService::decodeSerialMessage(String message) {
 }
 
 void SerialMessageService::read() {
-  String content;
-  uint8_t delimiters = 0;
-
+  static String buffer = "";
+  
+  // Read ALL available bytes into buffer
   while (Serial.available()) {
-    char ch = (char)Serial.read();
-    if (ch == MESSAGE_DELIMITER) {
-      delimiters++;
-    }
-    if (delimiters > 0) {
-      content += ch;
-    }
-    if (delimiters == 3) {
-      this->queue.add(SerialMessageService::decodeSerialMessage(content));
-      content = String();
-      delimiters = 0;
+    char ch = Serial.read();
+    if (ch != '\r' && ch != '\n') {
+      buffer += ch;
     }
   }
+  
+  // If buffer is empty, nothing to do
+  if (buffer.length() == 0) return;
+  
+  // Try to parse complete messages from buffer
+  // Format: |TYPE|CONTENT|
+  while (buffer.length() >= 3) {
+    int firstDelim = buffer.indexOf('|');
+    if (firstDelim == -1) {
+      buffer = "";
+      break;
+    }
+    
+    int secondDelim = buffer.indexOf('|', firstDelim + 1);
+    if (secondDelim == -1) {
+      // Incomplete message - wait for more data
+      break;
+    }
+    
+    int thirdDelim = buffer.indexOf('|', secondDelim + 1);
+    if (thirdDelim == -1) {
+      // Incomplete - wait for more
+      break;
+    }
+    
+    // We have a complete message!
+    String typeStr = buffer.substring(firstDelim + 1, secondDelim);
+    String content = buffer.substring(secondDelim + 1, thirdDelim);
+    
+    Serial.print("PARSED:");
+    Serial.print(typeStr);
+    Serial.print(":");
+    Serial.println(content);
+    
+    // Parse message type
+    MessageType type = enumFromString<MessageType>(typeStr, MESSAGE_TYPE_STRINGS);
+    this->queue.add(new Message(type, content));
+    
+    // Remove parsed message from buffer
+    buffer = buffer.substring(thirdDelim + 1);
+  }
+  
+  // Clean up buffer if it gets too long (possible garbage)
+  if (buffer.length() > 50) {
+    buffer = "";
+  }
+  
+  // Get next message from queue
   if (this->messageAvailable()) {
     delete this->currentMessage;
   }
   this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
+  
+  if (this->currentMessage != nullptr) {
+    Serial.print("GOT:");
+    Serial.println((int)this->currentMessage->getType());
+  }
 }
 
 void SerialMessageService::send(Message message) {

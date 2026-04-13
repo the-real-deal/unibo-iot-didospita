@@ -32,8 +32,8 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 				SerialPort.STOPBITS_1,
 				SerialPort.PARITY_NONE);
 
-		serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
-				SerialPort.FLOWCONTROL_RTSCTS_OUT);
+		// serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN |
+		// 		SerialPort.FLOWCONTROL_RTSCTS_OUT);
 
 		// serialPort.addEventListener(this, SerialPort.MASK_RXCHAR);
 		serialPort.addEventListener(this);
@@ -61,8 +61,13 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 		assert (typeDelimiterIndex != -1);
 		int terminatorIndex = message.toString().indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
 		assert (terminatorIndex == ((int) message.length()) - 1);
-		MessageType type = MessageType.valueOf(message.substring(0, typeDelimiterIndex));
-		String content = message.substring(typeDelimiterIndex, terminatorIndex);
+		String typeStr = message.substring(0, typeDelimiterIndex);
+		MessageType type = MessageType.fromDisplayName(typeStr);
+		if (type == null) {
+			System.out.println("Unknown message type: " + typeStr);
+			return null;
+		}
+		String content = message.substring(typeDelimiterIndex + 1, terminatorIndex);
 		return new MessageImpl(type, content);
 	}
 
@@ -71,6 +76,7 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 		if (event.isRXCHAR()) {
 			try {
 				String msg = serialPort.readString(event.getEventValue());
+				System.out.println("[SERIAL RECEIVED] Raw: " + msg.replace("\n", "\\n").replace("\r", "\\r"));
 
 				for (char ch : msg.toCharArray()) {
 					if (ch == MESSAGE_DELIMITER) {
@@ -80,11 +86,21 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 						decoderMsg.append(ch);
 					}
 					if (this.delimiters == 3) {
-						this.queue.add(decoderSerialMessage(decoderMsg));
+						Message decoded = decoderSerialMessage(decoderMsg);
+						if (decoded != null) {
+							this.queue.add(decoded);
+							System.out.println("[MESSAGE DECODED] Type: " + decoded.getType() + ", Content: " + decoded.getContent());
+						}
 						this.decoderMsg = new StringBuffer();
 						this.delimiters = 0;
 					}
 				}
+				
+				// If we have incomplete data but no more coming, reset (timeout handling)
+				if (this.delimiters > 0 && this.delimiters < 3) {
+					// Keep accumulating - don't reset
+				}
+				
 				this.currentMsg = this.readMessage();
 			} catch (Exception ex) {
 				ex.printStackTrace();

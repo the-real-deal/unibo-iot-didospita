@@ -52,14 +52,23 @@ public class DroneControllerImpl implements DroneController {
     }
 
     public void updateViewStatus() {
-        if (serialManager.messageAvailable()) {
+        // Don't poll - messages are processed in serialEvent callback
+        // Just check if there are messages in the queue
+        while (serialManager.messageAvailable()) {
             Message msg = receiveMsg();
-            assert (msg.getType() != null && msg.getContent().isEmpty());
-            if (msg.getType() == MessageType.STATE && msg.getContent() != "ALARM" && msg.getContent() != "NORMAL") {
-                managerView.updateDroneStatus(msg.getContent());
+            if (msg == null || msg.getType() == null) {
+                break;
             }
-            if (msg.getType() == MessageType.STATE && msg.getContent() == "ALARM" || msg.getContent() == "NORMAL") {
-                managerView.updateHangarStatus(msg.getContent());
+            if (msg.getType() == MessageType.STATE) {
+                String content = msg.getContent();
+                if (content.equals("ALARM") || content.equals("PREALARM")) {
+                    managerView.updateHangarStatus(content);
+                } else {
+                    managerView.updateDroneStatus(content);
+                    if (content.equals("DRONE INSIDE") || content.equals("DRONE OUTSIDE")) {
+                        managerView.updateHangarStatus("NORMAL");
+                    }
+                }
             }
             if (msg.getType() == MessageType.DISTANCE) {
                 managerView.updateDistance(msg.getContent());

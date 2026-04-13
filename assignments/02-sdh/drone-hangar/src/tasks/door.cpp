@@ -25,8 +25,9 @@ void DoorTask::ClosedState::step(DoorTask* task, Context* context) {
           task->messageService->getMessage()->getType() ==
               MessageType::REQUEST_TAKEOFF) {
         context->setState(GlobalState::Takeoff);
+        return;  // Don't fall through to default - door should open
       }
-      // no break, perform angle read even if inside
+      break;
     default:
       if (task->servo->getAngle() > task->closedAngle) {
         task->servo->setAngle(task->closedAngle);

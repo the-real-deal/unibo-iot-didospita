@@ -4,9 +4,8 @@
 #include "utils.hpp"
 
 StateChangeTask::StateChangeTask(Display* internalDisplay,
-                                 MessageService* messageService,
-                                 GlobalState initialState)
-    : Task<StateChangeTask>(new IdleState()),
+                                 MessageService* messageService)
+    : Task<StateChangeTask>(new PrintState()),
       internalDisplay(internalDisplay),
       messageService(messageService),
       prevState(GlobalState::Outside) {}

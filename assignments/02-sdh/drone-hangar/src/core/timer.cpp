@@ -8,16 +8,17 @@ Timer::Timer(uint64_t periodMillis)
 
 uint64_t Timer::getElapsedMillis() { return millis() - this->startTime; }
 
-bool Timer::isFinished() {
+bool Timer::isFinished()
+{
   return this->getElapsedMillis() >= this->periodMillis;
 }
 
-uint64_t Timer::wait() {
-  uint64_t remaining = this->periodMillis - this->getElapsedMillis();
-  if (remaining >= 0) {
-    delay(remaining);
+uint64_t Timer::wait()
+{
+  while (this->getElapsedMillis() < this->periodMillis)
+  {
+    delay(10);
   }
-  
   uint64_t total = this->getElapsedMillis();
   this->startTime = millis();
   return total;

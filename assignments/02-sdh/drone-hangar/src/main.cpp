@@ -67,11 +67,8 @@ void setup()
   int lcdAddress = i2c.scan();
   lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);
   lcd->begin();
-  
-  String initMsg = "DRONE INSIDE";
-  lcd->print(&initMsg);
 
-  stateChangeTask = new StateChangeTask(lcd, &serialMessageService, initialState);
+  stateChangeTask = new StateChangeTask(lcd, &serialMessageService);
 
   scheduler.addInput(&serialMessageService);
   scheduler.addInput(&pir);
@@ -92,4 +89,6 @@ void setup()
   alarmLed.turnOff();
 }
 
-void loop() { scheduler.advance(); }
+void loop() { 
+  scheduler.advance(); 
+}
