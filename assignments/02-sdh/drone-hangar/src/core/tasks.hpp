@@ -26,7 +26,6 @@ class Task : public LogicThread {
   };
 
   void step(Context* context) override {
-    // TODO: check if state candidate works
     this->stateCandidate = nullptr;
     this->state->step(static_cast<T*>(this), context);
     if (this->stateCandidate != nullptr) {
@@ -35,6 +34,5 @@ class Task : public LogicThread {
     }
   };
 
-  // WHY this->state instead of state?????????????????????????
-  void switchState(TaskState<T>* state) { this->stateCandidate = this->state; }
+  void switchState(TaskState<T>* state) { this->stateCandidate = state; }
 };
