@@ -44,7 +44,7 @@ void UltrasonicSensor::read() {
   delayMicroseconds(this->readDelayMicros);
   this->triggerPin.write(DigitalValue::Low);
 
-  uint8_t readStart = micros();
+  uint64_t readStart = micros();
   uint64_t pulse =
       this->echoPin.readPulse(DigitalValue::High, this->readTimeoutMicros);
   uint64_t readTime = micros() - readStart;

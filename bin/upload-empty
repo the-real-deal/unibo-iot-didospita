@@ -2,7 +2,6 @@
 
 set -e # exit on error
 
-DEV_TTY=${DEV_TTY:-${1:-"/dev/ttyACM0"}}
 TMP_DIR=$(mktemp -d)
 cd $TMP_DIR
 pio project init --board uno

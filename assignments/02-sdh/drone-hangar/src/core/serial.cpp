@@ -45,7 +45,9 @@ void SerialMessageService::read() {
       delimiters = 0;
     }
   }
-  delete this->currentMessage;
+  if (this->messageAvailable()) {
+    delete this->currentMessage;
+  }
   this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
 }
 

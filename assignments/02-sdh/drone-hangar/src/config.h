@@ -13,7 +13,7 @@
 // leds
 #define ON_LED_PIN 7         // L1
 #define IN_ACTION_LED_PIN 8  // L2
-#define ALARM_LED_PIN 8      // L3
+#define ALARM_LED_PIN 9      // L3
 
 // dht
 #define DHT_PIN 11  // TEMP
