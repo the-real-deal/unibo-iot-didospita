@@ -21,18 +21,41 @@
 #include "tasks/reset.hpp"
 #include "tasks/stateChange.hpp"
 
-I2CManager *i2c;
-Scheduler *scheduler;
-SerialMessageService *serialMessageService;
-LCD *lcd;
-PIRSensor *pir;
-ArduinoServoMotor *servo;
-DHTSensor *dht;
-UltrasonicSensor *sonar;
-PushButton *resetButton;
-Led *onLed;
-Led *inActionLed;
-Led *alarmLed;
+GlobalState initialState = GlobalState::Inside;
+I2CManager i2c;
+Scheduler scheduler(SCHEDULER_PERIOD_MS, initialState);
+SerialMessageService serialMessageService;
+LCD *lcd = nullptr; // in the heap to allow scanning for the i2c address
+PIRSensor pir(PIR_PIN);
+ArduinoServoMotor servo(SERVO_PIN, DOOR_CLOSED_ANGLE, SERVO_MIN_FREQ,
+                        SERVO_MAX_FREQ);
+DHTSensor dht(DHT_PIN, static_cast<DHTType>(DHT_TYPE));
+UltrasonicSensor sonar(
+    SONAR_ECHO_PIN, SONAR_TRIGGER_PIN,
+    SONAR_READ_TIMEOUT_US, SONAR_READ_DELAY_US,
+#ifdef SONAR_USE_TEMP_SENSOR
+    &dht
+#else
+    SONAR_TEMP
+#endif
+);
+PushButton resetButton(RESET_BUTTON_PIN);
+Led onLed(ON_LED_PIN);
+Led inActionLed(IN_ACTION_LED_PIN);
+Led alarmLed(ALARM_LED_PIN);
+
+DoorTask doorTask(&servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE,
+                  &serialMessageService);
+DDDTask dddTask(&sonar, &serialMessageService,
+                OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
+                INSIDE_DISTANCE, INSIDE_TIME_MS);
+StateChangeTask *stateChangeTask = nullptr; // in the heap because it depends on lcd
+DPDTask dpdTask(&pir, &serialMessageService);
+BlinkTask blinkTask(&inActionLed, BLINK_PERIOD_MS);
+AlarmTask alarmTask(&dht, &alarmLed, initialState, PREALARM_TEMP,
+                    PREALARM_TIME_MS, ALARM_TEMP,
+                    ALARM_TIME_MS);
+ResetTask resetTask(&resetButton, initialState);
 
 void setup()
 {
@@ -41,58 +64,32 @@ void setup()
     ;
   Wire.begin();
 
-  GlobalState initialState = GlobalState::Inside;
-
-  i2c = new I2CManager();
-  scheduler = new Scheduler(SCHEDULER_PERIOD_MS, initialState);
-  serialMessageService = new SerialMessageService();
-
-  int lcdAddress = i2c->scan();
-  assert(lcdAddress != -1);
+  int lcdAddress = i2c.scan();
   lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);
-  pir = new PIRSensor(PIR_PIN);
-  servo = new ArduinoServoMotor(SERVO_PIN, DOOR_CLOSED_ANGLE, SERVO_MIN_FREQ,
-                                SERVO_MAX_FREQ);
-  dht = new DHTSensor(DHT_PIN, static_cast<DHTType>(DHT_TYPE));
-  sonar = new UltrasonicSensor(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN,
-                               SONAR_READ_TIMEOUT_US, SONAR_READ_DELAY_US,
-#ifdef SONAR_USE_TEMP_SENSOR
-                               dht
-#else
-                               SONAR_TEMP
-#endif
-  );
-  resetButton = new PushButton(RESET_BUTTON_PIN);
-  onLed = new Led(ON_LED_PIN);
-  inActionLed = new Led(IN_ACTION_LED_PIN);
-  alarmLed = new Led(ALARM_LED_PIN);
-
-  scheduler->addInput(serialMessageService);
-  Serial.println("ADDED SERIAL MESSAGE SERVICE");
-  scheduler->addInput(pir);
-  // temperature reading must be performed before distance reading if the
-  // sonar does not use a static temperature
-  scheduler->addInput(dht);
-  scheduler->addInput(sonar);
-  scheduler->addInput(resetButton);
+  lcd->begin();
   
-  scheduler->addThread(new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE,
-                                    serialMessageService));
-  scheduler->addThread(new DDDTask(sonar, serialMessageService,
-                                   OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
-                                   INSIDE_DISTANCE, INSIDE_TIME_MS));
-  scheduler->addThread(new DPDTask(pir, serialMessageService));
-  scheduler->addThread(new BlinkTask(inActionLed, BLINK_PERIOD_MS));
-  scheduler->addThread(
-      new StateChangeTask(lcd, serialMessageService, initialState));
-  scheduler->addThread(new AlarmTask(dht, alarmLed, initialState, PREALARM_TEMP,
-                                     PREALARM_TIME_MS, ALARM_TEMP,
-                                     ALARM_TIME_MS));
-  scheduler->addThread(new ResetTask(resetButton, initialState));
+  String initMsg = "DRONE INSIDE";
+  lcd->print(&initMsg);
 
-  onLed->turnOn();
-  inActionLed->turnOff();
-  alarmLed->turnOff();
+  stateChangeTask = new StateChangeTask(lcd, &serialMessageService, initialState);
+
+  scheduler.addInput(&serialMessageService);
+  scheduler.addInput(&pir);
+  scheduler.addInput(&dht);
+  scheduler.addInput(&sonar);
+  scheduler.addInput(&resetButton);
+
+  scheduler.addThread(&doorTask);
+  scheduler.addThread(&dddTask);
+  scheduler.addThread(&dpdTask);
+  scheduler.addThread(&blinkTask);
+  scheduler.addThread(stateChangeTask);
+  scheduler.addThread(&alarmTask);
+  scheduler.addThread(&resetTask);
+
+  onLed.turnOn();
+  inActionLed.turnOff();
+  alarmLed.turnOff();
 }
 
-void loop() { scheduler->advance(); }
+void loop() { scheduler.advance(); }

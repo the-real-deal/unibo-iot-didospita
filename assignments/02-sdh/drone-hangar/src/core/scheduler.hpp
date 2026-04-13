@@ -1,18 +1,22 @@
 #pragma once
 
-#include <LinkedList.h>
+#include <Arduino.h>
 #include <assert.h>
 #include <stdint.h>
 
 #include "state.hpp"
 #include "timer.hpp"
 
+#define MAX_INPUTS 8
+#define MAX_THREADS 16
+
 class Scheduler;
 
-class Context {
+class Context
+{
   friend Scheduler;
 
- private:
+private:
   Timer timer;
   GlobalState state;
   GlobalState stateCandidate;
@@ -21,7 +25,7 @@ class Context {
   void waitTimer();
   void switchState();
 
- public:
+public:
   Context(int periodMillis, GlobalState initialState);
   GlobalState getState();
   void setState(GlobalState state);
@@ -29,31 +33,36 @@ class Context {
 };
 
 // interfaces to not work directly with tasks and sensors to avoid generics
-class LogicThread {
- public:
-  virtual void step(Context* context) = 0;
+class LogicThread
+{
+public:
+  virtual void step(Context *context) = 0;
   virtual ~LogicThread() = default;
 };
 
-class ExternalInput {
+class ExternalInput
+{
   friend Scheduler;
 
- protected:
+protected:
   virtual void read() = 0;
 
- public:
+public:
   virtual ~ExternalInput() = default;
 };
 
-class Scheduler {
- private:
+class Scheduler
+{
+private:
   Context context;
-  LinkedList<ExternalInput*> inputs;
-  LinkedList<LogicThread*> threads;
+  ExternalInput* inputs[MAX_INPUTS];
+  LogicThread* threads[MAX_THREADS];
+  uint8_t inputCount;
+  uint8_t threadCount;
 
- public:
+public:
   Scheduler(int periodMillis, GlobalState initialState);
-  void addInput(ExternalInput* input);
-  void addThread(LogicThread* thread);
+  void addInput(ExternalInput *input);
+  void addThread(LogicThread *thread);
   void advance();
 };

@@ -1,7 +1,5 @@
 #include "scheduler.hpp"
 
-#include <Arduino.h>
-
 #include "utils.hpp"
 
 Context::Context(int periodMillis, GlobalState initialState)
@@ -21,23 +19,34 @@ void Context::setState(GlobalState state) { this->stateCandidate = state; }
 uint64_t Context::getElapsedMillis() { return this->elapsedMillis; }
 
 Scheduler::Scheduler(int periodMillis, GlobalState initialState)
-    : context(periodMillis, initialState), inputs(), threads() {}
+    : context(periodMillis, initialState), inputCount(0), threadCount(0) {}
 
-void Scheduler::addInput(ExternalInput* sensor) { this->inputs.add(sensor); }
+void Scheduler::addInput(ExternalInput* sensor) {
+  if (inputCount < MAX_INPUTS) {
+    inputs[inputCount] = sensor;
+    inputCount++;
+  }
+}
 
-void Scheduler::addThread(LogicThread* thread) { this->threads.add(thread); }
+void Scheduler::addThread(LogicThread* thread) {
+  if (threadCount < MAX_THREADS) {
+    threads[threadCount] = thread;
+    threadCount++;
+  }
+}
 
-void Scheduler::advance() {
+void Scheduler::advance()
+{
   this->context.waitTimer();
   noInterrupts();
-  for (int i = 0; i < this->inputs.size(); i++) {
-    ExternalInput* input = this->inputs.get(i);
-    input->read();
+  for (int i = 0; i < inputCount; i++)
+  {
+    inputs[i]->read();
   }
   interrupts();
-  for (int i = 0; i < this->threads.size(); i++) {
-    LogicThread* thread = this->threads.get(i);
-    thread->step(&this->context);
+  for (int i = 0; i < threadCount; i++)
+  {
+    threads[i]->step(&this->context);
   }
   this->context.switchState();
 }

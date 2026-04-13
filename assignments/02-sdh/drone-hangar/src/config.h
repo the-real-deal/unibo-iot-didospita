@@ -23,7 +23,7 @@
 #define RESET_BUTTON_PIN 10  // RESET
 
 // scheduler
-#define SCHEDULER_PERIOD_MS 100
+#define SCHEDULER_PERIOD_MS 500
 
 // serial
 #define SERIAL_BAUD 9600

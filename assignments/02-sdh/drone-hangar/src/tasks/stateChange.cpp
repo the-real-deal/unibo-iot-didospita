@@ -6,10 +6,10 @@
 StateChangeTask::StateChangeTask(Display* internalDisplay,
                                  MessageService* messageService,
                                  GlobalState initialState)
-    : Task<StateChangeTask>(new PrintState()),
+    : Task<StateChangeTask>(new IdleState()),
       internalDisplay(internalDisplay),
       messageService(messageService),
-      prevState(initialState) {}
+      prevState(GlobalState::Outside) {}
 
 void StateChangeTask::IdleState::step(StateChangeTask* task, Context* context) {
   blockOnAlarm<StateChangeTask, IdleState>(task, context);

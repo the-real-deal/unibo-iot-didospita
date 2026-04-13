@@ -10,5 +10,5 @@ class I2CManager {
 
  public:
   I2CManager();
-  int scan();
+  uint8_t scan();
 };
