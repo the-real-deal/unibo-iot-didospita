@@ -45,6 +45,9 @@ class ExternalInput
   friend Scheduler;
 
 protected:
+  virtual bool requireInterrupts() {
+    return false;
+  }
   virtual void read() = 0;
 
 public:

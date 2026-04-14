@@ -9,12 +9,13 @@
 class SerialMessageService : public MessageService, public ExternalInput {
  private:
   static const char MESSAGE_DELIMITER = '|';
+  String serialBuffer;
   LinkedList<Message*> queue;
   Message* currentMessage;
-  static Message* decodeSerialMessage(String message);
 
  public:
   SerialMessageService();
+  bool requireInterrupts() override;
   Message* getMessage() override;
   bool messageAvailable() override;
   void send(Message message) override;

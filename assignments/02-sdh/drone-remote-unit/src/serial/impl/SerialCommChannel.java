@@ -18,8 +18,7 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 	private SerialPort serialPort;
 	private BlockingQueue<Message> queue;
 	private Message currentMsg;
-	private StringBuffer decoderMsg = new StringBuffer("");
-	private int delimiters = 0;
+	private StringBuffer serialBuffer = new StringBuffer("");
 
 	public SerialCommChannel(String port, int rate) throws Exception {
 		queue = new ArrayBlockingQueue<Message>(100);
@@ -54,59 +53,58 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 		}
 	}
 
-	private Message decoderSerialMessage(StringBuffer message) {
-		assert (message.length() >= 3); // start, type delimiter, terminator
-		assert (message.toString().charAt(0) == MESSAGE_DELIMITER); // start with delimiter
-		int typeDelimiterIndex = message.toString().indexOf(MESSAGE_DELIMITER);
-		assert (typeDelimiterIndex != -1);
-		int terminatorIndex = message.toString().indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
-		assert (terminatorIndex == ((int) message.length()) - 1);
-		String typeStr = message.substring(0, typeDelimiterIndex);
-		MessageType type = MessageType.fromDisplayName(typeStr);
-		if (type == null) {
-			System.out.println("Unknown message type: " + typeStr);
-			return null;
-		}
-		String content = message.substring(typeDelimiterIndex + 1, terminatorIndex);
-		return new MessageImpl(type, content);
-	}
-
 	public void serialEvent(SerialPortEvent event) {
 		/* if there are bytes received in the input buffer */
 		if (event.isRXCHAR()) {
 			try {
 				String msg = serialPort.readString(event.getEventValue());
-				System.out.println("[SERIAL RECEIVED] Raw: " + msg.replace("\n", "\\n").replace("\r", "\\r"));
-
-				for (char ch : msg.toCharArray()) {
-					if (ch == MESSAGE_DELIMITER) {
-						this.delimiters++;
-					}
-					if (this.delimiters > 0) {
-						decoderMsg.append(ch);
-					}
-					if (this.delimiters == 3) {
-						Message decoded = decoderSerialMessage(decoderMsg);
-						if (decoded != null) {
-							this.queue.add(decoded);
-							System.out.println("[MESSAGE DECODED] Type: " + decoded.getType() + ", Content: " + decoded.getContent());
-						}
-						this.decoderMsg = new StringBuffer();
-						this.delimiters = 0;
-					}
-				}
-				
-				// If we have incomplete data but no more coming, reset (timeout handling)
-				if (this.delimiters > 0 && this.delimiters < 3) {
-					// Keep accumulating - don't reset
-				}
-				
-				this.currentMsg = this.readMessage();
+				serialBuffer.append(msg);
 			} catch (Exception ex) {
 				ex.printStackTrace();
-				System.out.println("Error in receiving string from COM-port: " + ex);
+				System.err.println("Error in receiving string from COM-port: " + ex);
 			}
 		}
+		while (true) {
+			var lineEndIndex = serialBuffer.indexOf("\n");
+			if (lineEndIndex == -1) {
+				return;
+			}
+			var serialLineBuffer = new StringBuffer(serialBuffer.substring(0, lineEndIndex + 1));
+			serialBuffer.delete(0, lineEndIndex + 1);
+			while (true) {
+				var serialLine = serialLineBuffer.toString();
+				var messageStartIndex = serialLine.indexOf(MESSAGE_DELIMITER);
+				if (messageStartIndex == -1) {
+					break;
+				}
+				int typeDelimiterIndex = serialLine.indexOf(MESSAGE_DELIMITER, messageStartIndex + 1);
+				if (typeDelimiterIndex == -1) {
+					break;
+				};
+				int terminatorIndex = serialLine.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
+				if (terminatorIndex == - 1) {
+					break;
+				};
+				var messageString = serialLine.substring(messageStartIndex, terminatorIndex + 1);
+				System.out.println("MESSAGE: " + messageString);
+				String typeStr = messageString.substring(0, typeDelimiterIndex);
+				MessageType type = MessageType.fromDisplayName(typeStr);
+				if (type == null) {
+					System.err.println("Unknown message type: " + typeStr);
+					break;
+				}
+				String content = messageString.substring(typeDelimiterIndex + 1, terminatorIndex);
+				Message message = new MessageImpl(type, content);
+				if (message != null) {
+					this.queue.add(message);
+				}
+				serialLineBuffer.delete(messageStartIndex, terminatorIndex + 1);
+			}
+			if (serialLineBuffer.length() > 0) {
+				System.out.println("SERIAL: " + serialLineBuffer.toString());
+			}
+		}
+
 	}
 
 	@Override

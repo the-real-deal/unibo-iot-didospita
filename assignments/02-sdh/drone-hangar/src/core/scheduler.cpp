@@ -38,12 +38,18 @@ void Scheduler::addThread(LogicThread* thread) {
 void Scheduler::advance()
 {
   this->context.waitTimer();
-  noInterrupts();
   for (int i = 0; i < inputCount; i++)
   {
+    auto input = inputs[i];
+    auto disableInterrupts = !input->requireInterrupts();
+    if (disableInterrupts) {
+      noInterrupts();
+    }
     inputs[i]->read();
+    if (disableInterrupts) {
+      interrupts();
+    }
   }
-  interrupts();
   for (int i = 0; i < threadCount; i++)
   {
     threads[i]->step(&this->context);

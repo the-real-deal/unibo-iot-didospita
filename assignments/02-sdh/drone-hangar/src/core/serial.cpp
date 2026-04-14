@@ -1,102 +1,84 @@
 #include "serial.hpp"
 
-#include <assert.h>
-
 #include "utils.hpp"
 
 SerialMessageService::SerialMessageService()
-    : queue(), currentMessage(nullptr) {}
+    : serialBuffer(), queue(), currentMessage(nullptr) {}
 
-Message* SerialMessageService::getMessage() { return this->currentMessage; }
+Message *SerialMessageService::getMessage() { return this->currentMessage; }
 
-bool SerialMessageService::messageAvailable() {
+bool SerialMessageService::requireInterrupts() {
+  return true;
+}
+
+bool SerialMessageService::messageAvailable()
+{
   return this->currentMessage != nullptr;
 }
 
-Message* SerialMessageService::decodeSerialMessage(String message) {
-  assert(message.length() >= 3);            // start, type delimiter, terminator
-  assert(message[0] == MESSAGE_DELIMITER);  // start with delimiter
-  int typeDelimiterIndex = message.indexOf(MESSAGE_DELIMITER);
-  assert(typeDelimiterIndex != -1);
-  int terminatorIndex =
-      message.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
-  assert(terminatorIndex == ((int)message.length()) - 1);
-  MessageType type = enumFromString<MessageType>(
-      message.substring(0, typeDelimiterIndex), MESSAGE_TYPE_STRINGS);
-  String content = message.substring(typeDelimiterIndex, terminatorIndex);
-  return new Message(type, content);
-}
+void SerialMessageService::read()
+{
+  if (Serial.available())
+  {
+    auto buffer = Serial.readStringUntil('\n');
 
-void SerialMessageService::read() {
-  static String buffer = "";
-  
-  // Read ALL available bytes into buffer
-  while (Serial.available()) {
-    char ch = Serial.read();
-    if (ch != '\r' && ch != '\n') {
-      buffer += ch;
+    if (this->serialBuffer.length() == 0)
+    {
+      auto delimiterIndex = buffer.indexOf(MESSAGE_DELIMITER);
+      if (delimiterIndex != -1)
+      {
+        this->serialBuffer = buffer.substring(delimiterIndex);
+      }
+    }
+    else
+    {
+      this->serialBuffer += buffer;
     }
   }
-  
-  // If buffer is empty, nothing to do
-  if (buffer.length() == 0) return;
-  
+
   // Try to parse complete messages from buffer
   // Format: |TYPE|CONTENT|
-  while (buffer.length() >= 3) {
-    int firstDelim = buffer.indexOf('|');
-    if (firstDelim == -1) {
-      buffer = "";
+  while (this->serialBuffer.length() > 0)
+  {
+    int messageStartIndex = this->serialBuffer.indexOf(MESSAGE_DELIMITER);
+    if (messageStartIndex == -1)
+    {
+      this->serialBuffer = String(); // remove extra garbage that is not part of a message
       break;
     }
-    
-    int secondDelim = buffer.indexOf('|', firstDelim + 1);
-    if (secondDelim == -1) {
-      // Incomplete message - wait for more data
+
+    int typeDelimiterIndex = this->serialBuffer.indexOf(MESSAGE_DELIMITER, messageStartIndex + 1);
+    if (typeDelimiterIndex == -1)
+    {
       break;
     }
-    
-    int thirdDelim = buffer.indexOf('|', secondDelim + 1);
-    if (thirdDelim == -1) {
-      // Incomplete - wait for more
+
+    int terminatorIndex = this->serialBuffer.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
+    if (terminatorIndex == -1)
+    {
       break;
     }
-    
+
     // We have a complete message!
-    String typeStr = buffer.substring(firstDelim + 1, secondDelim);
-    String content = buffer.substring(secondDelim + 1, thirdDelim);
-    
-    Serial.print("PARSED:");
-    Serial.print(typeStr);
-    Serial.print(":");
-    Serial.println(content);
-    
+    String typeStr = this->serialBuffer.substring(messageStartIndex + 1, typeDelimiterIndex);
+    String content = this->serialBuffer.substring(typeDelimiterIndex + 1, terminatorIndex);
+
     // Parse message type
     MessageType type = enumFromString<MessageType>(typeStr, MESSAGE_TYPE_STRINGS);
     this->queue.add(new Message(type, content));
-    
-    // Remove parsed message from buffer
-    buffer = buffer.substring(thirdDelim + 1);
+    this->serialBuffer = this->serialBuffer.substring(terminatorIndex + 1);
   }
-  
-  // Clean up buffer if it gets too long (possible garbage)
-  if (buffer.length() > 50) {
-    buffer = "";
-  }
-  
+
   // Get next message from queue
-  if (this->messageAvailable()) {
+  if (this->messageAvailable())
+  {
     delete this->currentMessage;
   }
   this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
-  
-  if (this->currentMessage != nullptr) {
-    Serial.print("GOT:");
-    Serial.println((int)this->currentMessage->getType());
-  }
 }
 
-void SerialMessageService::send(Message message) {
+void SerialMessageService::send(Message message)
+{
   String typeString = String(
       enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS));
   Serial.flush();
@@ -105,5 +87,6 @@ void SerialMessageService::send(Message message) {
   Serial.print(MESSAGE_DELIMITER);
   Serial.print(message.getContent());
   Serial.print(MESSAGE_DELIMITER);
+  Serial.print('\n');
   Serial.flush();
 }
