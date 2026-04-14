@@ -27,6 +27,7 @@
 
 // serial
 #define SERIAL_BAUD 9600
+#define SERIAL_SYNC_BYTE '\0'
 
 // lcd
 #define LCD_COLS 16

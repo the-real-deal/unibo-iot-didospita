@@ -28,8 +28,7 @@ void setup()
   Serial.begin(SERIAL_BAUD);
   while (!Serial);
   Wire.begin();
-  Serial.print('\0'); // send sync message
-  Serial.println("Hello");
+  Serial.print(SERIAL_SYNC_BYTE);
 
   auto serialMessageService = new SerialMessageService();
 
