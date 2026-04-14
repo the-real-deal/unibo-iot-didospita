@@ -43,12 +43,12 @@ void Scheduler::advance()
 {
   this->context.waitTimer();
 
-  for (int i = 0; i < this->n_inputs; i++)
+  for (size_t i = 0; i < this->n_inputs; i++)
   {
     auto input = this->inputs[i];
     input->read();
   }
-  for (int i = 0; i < this->n_threads; i++)
+  for (size_t i = 0; i < this->n_threads; i++)
   {
     auto thread = this->threads[i];
     thread->step(&this->context);

@@ -8,9 +8,9 @@ class DDDTask : public Task<DDDTask> {
  private:
   DistanceSensor* droneDistanceSensor;
   MessageService* messageService;
-  float outsideDistance;
+  float outsideDistanceMm;
   uint64_t outsideTimeMillis;
-  float insideDistance;
+  float insideDistanceMm;
   uint64_t insideTimeMillis;
 
   void sendDistance(float distance);

@@ -2,6 +2,6 @@
 
 class DistanceSensor {
  public:
-  virtual float getDistance() = 0;
+  virtual float getDistanceMm() = 0;
   virtual ~DistanceSensor() = default;
 };

@@ -9,9 +9,9 @@ DDDTask::DDDTask(DistanceSensor* droneDistanceSensor,
     : Task<DDDTask>(new IdleState()),
       droneDistanceSensor(droneDistanceSensor),
       messageService(messageService),
-      outsideDistance(outsideDistance),
+      outsideDistanceMm(outsideDistance),
       outsideTimeMillis(outsideTimeMillis),
-      insideDistance(insideDistance),
+      insideDistanceMm(insideDistance),
       insideTimeMillis(insideTimeMillis) {}
 
 void DDDTask::sendDistance(float distance) {
@@ -34,7 +34,7 @@ void DDDTask::IdleState::step(DDDTask* task, Context* context) {
 }
 
 void DDDTask::TakeoffReadingState::step(DDDTask* task, Context* context) {
-  if (task->droneDistanceSensor->getDistance() >= task->outsideDistance) {
+  if (task->droneDistanceSensor->getDistanceMm() >= task->outsideDistanceMm) {
     task->switchState(new TakeoffDistanceCheckingState(task));
   }
 }
@@ -48,15 +48,15 @@ void DDDTask::TakeoffDistanceCheckingState::step(DDDTask* task,
   if (this->timer.isFinished()) {
     context->setState(GlobalState::Outside);
     task->switchState(new IdleState());
-  } else if (task->droneDistanceSensor->getDistance() < task->outsideDistance) {
+  } else if (task->droneDistanceSensor->getDistanceMm() < task->outsideDistanceMm) {
     task->switchState(new TakeoffReadingState());
   }
 }
 
 void DDDTask::LandingReadingState::step(DDDTask* task, Context* context) {
-  float distance = task->droneDistanceSensor->getDistance();
+  float distance = task->droneDistanceSensor->getDistanceMm();
   task->sendDistance(distance);
-  if (distance <= task->insideDistance) {
+  if (distance <= task->insideDistanceMm) {
     task->switchState(new LandingDistanceCheckingState(task));
   }
 }
@@ -71,9 +71,9 @@ void DDDTask::LandingDistanceCheckingState::step(DDDTask* task,
     context->setState(GlobalState::Inside);
     task->switchState(new IdleState());
   } else {
-    float distance = task->droneDistanceSensor->getDistance();
+    float distance = task->droneDistanceSensor->getDistanceMm();
     task->sendDistance(distance);
-    if (distance > task->insideDistance) {
+    if (distance > task->insideDistanceMm) {
       task->switchState(new LandingReadingState());
     }
   }

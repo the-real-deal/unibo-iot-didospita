@@ -62,8 +62,8 @@ void setup()
   auto doorTask = new DoorTask(servo, DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE,
                                serialMessageService);
   auto dddTask = new DDDTask(sonar, serialMessageService,
-                             OUTSIDE_DISTANCE, OUTSIDE_TIME_MS,
-                             INSIDE_DISTANCE, INSIDE_TIME_MS);
+                             OUTSIDE_DISTANCE_MM, OUTSIDE_TIME_MS,
+                             INSIDE_DISTANCE_MM, INSIDE_TIME_MS);
   auto stateChangeTask = new StateChangeTask(lcd, serialMessageService);
   auto dpdTask = new DPDTask(pir, serialMessageService);
   auto blinkTask = new BlinkTask(inActionLed, BLINK_PERIOD_MS);

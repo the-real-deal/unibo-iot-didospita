@@ -1,10 +1,10 @@
 #pragma once
 
 // general
-#define OUTSIDE_DISTANCE 100   // D1
-#define OUTSIDE_TIME_MS 500    // T1
-#define INSIDE_DISTANCE 40     // D2
-#define INSIDE_TIME_MS 500     // T2
+#define OUTSIDE_DISTANCE_MM 500   // D1
+#define OUTSIDE_TIME_MS 1000    // T1
+#define INSIDE_DISTANCE_MM 100     // D2
+#define INSIDE_TIME_MS 1000     // T2
 #define PREALARM_TEMP 30       // Temp1
 #define PREALARM_TIME_MS 2000  // T3
 #define ALARM_TEMP 35          // Temp2
@@ -23,7 +23,7 @@
 #define RESET_BUTTON_PIN 10  // RESET
 
 // scheduler
-#define SCHEDULER_PERIOD_MS 100
+#define SCHEDULER_PERIOD_MS 200
 #define SCHEDULER_MAX_INPUTS 10
 #define SCHEDULER_MAX_THREADS 20
 

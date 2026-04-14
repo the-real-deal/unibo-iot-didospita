@@ -19,7 +19,7 @@ class UltrasonicSensor : public DistanceSensor, public ExternalInput {
   uint64_t readDelayMicros;
   TemperatureSensor* tempSensor;
   float staticTemperature;
-  float distance;
+  float distanceMm;
 
   float getTemperature();
   float getSoundSpeed();
@@ -35,5 +35,5 @@ class UltrasonicSensor : public DistanceSensor, public ExternalInput {
   UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                    uint64_t readTimeoutMicros, uint64_t readDelayMicros,
                    float temperature);
-  float getDistance() override;
+  float getDistanceMm() override;
 };

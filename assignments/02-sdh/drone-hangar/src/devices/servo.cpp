@@ -4,13 +4,18 @@
 
 ArduinoServoMotor::ArduinoServoMotor(uint8_t pin, int initialAngle, int min,
                                      int max)
-    : servo(), angle(initialAngle) {
+    : servo(), angle(initialAngle)
+{
   this->servo.attach(pin, min, max);
-  while (!this->servo.attached());
+  while (!this->servo.attached())
+    ;
   this->setAngle(initialAngle);
 }
 
-void ArduinoServoMotor::read() { this->angle = this->servo.read(); }
+void ArduinoServoMotor::read()
+{
+  this->angle = this->servo.read();
+}
 
 int ArduinoServoMotor::getAngle() { return this->angle; }
 
