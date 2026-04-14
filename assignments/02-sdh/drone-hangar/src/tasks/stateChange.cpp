@@ -1,7 +1,7 @@
 #include "stateChange.hpp"
 
 #include "blocking.hpp"
-#include "utils.hpp"
+#include "std/enum.hpp"
 
 StateChangeTask::StateChangeTask(Display* internalDisplay,
                                  MessageService* messageService)

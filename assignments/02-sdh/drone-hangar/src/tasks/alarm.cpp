@@ -1,7 +1,7 @@
 #include "alarm.hpp"
 
 #include "blocking.hpp"
-#include "utils.hpp"
+#include "std/enum.hpp"
 
 AlarmTask::AlarmTask(TemperatureSensor* hangarTempSensor,
                      Indicator* alarmIndicator, GlobalState initialState,

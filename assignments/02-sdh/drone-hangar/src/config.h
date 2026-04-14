@@ -24,10 +24,13 @@
 
 // scheduler
 #define SCHEDULER_PERIOD_MS 100
+#define SCHEDULER_MAX_INPUTS 10
+#define SCHEDULER_MAX_THREADS 20
 
 // serial
 #define SERIAL_BAUD 9600
 #define SERIAL_SYNC_BYTE '\0'
+#define SERIAL_MESSAGES_QUEUE_SIZE 10
 
 // lcd
 #define LCD_COLS 16

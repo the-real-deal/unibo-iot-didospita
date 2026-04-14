@@ -1,15 +1,11 @@
 #include "serial.hpp"
 
-#include "utils.hpp"
+#include "std/enum.hpp"
 
 SerialMessageService::SerialMessageService()
-    : serialBuffer(), queue(), currentMessage(nullptr) {}
+    : serialBuffer(), queue(), n_messages(0), currentMessage(nullptr) {}
 
 Message *SerialMessageService::getMessage() { return this->currentMessage; }
-
-bool SerialMessageService::requireInterrupts() {
-  return true;
-}
 
 bool SerialMessageService::messageAvailable()
 {
@@ -66,7 +62,10 @@ void SerialMessageService::read()
     // Parse message type
     MessageType type = enumFromString<MessageType>(typeStr, MESSAGE_TYPE_STRINGS);
     auto message = new Message(type, content);
-    this->queue.add(message);
+    if (this->n_messages < SERIAL_MESSAGES_QUEUE_SIZE) {
+      this->queue[this->n_messages] = message;
+      this->n_messages++;
+    }
     this->serialBuffer = this->serialBuffer.substring(terminatorIndex + 1);
   }
 
@@ -75,7 +74,12 @@ void SerialMessageService::read()
   {
     delete this->currentMessage;
   }
-  this->currentMessage = this->queue.size() > 0 ? this->queue.pop() : nullptr;
+  if (this->n_messages > 0) {
+    this->currentMessage = this->queue[this->n_messages - 1];
+    this->n_messages--;  
+  } else {
+    this->currentMessage = nullptr;
+  }
 }
 
 void SerialMessageService::send(Message message)

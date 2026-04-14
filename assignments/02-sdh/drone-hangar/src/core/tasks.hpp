@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "scheduler.hpp"
-#include "utils.hpp"
+#include "std/enum.hpp"
 
 template <class T>
 class TaskState {

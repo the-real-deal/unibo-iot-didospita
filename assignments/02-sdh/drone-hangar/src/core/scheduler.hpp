@@ -4,11 +4,9 @@
 #include <assert.h>
 #include <stdint.h>
 
+#include "config.h"
 #include "state.hpp"
 #include "timer.hpp"
-
-#define MAX_INPUTS 8
-#define MAX_THREADS 16
 
 class Scheduler;
 
@@ -45,9 +43,6 @@ class ExternalInput
   friend Scheduler;
 
 protected:
-  virtual bool requireInterrupts() {
-    return false;
-  }
   virtual void read() = 0;
 
 public:
@@ -58,10 +53,10 @@ class Scheduler
 {
 private:
   Context context;
-  ExternalInput* inputs[MAX_INPUTS];
-  LogicThread* threads[MAX_THREADS];
-  uint8_t inputCount;
-  uint8_t threadCount;
+  ExternalInput* inputs[SCHEDULER_MAX_INPUTS];
+  size_t n_inputs;
+  LogicThread* threads[SCHEDULER_MAX_THREADS];
+  size_t n_threads;
 
 public:
   Scheduler(int periodMillis, GlobalState initialState);
