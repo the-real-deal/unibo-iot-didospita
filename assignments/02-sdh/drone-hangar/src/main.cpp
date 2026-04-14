@@ -26,15 +26,17 @@ Scheduler* scheduler = nullptr;
 void setup()
 {
   Serial.begin(SERIAL_BAUD);
-  while (!Serial)
-    ;
+  while (!Serial);
   Wire.begin();
+  Serial.print('\0'); // send sync message
+  Serial.println("Hello");
+
+  auto serialMessageService = new SerialMessageService();
 
   GlobalState initialState = GlobalState::Inside;
   scheduler = new Scheduler(SCHEDULER_PERIOD_MS, initialState);
   
   auto i2c = new I2CManager();
-  auto serialMessageService = new SerialMessageService();
 
   int lcdAddress = i2c->scan();
   auto lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);

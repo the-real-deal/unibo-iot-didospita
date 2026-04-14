@@ -1,6 +1,7 @@
 package serial.api;
 
 public enum MessageType {
+  SERIAL_SYNC("SERIAL SYNC"),
   REQUEST_LANDING("REQUEST LANDING"),
   REQUEST_TAKEOFF("REQUEST TAKEOFF"),
   STATE("STATE"),

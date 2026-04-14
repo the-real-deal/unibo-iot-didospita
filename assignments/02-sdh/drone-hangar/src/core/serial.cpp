@@ -65,7 +65,8 @@ void SerialMessageService::read()
 
     // Parse message type
     MessageType type = enumFromString<MessageType>(typeStr, MESSAGE_TYPE_STRINGS);
-    this->queue.add(new Message(type, content));
+    auto message = new Message(type, content);
+    this->queue.add(message);
     this->serialBuffer = this->serialBuffer.substring(terminatorIndex + 1);
   }
 

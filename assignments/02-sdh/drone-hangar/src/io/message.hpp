@@ -4,14 +4,12 @@
 
 enum class MessageType
 {
-  SERIAL_READY,
   REQUEST_LANDING,
   REQUEST_TAKEOFF,
   STATE,
   DISTANCE,
 };
 const char *const MESSAGE_TYPE_STRINGS[] = {
-    "SERIAL READY",
     "REQUEST LANDING",
     "REQUEST TAKEOFF",
     "STATE",
