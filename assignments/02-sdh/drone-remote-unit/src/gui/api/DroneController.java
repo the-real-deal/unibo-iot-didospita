@@ -11,8 +11,6 @@ public interface DroneController {
      */
     void sendMessage(Message msg);
 
-    void initialize() throws Exception;
-
     void setView(PanelView view);
 
     void updateViewStatus();

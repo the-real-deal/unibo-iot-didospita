@@ -6,29 +6,21 @@ import serial.api.Message;
 import serial.api.MessageService;
 import serial.api.MessageType;
 import serial.impl.MessageImpl;
-import serial.impl.SerialCommChannel;
 
 public class DroneControllerImpl implements DroneController {
 
-    private MessageService serialManager;
+    private MessageService messageService;
     private PanelView managerView;
-    private String serialPort;
-    private int rate;
 
-    public DroneControllerImpl(String sp, int rate, PanelView passedView) {
-        this.serialPort = sp;
-        this.rate = rate;
+    public DroneControllerImpl(MessageService messageService, PanelView passedView) {
+        this.messageService = messageService;
         this.managerView = passedView;
-    }
-
-    public void initialize() throws Exception {
-        this.serialManager = new SerialCommChannel(this.serialPort, this.rate);
     }
 
     @Override
     public void sendMessage(Message msg) {
         String statusMsg;
-        if (this.serialManager.send(msg)) {
+        if (this.messageService.send(msg)) {
             statusMsg = "Message sent!!!";
         } else {
             statusMsg = "Error in sending...";
@@ -44,7 +36,7 @@ public class DroneControllerImpl implements DroneController {
     private Message receiveMsg() {
         Message msg = new MessageImpl(null);
         try {
-            msg = this.serialManager.readMessage();
+            msg = this.messageService.readMessage();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -54,7 +46,7 @@ public class DroneControllerImpl implements DroneController {
     public void updateViewStatus() {
         // Don't poll - messages are processed in serialEvent callback
         // Just check if there are messages in the queue
-        while (serialManager.messageAvailable()) {
+        while (this.messageService.messageAvailable()) {
             Message msg = receiveMsg();
             if (msg == null || msg.getType() == null) {
                 break;

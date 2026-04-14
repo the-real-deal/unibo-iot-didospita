@@ -16,7 +16,7 @@ import serial.api.MessageType;
  * @author aricci
  *
  */
-public class SerialCommChannel implements MessageService, SerialPortEventListener {
+public class SerialCommChannel implements MessageService, SerialPortEventListener, AutoCloseable {
 
 	private static final char MESSAGE_DELIMITER = '|';
 	private static final char SERIAL_SYNC_BYTE = '\0';
@@ -37,10 +37,7 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 		serialPort.addEventListener(this);
 	}
 
-	/**
-	 * This should be called when you stop using the port.
-	 * This will prevent port locking on platforms like Linux.
-	 */
+	@Override
 	public void close() {
 		try {
 			if (serialPort != null) {
