@@ -64,8 +64,6 @@ void UltrasonicSensor::read()
   {
     this->distanceMm = this->pulseToDistance(pulse);
   }
-  Serial.print(F("Distance: "));
-  Serial.println(this->distanceMm);
 }
 
 float UltrasonicSensor::getDistanceMm() {

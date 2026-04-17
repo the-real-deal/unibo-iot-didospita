@@ -19,13 +19,12 @@ void DoorTask::ClosedState::step(DoorTask* task, Context* context) {
     case GlobalState::Takeoff:
     case GlobalState::Landing:
       task->switchState(new OpenState());
-      return;
+      break;
     case GlobalState::Inside:
       if (task->messageService->messageAvailable() &&
           task->messageService->getMessage()->getType() ==
               MessageType::REQUEST_TAKEOFF) {
         context->setState(GlobalState::Takeoff);
-        return;  // Don't fall through to default - door should open
       }
       break;
     default:
