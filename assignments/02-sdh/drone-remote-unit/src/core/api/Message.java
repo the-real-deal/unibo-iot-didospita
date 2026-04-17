@@ -1,4 +1,4 @@
-package serial.api;
+package core.api;
 
 public interface Message {
     MessageType getType();

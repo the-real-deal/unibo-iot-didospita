@@ -1,11 +1,12 @@
 package gui.impl;
 
+import core.api.HangarState;
+import core.api.Message;
+import core.api.MessageService;
+import core.api.MessageType;
+import core.impl.MessageImpl;
 import gui.api.DroneController;
 import gui.api.PanelView;
-import serial.api.Message;
-import serial.api.MessageService;
-import serial.api.MessageType;
-import serial.impl.MessageImpl;
 
 public class DroneControllerImpl implements DroneController {
 
@@ -53,14 +54,8 @@ public class DroneControllerImpl implements DroneController {
             }
             if (msg.getType() == MessageType.STATE) {
                 String content = msg.getContent();
-                if (content.equals("ALARM") || content.equals("PREALARM")) {
-                    managerView.updateHangarStatus(content);
-                } else {
-                    managerView.updateDroneStatus(content);
-                    if (content.equals("DRONE INSIDE") || content.equals("DRONE OUTSIDE")) {
-                        managerView.updateHangarStatus("NORMAL");
-                    }
-                }
+                HangarState state = HangarState.fromDisplayName(content);
+                managerView.updateHangarState(state);
             }
             if (msg.getType() == MessageType.DISTANCE) {
                 managerView.updateDistance(msg.getContent());

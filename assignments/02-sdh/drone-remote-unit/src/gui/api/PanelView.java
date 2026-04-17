@@ -1,5 +1,7 @@
 package gui.api;
 
+import core.api.HangarState;
+
 public interface PanelView {
     /**
      * A method that is invoked to display a specific message passed from the controller in response to certain actions.
@@ -8,7 +10,6 @@ public interface PanelView {
      */
     void displayMessage(String messagge, String title); 
     void setController(DroneController controller);
-    void updateDroneStatus(String status);
-    void updateHangarStatus(String status);
+    void updateHangarState(HangarState state);
     void updateDistance(String distance);
 }

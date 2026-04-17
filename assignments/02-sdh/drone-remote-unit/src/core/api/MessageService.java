@@ -1,4 +1,4 @@
-package serial.api;
+package core.api;
 
 public interface MessageService {
   Message readMessage() throws InterruptedException;

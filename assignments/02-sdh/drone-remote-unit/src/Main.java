@@ -1,8 +1,8 @@
+import core.impl.SerialCommChannel;
 import gui.api.DroneController;
 import gui.api.PanelView;
 import gui.impl.DroneControllerImpl;
 import gui.view.PanelViewImpl;
-import serial.impl.SerialCommChannel;
 
 public class Main {
     public static void main(String[] args) throws Exception {

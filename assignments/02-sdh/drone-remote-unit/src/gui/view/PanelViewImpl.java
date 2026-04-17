@@ -1,14 +1,17 @@
 package gui.view;
 
 import javax.swing.*;
+
+import core.api.HangarState;
+import core.api.MessageType;
+import core.impl.MessageImpl;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import gui.api.DroneController;
 import gui.api.PanelView;
-import serial.api.MessageType;
-import serial.impl.MessageImpl;
 
 public class PanelViewImpl extends JFrame implements PanelView {
 
@@ -101,13 +104,22 @@ public class PanelViewImpl extends JFrame implements PanelView {
     }
 
     @Override
-    public void updateDroneStatus(String status) {
-        lblStatusDroneVal.setText(status);
-    }
-
-    @Override
-    public void updateHangarStatus(String status) {
-        lblStatusHangarVal.setText(status);
+    public void updateHangarState(HangarState state) {
+        var status = state.getDisplayName();
+        switch (state) {
+            case ALARM:
+            case PREALARM:
+                lblStatusHangarVal.setText(status);
+                break;
+            case INSIDE:
+            case OUTSIDE:
+                lblStatusHangarVal.setText("NORMAL");
+                // no break, go to default
+            default:
+                lblStatusDroneVal.setText(status);
+                break;
+        }
+        
     }
 
     @Override

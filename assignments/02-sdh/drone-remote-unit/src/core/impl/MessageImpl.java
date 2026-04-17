@@ -1,7 +1,7 @@
-package serial.impl;
+package core.impl;
 
-import serial.api.Message;
-import serial.api.MessageType;
+import core.api.Message;
+import core.api.MessageType;
 
 public class MessageImpl implements Message {
     private MessageType type;

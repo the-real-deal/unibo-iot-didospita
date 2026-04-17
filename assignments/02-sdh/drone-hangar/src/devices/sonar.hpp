@@ -5,35 +5,28 @@
 #include "io/distance.hpp"
 #include "io/temperature.hpp"
 
-class UltrasonicSensor : public DistanceSensor, public ExternalInput {
- private:
-  // 'constexpr' needed for in-class initialization of static data member 'const
-  // float UltrasonicSensor::DISTANCE_OOO_MIN' of non-integral type
-  // [-fpermissive]
-  static constexpr float DISTANCE_OOO_MIN = 0;
-  static constexpr float DISTANCE_OOO_MAX = INFINITY;
-
+class UltrasonicSensor : public DistanceSensor, public ExternalInput
+{
+private:
   DigitalInputPin echoPin;
   DigitalOutputPin triggerPin;
-  uint64_t readTimeoutMicros;
+  uint64_t readStartMicros;
   uint64_t readDelayMicros;
-  TemperatureSensor* tempSensor;
-  float staticTemperature;
+  uint64_t readTimeoutMicros;
+  TemperatureSensor *tempSensor;
+  float maxDistanceMm;
   float distanceMm;
 
-  float getTemperature();
   float getSoundSpeed();
   float pulseToDistance(uint64_t pulse);
 
- protected:
+protected:
   void read() override;
 
- public:
+public:
   UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
-                   uint64_t readTimeoutMicros, uint64_t readDelayMicros,
-                   TemperatureSensor* tempSensor);
-  UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
-                   uint64_t readTimeoutMicros, uint64_t readDelayMicros,
-                   float temperature);
+                   uint64_t readStartMicros, uint64_t readDelayMicros,
+                   uint64_t readTimeoutMicros, TemperatureSensor *tempSensor,
+                   float maxDistanceMm);
   float getDistanceMm() override;
 };

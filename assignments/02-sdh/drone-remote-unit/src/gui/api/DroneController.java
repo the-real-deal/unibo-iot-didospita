@@ -1,6 +1,6 @@
 package gui.api;
 
-import serial.api.Message;
+import core.api.Message;
 
 public interface DroneController {
     /**

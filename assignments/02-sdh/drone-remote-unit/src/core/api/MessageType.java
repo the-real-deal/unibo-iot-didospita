@@ -1,4 +1,4 @@
-package serial.api;
+package core.api;
 
 public enum MessageType {
   SERIAL_SYNC("SERIAL SYNC"),

@@ -1,14 +1,14 @@
-package serial.impl;
+package core.impl;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import core.api.Message;
+import core.api.MessageService;
+import core.api.MessageType;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
-import serial.api.Message;
-import serial.api.MessageService;
-import serial.api.MessageType;
 
 /**
  * Comm channel implementation based on serial port.
