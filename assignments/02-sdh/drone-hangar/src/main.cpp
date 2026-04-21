@@ -35,7 +35,7 @@ DHTSensor dht(DHT_PIN, static_cast<DHTType>(DHT_TYPE));
 UltrasonicSensor sonar(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN,
                        SONAR_READ_START_US, SONAR_READ_DELAY_US,
                        SONAR_READ_TIMEOUT_US, &dht,
-                       SONAR_MAX_DISTANCE_MM);
+                       SONAR_MIN_DISTANCE_MM, SONAR_MAX_DISTANCE_MM);
 PushButton resetButton(RESET_BUTTON_PIN);
 Led onLed(ON_LED_PIN);
 Led inActionLed(IN_ACTION_LED_PIN);
@@ -64,7 +64,7 @@ void setup()
   Serial.print(SERIAL_SYNC_BYTE);
 
   int lcdAddress = i2c.scan();
-  auto lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);
+  lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);
   lcd->begin();
   stateChangeTask = new StateChangeTask(lcd, &serialMessageService);
 

@@ -55,7 +55,7 @@ DDDTask::TakeoffDistanceCheckingState::TakeoffDistanceCheckingState(
 void DDDTask::TakeoffDistanceCheckingState::step(DDDTask *task,
                                                  Context *context)
 {
-  Serial.print(F("Elapsed: "));
+  Serial.print(F("ELAPSED: "));
   Serial.println((uint32_t)this->timer.getElapsedMillis());
   Serial.flush();
   if (this->timer.isFinished())

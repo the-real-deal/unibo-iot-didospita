@@ -1,19 +1,19 @@
 #include "sonar.hpp"
 
 #include <limits.h>
+#include <limits.h>
 
 UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
-                                   uint64_t readStartMicros,
-                                   uint64_t readDelayMicros,
-                                   uint64_t readTimeoutMicros,
-                                   TemperatureSensor *tempSensor,
-                                   float maxDistanceMm)
+                                   uint64_t readStartMicros, uint64_t readDelayMicros,
+                                   uint64_t readTimeoutMicros, TemperatureSensor *tempSensor,
+                                   float minDistanceMm, float maxDistanceMm)
     : echoPin(echoPin),
       triggerPin(triggerPin),
       readStartMicros(readStartMicros),
       readDelayMicros(readDelayMicros),
       readTimeoutMicros(readTimeoutMicros),
       tempSensor(tempSensor),
+      minDistanceMm(minDistanceMm),
       maxDistanceMm(maxDistanceMm),
       distanceMm(0) {}
 
@@ -42,11 +42,12 @@ void UltrasonicSensor::read()
   uint64_t readTime = micros() - readStart;
   if (pulse == 0)
   {
-    this->distanceMm = readTime < this->readTimeoutMicros ? 0 : this->maxDistanceMm;
+    this->distanceMm = readTime < this->readTimeoutMicros ? this->minDistanceMm : this->maxDistanceMm;
   }
   else
   {
-    this->distanceMm = this->pulseToDistance(pulse);
+    auto distance = this->pulseToDistance(pulse);
+    this->distanceMm = min(this->maxDistanceMm, max(distance, this->minDistanceMm));
   }
 }
 

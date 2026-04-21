@@ -2,9 +2,9 @@
 
 // general
 #define OUTSIDE_DISTANCE_MM 500 // D1
-#define OUTSIDE_TIME_MS 1000    // T1
+#define OUTSIDE_TIME_MS 3000    // T1
 #define INSIDE_DISTANCE_MM 100  // D2
-#define INSIDE_TIME_MS 1000     // T2
+#define INSIDE_TIME_MS 3000     // T2
 #define PREALARM_TEMP 30        // Temp1
 #define PREALARM_TIME_MS 2000   // T3
 #define ALARM_TEMP 35           // Temp2
@@ -49,8 +49,9 @@
 #define SONAR_TRIGGER_PIN 4
 #define SONAR_READ_START_US 3
 #define SONAR_READ_DELAY_US 5
-#define SONAR_READ_TIMEOUT_US (100L * 1000L)
-#define SONAR_MAX_DISTANCE_MM (100L * 1000L)
+#define SONAR_READ_TIMEOUT_US (30L * 1000L) // 30ms =~ 5m
+#define SONAR_MIN_DISTANCE_MM 50
+#define SONAR_MAX_DISTANCE_MM 3000
 
 // door
 #define DOOR_CLOSED_ANGLE 0
