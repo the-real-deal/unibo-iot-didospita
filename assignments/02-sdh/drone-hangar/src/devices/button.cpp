@@ -2,7 +2,8 @@
 
 PushButton::PushButton(uint8_t pin) : pin(pin), pressed(false) {}
 
-void PushButton::read() {
+void PushButton::read()
+{
   this->pressed = this->pin.read() == DigitalValue::High;
 }
 

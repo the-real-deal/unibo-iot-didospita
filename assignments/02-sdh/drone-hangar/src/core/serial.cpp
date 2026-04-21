@@ -62,7 +62,8 @@ void SerialMessageService::read()
     // Parse message type
     MessageType type = enumFromString<MessageType>(typeStr, MESSAGE_TYPE_STRINGS);
     auto message = new Message(type, content);
-    if (this->n_messages < SERIAL_MESSAGES_QUEUE_SIZE) {
+    if (this->n_messages < SERIAL_MESSAGES_QUEUE_SIZE)
+    {
       this->queue[this->n_messages] = message;
       this->n_messages++;
     }
@@ -74,10 +75,13 @@ void SerialMessageService::read()
   {
     delete this->currentMessage;
   }
-  if (this->n_messages > 0) {
+  if (this->n_messages > 0)
+  {
     this->currentMessage = this->queue[this->n_messages - 1];
-    this->n_messages--;  
-  } else {
+    this->n_messages--;
+  }
+  else
+  {
     this->currentMessage = nullptr;
   }
 }

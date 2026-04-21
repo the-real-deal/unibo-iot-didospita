@@ -53,9 +53,9 @@ class Scheduler
 {
 private:
   Context context;
-  ExternalInput* inputs[SCHEDULER_MAX_INPUTS];
+  ExternalInput *inputs[SCHEDULER_MAX_INPUTS];
   size_t n_inputs;
-  LogicThread* threads[SCHEDULER_MAX_THREADS];
+  LogicThread *threads[SCHEDULER_MAX_THREADS];
   size_t n_threads;
 
 public:

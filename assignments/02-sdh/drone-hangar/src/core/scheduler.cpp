@@ -23,7 +23,8 @@ Scheduler::Scheduler(int periodMillis, GlobalState initialState)
 
 void Scheduler::addInput(ExternalInput *input)
 {
-  if (this->n_inputs >= SCHEDULER_MAX_INPUTS) {
+  if (this->n_inputs >= SCHEDULER_MAX_INPUTS)
+  {
     return;
   }
   this->inputs[this->n_inputs] = input;
@@ -32,7 +33,8 @@ void Scheduler::addInput(ExternalInput *input)
 
 void Scheduler::addThread(LogicThread *thread)
 {
-  if (this->n_threads >= SCHEDULER_MAX_THREADS) {
+  if (this->n_threads >= SCHEDULER_MAX_THREADS)
+  {
     return;
   }
   this->threads[this->n_threads] = thread;

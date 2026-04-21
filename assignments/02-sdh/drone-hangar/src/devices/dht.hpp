@@ -8,7 +8,8 @@
 #include "io/humidity.hpp"
 #include "io/temperature.hpp"
 
-enum class DHTType : uint8_t {
+enum class DHTType : uint8_t
+{
   DHT11 = DHT11,
   DHT21 = DHT21,
   DHT22 = DHT22,
@@ -16,16 +17,17 @@ enum class DHTType : uint8_t {
 
 class DHTSensor : public TemperatureSensor,
                   public HumiditySensor,
-                  public ExternalInput {
- private:
+                  public ExternalInput
+{
+private:
   DHT dht;
   float temperature;
   float humidity;
 
- protected:
+protected:
   void read() override;
 
- public:
+public:
   DHTSensor(uint8_t pin, DHTType type);
   float getTemperature() override;
   float getHumidity() override;

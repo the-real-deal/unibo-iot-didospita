@@ -2,7 +2,8 @@
 
 #include <Arduino.h>
 
-enum class GlobalState {
+enum class GlobalState
+{
   Inside,
   Outside,
   Prealarm,
@@ -10,6 +11,11 @@ enum class GlobalState {
   Takeoff,
   Landing,
 };
-const char* const GLOBAL_STATE_STRINGS[] = {
-    "DRONE INSIDE", "DRONE OUT", "PREALARM", "ALARM", "TAKE OFF", "LANDING",
+const char *const GLOBAL_STATE_STRINGS[] = {
+    "DRONE INSIDE",
+    "DRONE OUT",
+    "PREALARM",
+    "ALARM",
+    "TAKE OFF",
+    "LANDING",
 };

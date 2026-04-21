@@ -4,15 +4,16 @@
 #include "core/scheduler.hpp"
 #include "io/presence.hpp"
 
-class PIRSensor : public PresenceSensor, public ExternalInput {
- private:
+class PIRSensor : public PresenceSensor, public ExternalInput
+{
+private:
   DigitalInputPin pin;
   DigitalValue value;
 
- protected:
+protected:
   void read() override;
 
- public:
+public:
   PIRSensor(uint8_t pin);
   bool isPresent() override;
 };

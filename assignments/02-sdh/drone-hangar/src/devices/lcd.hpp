@@ -4,8 +4,9 @@
 
 #include "io/display.hpp"
 
-class LCD : public Display {
- private:
+class LCD : public Display
+{
+private:
   LiquidCrystal_I2C lcd;
   uint8_t currentCol;
   uint8_t currentRow;
@@ -13,9 +14,9 @@ class LCD : public Display {
   uint8_t col();
   uint8_t row();
 
- public:
+public:
   LCD(uint8_t address, uint8_t cols, uint8_t rows);
   void begin();
   void clear() override;
-  void print(String* message) override;
+  void print(String *message) override;
 };

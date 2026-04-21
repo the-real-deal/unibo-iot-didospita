@@ -3,29 +3,33 @@
 #include "blocking.hpp"
 #include "std/enum.hpp"
 
-StateChangeTask::StateChangeTask(Display* internalDisplay,
-                                 MessageService* messageService)
+StateChangeTask::StateChangeTask(Display *internalDisplay,
+                                 MessageService *messageService)
     : Task<StateChangeTask>(new PrintState()),
       internalDisplay(internalDisplay),
       messageService(messageService),
       prevState(GlobalState::Outside) {}
 
-void StateChangeTask::IdleState::step(StateChangeTask* task, Context* context) {
+void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
+{
   blockOnAlarm<StateChangeTask, IdleState>(task, context);
   GlobalState state = context->getState();
-  switch (state) {
-    case GlobalState::Prealarm:
-      break;
-    default:
-      if (task->prevState != state) {
-        task->switchState(new PrintState());
-      }
-      break;
+  switch (state)
+  {
+  case GlobalState::Prealarm:
+    break;
+  default:
+    if (task->prevState != state)
+    {
+      task->switchState(new PrintState());
+    }
+    break;
   }
 }
 
-void StateChangeTask::PrintState::step(StateChangeTask* task,
-                                       Context* context) {
+void StateChangeTask::PrintState::step(StateChangeTask *task,
+                                       Context *context)
+{
   GlobalState state = context->getState();
   String stateString = String(enumToString(state, GLOBAL_STATE_STRINGS));
   task->internalDisplay->clear();

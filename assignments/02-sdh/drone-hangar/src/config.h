@@ -22,6 +22,9 @@
 // reset
 #define RESET_BUTTON_PIN 10 // RESET
 
+// timer
+#define TIMER_READ_FREQ_MS 10
+
 // scheduler
 #define SCHEDULER_PERIOD_MS 200
 #define SCHEDULER_MAX_INPUTS 10

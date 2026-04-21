@@ -1,7 +1,8 @@
 #pragma once
 
-class Button {
- public:
+class Button
+{
+public:
   virtual bool isPressed() = 0;
   virtual ~Button() = default;
 };
