@@ -2,14 +2,12 @@
 
 #include <Arduino.h>
 
-ArduinoServoMotor::ArduinoServoMotor(uint8_t pin, int initialAngle, int min,
-                                     int max)
-    : servo(), angle(initialAngle)
+ArduinoServoMotor::ArduinoServoMotor(Servo servo, int initialAngle)
+    : servo(servo), angle(initialAngle) {}
+
+void ArduinoServoMotor::setup()
 {
-  this->servo.attach(pin, min, max);
-  while (!this->servo.attached())
-    ;
-  this->setAngle(initialAngle);
+  this->setAngle(this->angle);
 }
 
 void ArduinoServoMotor::read()

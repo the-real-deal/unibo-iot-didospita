@@ -41,6 +41,20 @@ void Scheduler::addThread(LogicThread *thread)
   this->n_threads++;
 }
 
+void Scheduler::setup()
+{
+  for (size_t i = 0; i < this->n_inputs; i++)
+  {
+    auto input = this->inputs[i];
+    input->setup();
+  }
+  for (size_t i = 0; i < this->n_threads; i++)
+  {
+    auto thread = this->threads[i];
+    thread->setup();
+  }
+}
+
 void Scheduler::advance()
 {
   this->context.waitTimer();
@@ -55,5 +69,6 @@ void Scheduler::advance()
     auto thread = this->threads[i];
     thread->step(&this->context);
   }
+
   this->context.switchState();
 }

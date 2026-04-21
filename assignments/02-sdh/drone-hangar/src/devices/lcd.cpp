@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 
-LCD::LCD(uint8_t address, uint8_t cols, uint8_t rows)
-    : lcd(address, cols, rows), currentCol(0), currentRow(0) {}
+LCD::LCD(LiquidCrystal_I2C lcd)
+    : lcd(lcd), currentCol(0), currentRow(0) {}
 
 void LCD::begin()
 {

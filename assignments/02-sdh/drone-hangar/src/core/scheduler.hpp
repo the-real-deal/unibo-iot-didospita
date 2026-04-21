@@ -34,6 +34,7 @@ public:
 class LogicThread
 {
 public:
+  virtual void setup() {}
   virtual void step(Context *context) = 0;
   virtual ~LogicThread() = default;
 };
@@ -43,6 +44,7 @@ class ExternalInput
   friend Scheduler;
 
 protected:
+  virtual void setup() {}
   virtual void read() = 0;
 
 public:
@@ -62,5 +64,6 @@ public:
   Scheduler(int periodMillis, GlobalState initialState);
   void addInput(ExternalInput *input);
   void addThread(LogicThread *thread);
+  void setup();
   void advance();
 };

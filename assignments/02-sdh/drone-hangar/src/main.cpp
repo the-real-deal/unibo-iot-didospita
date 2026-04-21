@@ -28,13 +28,9 @@ LCD *lcd = nullptr;
 
 SerialMessageService serialMessageService;
 PIRSensor pir(PIR_PIN);
-ArduinoServoMotor servo(SERVO_PIN, DOOR_CLOSED_ANGLE,
-                        SERVO_MIN_FREQ, SERVO_MAX_FREQ);
-DHTSensor dht(DHT_PIN, static_cast<DHTType>(DHT_TYPE));
-UltrasonicSensor sonar(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN,
-                       SONAR_READ_START_US, SONAR_READ_DELAY_US,
-                       SONAR_READ_TIMEOUT_US, &dht,
-                       SONAR_MIN_DISTANCE_MM, SONAR_MAX_DISTANCE_MM);
+ArduinoServoMotor *servo = nullptr;
+DHTSensor *dht = nullptr;
+UltrasonicSensor *sonar = nullptr; // depends on dht
 PushButton resetButton(RESET_BUTTON_PIN);
 
 Led builtinLed(LED_BUILTIN);
@@ -42,18 +38,12 @@ Led onLed(ON_LED_PIN);
 Led inActionLed(IN_ACTION_LED_PIN);
 Led alarmLed(ALARM_LED_PIN);
 
-DoorTask doorTask(&servo, DOOR_CLOSED_ANGLE,
-                  DOOR_OPEN_ANGLE, &serialMessageService);
-DDDTask dddTask(&sonar, &serialMessageService,
-                OUTSIDE_DISTANCE_MM, OUTSIDE_TIME_MS,
-                INSIDE_DISTANCE_MM, INSIDE_TIME_MS);
+DoorTask *doorTask = nullptr; // depends on servo
+DDDTask *dddTask = nullptr;   // depends on sonar
 DPDTask dpdTask(&pir, &serialMessageService);
 BlinkTask blinkTask(&inActionLed, BLINK_PERIOD_MS);
 StateChangeTask *stateChangeTask = nullptr; // depends on lcd
-AlarmTask alarmTask(&dht, &alarmLed,
-                    initialState, PREALARM_TEMP,
-                    PREALARM_TIME_MS, ALARM_TEMP,
-                    ALARM_TIME_MS);
+AlarmTask *alarmTask = nullptr; // depends on dht
 ResetTask resetTask(&resetButton, initialState);
 
 void setup()
@@ -65,23 +55,46 @@ void setup()
   Serial.print(SERIAL_SYNC_BYTE);
 
   int lcdAddress = i2c.scan();
-  lcd = new LCD(lcdAddress, LCD_COLS, LCD_ROWS);
+  auto lcd_raw = LiquidCrystal_I2C(lcdAddress, LCD_COLS, LCD_ROWS);
+  lcd = new LCD(lcd_raw);
   lcd->begin();
   stateChangeTask = new StateChangeTask(lcd, &serialMessageService);
 
+  auto servo_raw = Servo();
+  servo_raw.attach(SERVO_PIN, SERVO_MIN_FREQ, SERVO_MAX_FREQ);
+  while (!servo_raw.attached())
+    ;
+  servo = new ArduinoServoMotor(servo_raw, DOOR_CLOSED_ANGLE);
+  doorTask = new DoorTask(servo, DOOR_CLOSED_ANGLE,
+                          DOOR_OPEN_ANGLE, &serialMessageService);
+
+  auto dht_raw = DHT(DHT_PIN, DHT_TYPE);
+  dht = new DHTSensor(dht_raw);
+  sonar = new UltrasonicSensor(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN,
+                               SONAR_READ_START_US, SONAR_READ_DELAY_US,
+                               SONAR_READ_TIMEOUT_US, dht,
+                               SONAR_MIN_DISTANCE_MM, SONAR_MAX_DISTANCE_MM);
+  dddTask = new DDDTask(sonar, &serialMessageService,
+                        OUTSIDE_DISTANCE_MM, OUTSIDE_TIME_MS,
+                        INSIDE_DISTANCE_MM, INSIDE_TIME_MS);
+  alarmTask = new AlarmTask(dht, &alarmLed,
+                            initialState, PREALARM_TEMP,
+                            PREALARM_TIME_MS, ALARM_TEMP,
+                            ALARM_TIME_MS);
+
   scheduler.addInput(&serialMessageService);
   scheduler.addInput(&pir);
-  scheduler.addInput(&servo);
-  scheduler.addInput(&dht);
-  scheduler.addInput(&sonar);
+  scheduler.addInput(servo);
+  scheduler.addInput(dht);
+  scheduler.addInput(sonar);
   scheduler.addInput(&resetButton);
 
-  scheduler.addThread(&doorTask);
-  scheduler.addThread(&dddTask);
+  scheduler.addThread(doorTask);
+  scheduler.addThread(dddTask);
   scheduler.addThread(&dpdTask);
   // scheduler.addThread(&blinkTask);
   scheduler.addThread(stateChangeTask);
-  scheduler.addThread(&alarmTask);
+  scheduler.addThread(alarmTask);
   scheduler.addThread(&resetTask);
 
   onLed.turnOn();

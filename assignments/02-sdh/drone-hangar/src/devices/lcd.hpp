@@ -15,7 +15,7 @@ private:
   uint8_t row();
 
 public:
-  LCD(uint8_t address, uint8_t cols, uint8_t rows);
+  LCD(LiquidCrystal_I2C lcd);
   void begin();
   void clear() override;
   void print(String *message) override;

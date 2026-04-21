@@ -14,10 +14,11 @@ private:
   int angle;
 
 protected:
+  void setup() override;
   void read() override;
 
 public:
-  ArduinoServoMotor(uint8_t pin, int initialAngle, int min, int max);
+  ArduinoServoMotor(Servo servo, int initialAngle);
   int getAngle() override;
   void setAngle(int angle) override;
 };

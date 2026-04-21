@@ -25,10 +25,11 @@ private:
   float humidity;
 
 protected:
+  void setup() override;
   void read() override;
 
 public:
-  DHTSensor(uint8_t pin, DHTType type);
+  DHTSensor(DHT dht);
   float getTemperature() override;
   float getHumidity() override;
 };
