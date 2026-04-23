@@ -43,7 +43,7 @@ DDDTask *dddTask = nullptr;   // depends on sonar
 DPDTask dpdTask(&pir, &serialMessageService);
 BlinkTask blinkTask(&inActionLed, BLINK_PERIOD_MS);
 StateChangeTask *stateChangeTask = nullptr; // depends on lcd
-AlarmTask *alarmTask = nullptr; // depends on dht
+AlarmTask *alarmTask = nullptr;             // depends on dht
 ResetTask resetTask(&resetButton, initialState);
 
 void setup()
@@ -60,10 +60,9 @@ void setup()
   stateChangeTask = new StateChangeTask(lcd, &serialMessageService);
 
   auto servo_raw = Servo();
-  servo_raw.attach(SERVO_PIN, SERVO_MIN_FREQ, SERVO_MAX_FREQ);
-  while (!servo_raw.attached())
-    ;
-  servo = new ArduinoServoMotor(servo_raw, DOOR_CLOSED_ANGLE);
+  servo = new ArduinoServoMotor(servo_raw, SERVO_PIN,
+                                SERVO_MIN_FREQ, SERVO_MAX_FREQ,
+                                DOOR_CLOSED_ANGLE);
   doorTask = new DoorTask(servo, DOOR_CLOSED_ANGLE,
                           DOOR_OPEN_ANGLE, &serialMessageService);
 

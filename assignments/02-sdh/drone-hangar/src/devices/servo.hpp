@@ -11,6 +11,9 @@ class ArduinoServoMotor : public ServoMotor, public ExternalInput
 {
 private:
   Servo servo;
+  uint8_t pin;
+  int minFreq;
+  int maxFreq;
   int angle;
 
 protected:
@@ -18,7 +21,7 @@ protected:
   void read() override;
 
 public:
-  ArduinoServoMotor(Servo servo, int initialAngle);
+  ArduinoServoMotor(Servo servo, uint8_t pin, int minFreq, int maxFreq, int initialAngle);
   int getAngle() override;
   void setAngle(int angle) override;
 };
