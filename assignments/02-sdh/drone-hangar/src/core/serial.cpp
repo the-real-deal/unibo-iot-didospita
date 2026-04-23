@@ -2,14 +2,22 @@
 
 #include "std/enum.hpp"
 
-SerialMessageService::SerialMessageService()
-    : serialBuffer(), queue(), n_messages(0), currentMessage(nullptr) {}
+SerialMessageService::SerialMessageService(char messageDelimiter, char syncByte)
+    : messageDelimiter(messageDelimiter), syncByte(syncByte),
+      serialBuffer(), queue(),
+      n_messages(0), currentMessage(nullptr) {}
 
 Message *SerialMessageService::getMessage() { return this->currentMessage; }
 
 bool SerialMessageService::messageAvailable()
 {
   return this->currentMessage != nullptr;
+}
+
+void SerialMessageService::setup()
+{
+  Serial.print(this->syncByte);
+  Serial.flush();
 }
 
 void SerialMessageService::read()
@@ -20,7 +28,7 @@ void SerialMessageService::read()
 
     if (this->serialBuffer.length() == 0)
     {
-      auto delimiterIndex = buffer.indexOf(MESSAGE_DELIMITER);
+      auto delimiterIndex = buffer.indexOf(this->messageDelimiter);
       if (delimiterIndex != -1)
       {
         this->serialBuffer = buffer.substring(delimiterIndex);
@@ -36,20 +44,20 @@ void SerialMessageService::read()
   // Format: |TYPE|CONTENT|
   while (this->serialBuffer.length() > 0)
   {
-    int messageStartIndex = this->serialBuffer.indexOf(MESSAGE_DELIMITER);
+    int messageStartIndex = this->serialBuffer.indexOf(this->messageDelimiter);
     if (messageStartIndex == -1)
     {
       this->serialBuffer = String(); // remove extra garbage that is not part of a message
       break;
     }
 
-    int typeDelimiterIndex = this->serialBuffer.indexOf(MESSAGE_DELIMITER, messageStartIndex + 1);
+    int typeDelimiterIndex = this->serialBuffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
     if (typeDelimiterIndex == -1)
     {
       break;
     }
 
-    int terminatorIndex = this->serialBuffer.indexOf(MESSAGE_DELIMITER, typeDelimiterIndex + 1);
+    int terminatorIndex = this->serialBuffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
     if (terminatorIndex == -1)
     {
       break;
@@ -91,11 +99,11 @@ void SerialMessageService::send(Message message)
   String typeString = String(
       enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS));
   Serial.flush();
-  Serial.print(MESSAGE_DELIMITER);
+  Serial.print(this->messageDelimiter);
   Serial.print(typeString);
-  Serial.print(MESSAGE_DELIMITER);
+  Serial.print(this->messageDelimiter);
   Serial.print(message.getContent());
-  Serial.print(MESSAGE_DELIMITER);
+  Serial.print(this->messageDelimiter);
   Serial.print('\n');
   Serial.flush();
 }

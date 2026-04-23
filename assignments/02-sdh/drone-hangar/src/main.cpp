@@ -26,7 +26,7 @@ Scheduler scheduler(SCHEDULER_PERIOD_MS, initialState);
 I2CManager i2c;
 LCD *lcd = nullptr;
 
-SerialMessageService serialMessageService;
+SerialMessageService serialMessageService(SERIAL_MESSAGE_DELIMITER, SERIAL_SYNC_BYTE);
 PIRSensor pir(PIR_PIN);
 ArduinoServoMotor *servo = nullptr;
 DHTSensor *dht = nullptr;
@@ -52,7 +52,6 @@ void setup()
   while (!Serial)
     ;
   Wire.begin();
-  Serial.print(SERIAL_SYNC_BYTE);
 
   int lcdAddress = i2c.scan();
   auto lcd_raw = LiquidCrystal_I2C(lcdAddress, LCD_COLS, LCD_ROWS);
@@ -92,7 +91,7 @@ void setup()
   scheduler.addThread(doorTask);
   scheduler.addThread(dddTask);
   scheduler.addThread(&dpdTask);
-  // scheduler.addThread(&blinkTask);
+  scheduler.addThread(&blinkTask);
   scheduler.addThread(stateChangeTask);
   scheduler.addThread(alarmTask);
   scheduler.addThread(&resetTask);
@@ -100,6 +99,8 @@ void setup()
   onLed.turnOn();
   inActionLed.turnOff();
   alarmLed.turnOff();
+
+  scheduler.setup();
 }
 
 void loop()

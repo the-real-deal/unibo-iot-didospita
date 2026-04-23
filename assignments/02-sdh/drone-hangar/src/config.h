@@ -33,6 +33,7 @@
 // serial
 #define SERIAL_BAUD 9600
 #define SERIAL_SYNC_BYTE '\0'
+#define SERIAL_MESSAGE_DELIMITER '|'
 #define SERIAL_MESSAGES_QUEUE_SIZE 10
 
 // lcd
