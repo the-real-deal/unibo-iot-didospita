@@ -12,5 +12,6 @@ public:
   Timer(uint64_t periodMillis);
   uint64_t getElapsedMillis();
   bool isFinished();
+  void reset();
   uint64_t wait();
 };

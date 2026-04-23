@@ -6,6 +6,6 @@ class Display
 {
 public:
   virtual void clear();
-  virtual void print(String *message);
+  virtual void print(const char *message);
   virtual ~Display() = default;
 };

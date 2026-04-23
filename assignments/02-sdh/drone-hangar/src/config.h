@@ -18,6 +18,9 @@
 // dht
 #define DHT_PIN 11 // TEMP
 #define DHT_TYPE 11
+#define DHT_READ_PERIOD_MS 2000
+#define DHT_INITIAL_TEMP 20
+#define DHT_INITIAL_HUMIDITY 50
 
 // reset
 #define RESET_BUTTON_PIN 10 // RESET
@@ -28,7 +31,7 @@
 // scheduler
 #define SCHEDULER_PERIOD_MS 200
 #define SCHEDULER_MAX_INPUTS 10
-#define SCHEDULER_MAX_THREADS 20
+#define SCHEDULER_MAX_THREADS 10
 
 // serial
 #define SERIAL_BAUD 9600

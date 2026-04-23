@@ -21,7 +21,7 @@ protected:
   void read() override;
 
 public:
-  ArduinoServoMotor(Servo servo, uint8_t pin, int minFreq, int maxFreq, int initialAngle);
+  ArduinoServoMotor(uint8_t pin, int minFreq, int maxFreq, int initialAngle);
   int getAngle() override;
   void setAngle(int angle) override;
 };

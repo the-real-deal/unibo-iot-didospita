@@ -31,9 +31,10 @@ void StateChangeTask::PrintState::step(StateChangeTask *task,
                                        Context *context)
 {
   GlobalState state = context->getState();
-  String stateString = String(enumToString(state, GLOBAL_STATE_STRINGS));
+  auto stateString = enumToString(state, GLOBAL_STATE_STRINGS);
+
   task->internalDisplay->clear();
-  task->internalDisplay->print(&stateString);
+  task->internalDisplay->print(stateString);
   task->messageService->send(Message(MessageType::STATE, stateString));
   task->prevState = state;
   task->switchState(new IdleState());

@@ -14,6 +14,6 @@ protected:
   void read() override;
 
 public:
-  PIRSensor(uint8_t pin);
+  PIRSensor(DigitalInputPin pin);
   bool isPresent() override;
 };

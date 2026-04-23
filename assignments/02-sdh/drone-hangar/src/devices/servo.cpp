@@ -2,12 +2,11 @@
 
 #include <Arduino.h>
 
-ArduinoServoMotor::ArduinoServoMotor(Servo servo,
-                                     uint8_t pin,
+ArduinoServoMotor::ArduinoServoMotor(uint8_t pin,
                                      int minFreq,
                                      int maxFreq,
                                      int initialAngle)
-    : servo(servo),
+    : servo(),
       pin(pin),
       minFreq(minFreq),
       maxFreq(maxFreq),

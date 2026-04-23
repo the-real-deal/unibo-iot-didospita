@@ -1,6 +1,6 @@
 #include "button.hpp"
 
-PushButton::PushButton(uint8_t pin) : pin(pin), pressed(false) {}
+PushButton::PushButton(DigitalInputPin pin) : pin(pin), pressed(false) {}
 
 void PushButton::read()
 {

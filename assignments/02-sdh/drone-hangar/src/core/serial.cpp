@@ -1,11 +1,20 @@
 #include "serial.hpp"
 
+#include <Arduino.h>
+#include <MemoryUsage.h>
+
 #include "std/enum.hpp"
 
-SerialMessageService::SerialMessageService(char messageDelimiter, char syncByte)
-    : messageDelimiter(messageDelimiter), syncByte(syncByte),
-      serialBuffer(), queue(),
-      n_messages(0), currentMessage(nullptr) {}
+SerialMessageService::SerialMessageService(uint64_t baud, char messageDelimiter, char syncByte)
+    : baud(baud), messageDelimiter(messageDelimiter), syncByte(syncByte),
+      queue(), n_messages(0), currentMessage(nullptr) {}
+
+void SerialMessageService::begin()
+{
+  Serial.begin(this->baud);
+  while (!Serial)
+    ;
+}
 
 Message *SerialMessageService::getMessage() { return this->currentMessage; }
 
@@ -20,65 +29,51 @@ void SerialMessageService::setup()
   Serial.flush();
 }
 
-void SerialMessageService::read()
+void SerialMessageService::readMessages()
 {
-  if (Serial.available())
+  String buffer;
+  while (Serial.available())
   {
-    auto buffer = Serial.readStringUntil('\n');
+    String buffer = Serial.readString();
 
-    if (this->serialBuffer.length() == 0)
-    {
-      auto delimiterIndex = buffer.indexOf(this->messageDelimiter);
-      if (delimiterIndex != -1)
-      {
-        this->serialBuffer = buffer.substring(delimiterIndex);
-      }
-    }
-    else
-    {
-      this->serialBuffer += buffer;
-    }
-  }
-
-  // Try to parse complete messages from buffer
-  // Format: |TYPE|CONTENT|
-  while (this->serialBuffer.length() > 0)
-  {
-    int messageStartIndex = this->serialBuffer.indexOf(this->messageDelimiter);
+    int messageStartIndex = buffer.indexOf(this->messageDelimiter);
     if (messageStartIndex == -1)
     {
-      this->serialBuffer = String(); // remove extra garbage that is not part of a message
-      break;
+      return;
     }
 
-    int typeDelimiterIndex = this->serialBuffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
+    int typeDelimiterIndex = buffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
     if (typeDelimiterIndex == -1)
     {
-      break;
+      return;
     }
 
-    int terminatorIndex = this->serialBuffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
+    int terminatorIndex = buffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
     if (terminatorIndex == -1)
     {
-      break;
+      return;
     }
 
     // We have a complete message!
-    String typeStr = this->serialBuffer.substring(messageStartIndex + 1, typeDelimiterIndex);
-    String content = this->serialBuffer.substring(typeDelimiterIndex + 1, terminatorIndex);
+    String typeStr = buffer.substring(messageStartIndex + 1, typeDelimiterIndex);
+    String content = buffer.substring(typeDelimiterIndex + 1, terminatorIndex);
 
     // Parse message type
-    MessageType type = enumFromString<MessageType>(typeStr, MESSAGE_TYPE_STRINGS);
+    MessageType type = enumFromString<MessageType>(typeStr.c_str(), MESSAGE_TYPE_STRINGS);
     auto message = new Message(type, content);
     if (this->n_messages < SERIAL_MESSAGES_QUEUE_SIZE)
     {
       this->queue[this->n_messages] = message;
       this->n_messages++;
     }
-    this->serialBuffer = this->serialBuffer.substring(terminatorIndex + 1);
+    buffer = buffer.substring(terminatorIndex);
   }
+}
 
-  // Get next message from queue
+void SerialMessageService::read()
+{
+  this->readMessages();
+
   if (this->messageAvailable())
   {
     delete this->currentMessage;
@@ -96,13 +91,14 @@ void SerialMessageService::read()
 
 void SerialMessageService::send(Message message)
 {
-  String typeString = String(
-      enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS));
+  auto typeStr = enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS);
+  auto contentStr = message.getContent();
+
   Serial.flush();
   Serial.print(this->messageDelimiter);
-  Serial.print(typeString);
+  Serial.print(typeStr);
   Serial.print(this->messageDelimiter);
-  Serial.print(message.getContent());
+  Serial.print(contentStr);
   Serial.print(this->messageDelimiter);
   Serial.print('\n');
   Serial.flush();

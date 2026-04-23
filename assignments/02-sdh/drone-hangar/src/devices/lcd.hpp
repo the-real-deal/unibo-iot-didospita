@@ -3,8 +3,9 @@
 #include <LiquidCrystal_I2C.h>
 
 #include "io/display.hpp"
+#include "core/begin.hpp"
 
-class LCD : public Display
+class LCD : public Display, public DelayedBegin
 {
 private:
   LiquidCrystal_I2C lcd;
@@ -16,7 +17,7 @@ private:
 
 public:
   LCD(LiquidCrystal_I2C lcd);
-  void begin();
+  void begin() override;
   void clear() override;
-  void print(String *message) override;
+  void print(const char *message) override;
 };

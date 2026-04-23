@@ -2,7 +2,9 @@
 
 #include <stdint.h>
 
-class I2CManager
+#include "begin.hpp"
+
+class I2CManager : public DelayedBegin
 {
 private:
   uint8_t startAddress;
@@ -10,6 +12,7 @@ private:
   static const uint8_t MAX_ADDRESS = 126;
 
 public:
+  void begin() override;
   I2CManager();
   uint8_t scan();
 };

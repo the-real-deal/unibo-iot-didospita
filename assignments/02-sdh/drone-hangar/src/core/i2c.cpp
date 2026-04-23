@@ -5,6 +5,11 @@
 
 I2CManager::I2CManager() : startAddress(MIN_ADDRESS) {}
 
+void I2CManager::begin()
+{
+  Wire.begin();
+}
+
 uint8_t I2CManager::scan()
 {
   for (uint8_t address = this->startAddress; address <= MAX_ADDRESS;

@@ -20,16 +20,18 @@ class DHTSensor : public TemperatureSensor,
                   public ExternalInput
 {
 private:
-  DHT dht;
+  DHT_Unified dht;
   float temperature;
   float humidity;
+  Timer readTimer;
 
 protected:
   void setup() override;
   void read() override;
 
 public:
-  DHTSensor(DHT dht);
+  DHTSensor(uint8_t pin, DHTType type,
+            float initialTemp, float initialHumidity);
   float getTemperature() override;
   float getHumidity() override;
 };

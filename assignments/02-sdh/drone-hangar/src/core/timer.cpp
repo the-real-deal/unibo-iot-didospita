@@ -6,13 +6,21 @@
 #include "config.h"
 
 Timer::Timer(uint64_t periodMillis)
-    : periodMillis(periodMillis), startTime(millis()) {}
+    : periodMillis(periodMillis)
+{
+  this->reset();
+}
 
 uint64_t Timer::getElapsedMillis() { return millis() - this->startTime; }
 
 bool Timer::isFinished()
 {
   return this->getElapsedMillis() >= this->periodMillis;
+}
+
+void Timer::reset()
+{
+  this->startTime = millis();
 }
 
 uint64_t Timer::wait()
@@ -22,6 +30,5 @@ uint64_t Timer::wait()
     delay(TIMER_READ_FREQ_MS);
   }
   uint64_t total = this->getElapsedMillis();
-  this->startTime = millis();
   return total;
 }

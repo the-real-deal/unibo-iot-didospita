@@ -11,7 +11,7 @@ private:
   void setValue(DigitalValue value);
 
 public:
-  Led(uint8_t pin);
+  Led(DigitalOutputPin pin);
 
   void turnOn() override;
   void turnOff() override;

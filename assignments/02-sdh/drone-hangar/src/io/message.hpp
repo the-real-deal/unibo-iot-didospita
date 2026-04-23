@@ -26,7 +26,7 @@ public:
   Message(MessageType type);
   Message(MessageType type, String content);
   MessageType getType();
-  String getContent();
+  const char *getContent();
 };
 
 class MessageService

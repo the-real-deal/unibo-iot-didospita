@@ -29,7 +29,7 @@ void LCD::clear()
   this->setCursor(0, 0);
 }
 
-void LCD::print(String *message)
+void LCD::print(const char *message)
 {
-  this->lcd.print(*message);
+  this->lcd.print(message);
 }

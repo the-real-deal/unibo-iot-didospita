@@ -1,6 +1,6 @@
 #include "led.hpp"
 
-Led::Led(uint8_t pin) : pin(pin), value(DigitalValue::Low) {}
+Led::Led(DigitalOutputPin pin) : pin(pin), value(DigitalValue::Low) {}
 
 void Led::setValue(DigitalValue value)
 {

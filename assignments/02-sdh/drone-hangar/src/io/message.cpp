@@ -7,4 +7,8 @@ Message::Message(MessageType type) : Message(type, String()) {}
 
 MessageType Message::getType() { return this->type; }
 
-String Message::getContent() { return this->content; }
+const char *Message::getContent()
+{
+    auto contentStr = this->content.c_str();
+    return contentStr;
+}

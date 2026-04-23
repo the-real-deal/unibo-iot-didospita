@@ -3,18 +3,22 @@
 #include <Arduino.h>
 
 template <typename T>
-const char *const enumToString(T value, const char *const enumStrings[])
+const char *enumToString(T value, const char *const enumStrings[])
 {
-  return enumStrings[static_cast<size_t>(value)];
+  auto strRepr = enumStrings[static_cast<size_t>(value)];
+  return strRepr;
 }
 
 template <typename T, size_t N>
-T enumFromString(const String value, const char *const (&enumStrings)[N])
+T enumFromString(const char *value, const char *const (&enumStrings)[N])
 {
   for (size_t i = 0; i < N; ++i)
   {
-    if (value == String(enumStrings[i]))
-      return static_cast<T>(i);
+    if (strcmp(value, enumStrings[i]) == 0)
+    {
+      auto enumVal = static_cast<T>(i);
+      return enumVal;
+    }
   }
   abort();
 }
