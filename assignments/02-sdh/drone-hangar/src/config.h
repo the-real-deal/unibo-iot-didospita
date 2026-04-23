@@ -60,6 +60,7 @@
 // door
 #define DOOR_CLOSED_ANGLE 0
 #define DOOR_OPEN_ANGLE 180
+#define DOOR_ANGLE_MARGIN 10
 
 // blink
 #define BLINK_PERIOD_MS 500

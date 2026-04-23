@@ -63,8 +63,9 @@ void setup()
   servo = new ArduinoServoMotor(servo_raw, SERVO_PIN,
                                 SERVO_MIN_FREQ, SERVO_MAX_FREQ,
                                 DOOR_CLOSED_ANGLE);
-  doorTask = new DoorTask(servo, DOOR_CLOSED_ANGLE,
-                          DOOR_OPEN_ANGLE, &serialMessageService);
+  doorTask = new DoorTask(servo, 
+                          DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE, 
+                          DOOR_ANGLE_MARGIN, &serialMessageService);
 
   auto dht_raw = DHT(DHT_PIN, DHT_TYPE);
   dht = new DHTSensor(dht_raw);

@@ -3,11 +3,12 @@
 #include "blocking.hpp"
 
 DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle,
-                   MessageService *messageService)
+                   int angleMargin, MessageService *messageService)
     : Task<DoorTask>(new ClosedState()),
       servo(servo),
       closedAngle(closedAngle),
       openAngle(openAngle),
+      angleMargin(angleMargin),
       messageService(messageService) {}
 
 void DoorTask::ClosedState::step(DoorTask *task, Context *context)
@@ -29,7 +30,7 @@ void DoorTask::ClosedState::step(DoorTask *task, Context *context)
     }
     // no break, do default behaviour
   default:
-    if (task->servo->getAngle() > task->closedAngle)
+    if (task->servo->getAngle() >= task->closedAngle + task->angleMargin)
     {
       task->servo->setAngle(task->closedAngle);
     }
@@ -43,7 +44,7 @@ void DoorTask::OpenState::step(DoorTask *task, Context *context)
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    if (task->servo->getAngle() < task->openAngle)
+    if (task->servo->getAngle() <= task->openAngle - task->angleMargin)
     {
       task->servo->setAngle(task->openAngle);
     }
