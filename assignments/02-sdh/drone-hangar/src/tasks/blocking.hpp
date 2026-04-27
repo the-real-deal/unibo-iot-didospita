@@ -5,6 +5,7 @@
 template <typename T, typename B, typename S>
 class BlockedTaskState : public TaskState<T>
 {
+
 private:
   B blockingState;
   S *(*returnStateCreator)();
@@ -35,5 +36,5 @@ template <typename T, typename S>
 void blockOnAlarm(T *task, Context *context)
 {
   blockOnAlarm(task, context, static_cast<S *(*)()>([]()
-                                                    { return new S(); }));
+                                                   { return new S(); }));
 }

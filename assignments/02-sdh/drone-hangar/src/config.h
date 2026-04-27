@@ -18,9 +18,7 @@
 // dht
 #define DHT_PIN 11 // TEMP
 #define DHT_TYPE 11
-#define DHT_READ_PERIOD_MS 2000
 #define DHT_INITIAL_TEMP 20
-#define DHT_INITIAL_HUMIDITY 50
 
 // reset
 #define RESET_BUTTON_PIN 10 // RESET
@@ -37,7 +35,6 @@
 #define SERIAL_BAUD 9600
 #define SERIAL_SYNC_BYTE '\0'
 #define SERIAL_MESSAGE_DELIMITER '|'
-#define SERIAL_MESSAGES_QUEUE_SIZE 10
 
 // lcd
 #define LCD_COLS 16

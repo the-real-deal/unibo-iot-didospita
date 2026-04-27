@@ -35,6 +35,7 @@ private:
 
   public:
     PrealarmTempCheckingState(AlarmTask *task);
+    void setup(AlarmTask *task) override;
     void step(AlarmTask *task, Context *context) override;
   };
 
@@ -57,6 +58,7 @@ private:
 
   public:
     AlarmTempCheckingState(AlarmTask *task);
+    void setup(AlarmTask *task) override;
     void step(AlarmTask *task, Context *context) override;
   };
 

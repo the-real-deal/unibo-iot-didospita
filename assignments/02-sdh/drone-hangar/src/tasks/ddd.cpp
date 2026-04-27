@@ -49,6 +49,11 @@ DDDTask::TakeoffDistanceCheckingState::TakeoffDistanceCheckingState(
     DDDTask *task)
     : timer(task->outsideTimeMillis) {}
 
+void DDDTask::TakeoffDistanceCheckingState::setup(DDDTask *task)
+{
+  this->timer.start();
+}
+
 void DDDTask::TakeoffDistanceCheckingState::step(DDDTask *task,
                                                  Context *context)
 {
@@ -79,6 +84,11 @@ void DDDTask::LandingReadingState::step(DDDTask *task, Context *context)
 DDDTask::LandingDistanceCheckingState::LandingDistanceCheckingState(
     DDDTask *task)
     : timer(task->insideTimeMillis) {}
+
+void DDDTask::LandingDistanceCheckingState::setup(DDDTask *task)
+{
+  this->timer.start();
+}
 
 void DDDTask::LandingDistanceCheckingState::step(DDDTask *task,
                                                  Context *context)

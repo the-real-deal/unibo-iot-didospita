@@ -24,6 +24,11 @@ void BlinkTask::IdleState::step(BlinkTask *task, Context *context)
 
 BlinkTask::OnState::OnState(BlinkTask *task) : timer(task->periodMillis) {}
 
+void BlinkTask::OnState::setup(BlinkTask *task)
+{
+  this->timer.start();
+}
+
 void BlinkTask::OnState::step(BlinkTask *task, Context *context)
 {
   if (task->blinkIndicator->isOff())
@@ -46,6 +51,11 @@ void BlinkTask::OnState::step(BlinkTask *task, Context *context)
 }
 
 BlinkTask::OffState::OffState(BlinkTask *task) : timer(task->periodMillis) {}
+
+void BlinkTask::OffState::setup(BlinkTask *task)
+{
+  this->timer.start();
+}
 
 void BlinkTask::OffState::step(BlinkTask *task, Context *context)
 {

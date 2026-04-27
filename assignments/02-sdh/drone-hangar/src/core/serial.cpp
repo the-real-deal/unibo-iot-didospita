@@ -1,13 +1,12 @@
 #include "serial.hpp"
 
 #include <Arduino.h>
-#include <MemoryUsage.h>
 
 #include "std/enum.hpp"
 
 SerialMessageService::SerialMessageService(uint64_t baud, char messageDelimiter, char syncByte)
     : baud(baud), messageDelimiter(messageDelimiter), syncByte(syncByte),
-      queue(), n_messages(0), currentMessage(nullptr) {}
+      currentMessage(nullptr) {}
 
 void SerialMessageService::begin()
 {
@@ -29,64 +28,50 @@ void SerialMessageService::setup()
   Serial.flush();
 }
 
-void SerialMessageService::readMessages()
+Message* SerialMessageService::readNewMessage()
 {
-  String buffer;
   while (Serial.available())
   {
-    String buffer = Serial.readString();
-
-    int messageStartIndex = buffer.indexOf(this->messageDelimiter);
-    if (messageStartIndex == -1)
-    {
-      return;
-    }
-
-    int typeDelimiterIndex = buffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
-    if (typeDelimiterIndex == -1)
-    {
-      return;
-    }
-
-    int terminatorIndex = buffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
-    if (terminatorIndex == -1)
-    {
-      return;
-    }
-
-    // We have a complete message!
-    String typeStr = buffer.substring(messageStartIndex + 1, typeDelimiterIndex);
-    String content = buffer.substring(typeDelimiterIndex + 1, terminatorIndex);
-
-    // Parse message type
-    MessageType type = enumFromString<MessageType>(typeStr.c_str(), MESSAGE_TYPE_STRINGS);
-    auto message = new Message(type, content);
-    if (this->n_messages < SERIAL_MESSAGES_QUEUE_SIZE)
-    {
-      this->queue[this->n_messages] = message;
-      this->n_messages++;
-    }
-    buffer = buffer.substring(terminatorIndex);
+    this->buffer += Serial.readString();
   }
+
+  int messageStartIndex = this->buffer.indexOf(this->messageDelimiter);
+  if (messageStartIndex == -1)
+  {
+    return nullptr;
+  }
+
+  int typeDelimiterIndex = this->buffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
+  if (typeDelimiterIndex == -1)
+  {
+    return nullptr;
+  }
+
+  int terminatorIndex = this->buffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
+  if (terminatorIndex == -1)
+  {
+    return nullptr;
+  }
+
+  String typeStr = this->buffer.substring(messageStartIndex + 1, typeDelimiterIndex);
+  String content = this->buffer.substring(typeDelimiterIndex + 1, terminatorIndex);
+
+  MessageType type = enumFromString<MessageType>(typeStr.c_str(), MESSAGE_TYPE_STRINGS);
+  auto message = new Message(type, content);
+  buffer = buffer.substring(terminatorIndex);
+  return message;
 }
 
 void SerialMessageService::read()
 {
-  this->readMessages();
+  auto newMessage = this->readNewMessage();
 
   if (this->messageAvailable())
   {
     delete this->currentMessage;
   }
-  if (this->n_messages > 0)
-  {
-    this->currentMessage = this->queue[this->n_messages - 1];
-    this->n_messages--;
-  }
-  else
-  {
-    this->currentMessage = nullptr;
-  }
+
+  this->currentMessage = newMessage;
 }
 
 void SerialMessageService::send(Message message)

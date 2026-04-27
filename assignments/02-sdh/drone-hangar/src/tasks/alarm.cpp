@@ -58,6 +58,11 @@ void AlarmTask::PrealarmReadingState::step(AlarmTask *task, Context *context)
 AlarmTask::PrealarmTempCheckingState::PrealarmTempCheckingState(AlarmTask *task)
     : timer(task->prealarmTimeMillis) {}
 
+void AlarmTask::PrealarmTempCheckingState::setup(AlarmTask *task)
+{
+  this->timer.start();
+}
+
 void AlarmTask::PrealarmTempCheckingState::step(AlarmTask *task,
                                                 Context *context)
 {
@@ -103,6 +108,11 @@ void AlarmTask::AlarmReadingState::step(AlarmTask *task, Context *context)
 
 AlarmTask::AlarmTempCheckingState::AlarmTempCheckingState(AlarmTask *task)
     : timer(task->alarmTimeMillis) {}
+
+void AlarmTask::AlarmTempCheckingState::setup(AlarmTask *task)
+{
+  this->timer.start();
+}
 
 void AlarmTask::AlarmTempCheckingState::step(AlarmTask *task,
                                              Context *context)

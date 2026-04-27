@@ -1,11 +1,8 @@
 #pragma once
 
-#include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <DHT_U.h>
 
 #include "core/scheduler.hpp"
-#include "io/humidity.hpp"
 #include "io/temperature.hpp"
 
 enum class DHTType : uint8_t
@@ -16,22 +13,17 @@ enum class DHTType : uint8_t
 };
 
 class DHTSensor : public TemperatureSensor,
-                  public HumiditySensor,
                   public ExternalInput
 {
 private:
-  DHT_Unified dht;
+  DHT dht;
   float temperature;
-  float humidity;
-  Timer readTimer;
 
 protected:
   void setup() override;
   void read() override;
 
 public:
-  DHTSensor(uint8_t pin, DHTType type,
-            float initialTemp, float initialHumidity);
+  DHTSensor(uint8_t pin, DHTType type, float initialTemp);
   float getTemperature() override;
-  float getHumidity() override;
 };

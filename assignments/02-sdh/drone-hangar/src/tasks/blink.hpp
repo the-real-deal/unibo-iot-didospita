@@ -22,6 +22,7 @@ private:
 
   public:
     OnState(BlinkTask *task);
+    void setup(BlinkTask *task) override;
     void step(BlinkTask *task, Context *context) override;
   };
 
@@ -32,6 +33,7 @@ private:
 
   public:
     OffState(BlinkTask *task);
+    void setup(BlinkTask *task) override;
     void step(BlinkTask *task, Context *context) override;
   };
 

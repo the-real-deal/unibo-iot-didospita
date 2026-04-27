@@ -42,8 +42,7 @@ PIRSensor pir(pirPin);
 ArduinoServoMotor servo(SERVO_PIN,
                         SERVO_MIN_FREQ, SERVO_MAX_FREQ,
                         DOOR_CLOSED_ANGLE);
-DHTSensor dht(DHT_PIN, static_cast<DHTType>(DHT_TYPE),
-              DHT_INITIAL_TEMP, DHT_INITIAL_HUMIDITY);
+DHTSensor dht(DHT_PIN, static_cast<DHTType>(DHT_TYPE), DHT_INITIAL_TEMP);
 UltrasonicSensor sonar(sonarEchoPin, sonarTriggerPin,
                        SONAR_READ_START_US, SONAR_READ_DELAY_US,
                        SONAR_READ_TIMEOUT_US, &dht,
@@ -76,6 +75,7 @@ void setup()
   I2CManager i2c;
   i2c.begin();
 
+  builtinLedPin.begin();
   pirPin.begin();
   sonarEchoPin.begin();
   sonarTriggerPin.begin();
@@ -98,19 +98,23 @@ void setup()
   scheduler.addInput(&sonar);
   scheduler.addInput(&resetButton);
 
-  scheduler.addThread(&doorTask);
-  scheduler.addThread(&dddTask);
-  scheduler.addThread(&dpdTask);
-  scheduler.addThread(&blinkTask);
-  scheduler.addThread(stateChangeTask);
-  scheduler.addThread(&alarmTask);
-  scheduler.addThread(&resetTask);
+  // scheduler.addThread(&doorTask);
+  // scheduler.addThread(&dddTask);
+  // scheduler.addThread(&dpdTask);
+  // scheduler.addThread(&blinkTask);
+  // scheduler.addThread(stateChangeTask);
+  // scheduler.addThread(&alarmTask);
+  // scheduler.addThread(&resetTask);
 
   onLed.turnOn();
   inActionLed.turnOff();
   alarmLed.turnOff();
 
   scheduler.setup();
+
+  Serial.println(F("SETUP END"));
+  Serial.flush();
+  builtinLed.turnOn();
 }
 
 void loop()

@@ -2,15 +2,10 @@
 
 #include "std/enum.hpp"
 
-Context::Context(int periodMillis, GlobalState initialState)
-    : timer(periodMillis),
-      state(initialState),
+Context::Context(GlobalState initialState)
+    : state(initialState),
       stateCandidate(initialState),
       elapsedMillis(0) {}
-
-void Context::waitTimer() { this->elapsedMillis = this->timer.wait(); }
-
-void Context::switchState() { this->state = this->stateCandidate; }
 
 GlobalState Context::getState() { return this->state; }
 
@@ -19,7 +14,7 @@ void Context::setState(GlobalState state) { this->stateCandidate = state; }
 uint64_t Context::getElapsedMillis() { return this->elapsedMillis; }
 
 Scheduler::Scheduler(int periodMillis, GlobalState initialState)
-    : context(periodMillis, initialState), inputs(), n_inputs(0), threads(), n_threads(0) {}
+    : context(initialState), timer(periodMillis), inputs(), n_inputs(0), threads(), n_threads(0) {}
 
 void Scheduler::addInput(ExternalInput *input)
 {
@@ -53,11 +48,12 @@ void Scheduler::setup()
     auto thread = this->threads[i];
     thread->setup();
   }
+  this->timer.start();
 }
 
 void Scheduler::advance()
 {
-  this->context.waitTimer();
+  this->context.elapsedMillis = this->timer.wait();
 
   for (size_t i = 0; i < this->n_inputs; i++)
   {
@@ -70,5 +66,6 @@ void Scheduler::advance()
     thread->step(&this->context);
   }
 
-  this->context.switchState();
+  this->context.state = this->context.stateCandidate;
+  this->timer.start();
 }

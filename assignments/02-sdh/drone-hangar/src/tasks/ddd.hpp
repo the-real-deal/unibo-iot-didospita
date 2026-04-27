@@ -35,6 +35,7 @@ private:
 
   public:
     TakeoffDistanceCheckingState(DDDTask *task);
+    void setup(DDDTask *task) override;
     void step(DDDTask *task, Context *context) override;
   };
 
@@ -51,6 +52,7 @@ private:
 
   public:
     LandingDistanceCheckingState(DDDTask *task);
+    void setup(DDDTask *task) override;
     void step(DDDTask *task, Context *context) override;
   };
 

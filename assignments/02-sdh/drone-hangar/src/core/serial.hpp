@@ -13,12 +13,11 @@ private:
   uint64_t baud;
   char messageDelimiter;
   char syncByte;
-  Message *queue[SERIAL_MESSAGES_QUEUE_SIZE];
-  size_t n_messages;
+  String buffer;
   Message *currentMessage;
 
 private:
-  void readMessages();
+  Message* readNewMessage();
 
 protected:
   void setup() override;
