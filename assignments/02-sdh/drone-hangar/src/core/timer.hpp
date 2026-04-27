@@ -10,6 +10,7 @@ private:
 
 public:
   Timer(uint64_t periodMillis);
+  Timer();
   uint64_t getElapsedMillis();
   bool isFinished();
   void start();

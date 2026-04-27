@@ -98,23 +98,19 @@ void setup()
   scheduler.addInput(&sonar);
   scheduler.addInput(&resetButton);
 
-  // scheduler.addThread(&doorTask);
-  // scheduler.addThread(&dddTask);
-  // scheduler.addThread(&dpdTask);
-  // scheduler.addThread(&blinkTask);
-  // scheduler.addThread(stateChangeTask);
-  // scheduler.addThread(&alarmTask);
-  // scheduler.addThread(&resetTask);
+  scheduler.addThread(&doorTask);
+  scheduler.addThread(&dddTask);
+  scheduler.addThread(&dpdTask);
+  scheduler.addThread(&blinkTask);
+  scheduler.addThread(stateChangeTask);
+  scheduler.addThread(&alarmTask);
+  scheduler.addThread(&resetTask);
 
   onLed.turnOn();
   inActionLed.turnOff();
   alarmLed.turnOff();
 
   scheduler.setup();
-
-  Serial.println(F("SETUP END"));
-  Serial.flush();
-  builtinLed.turnOn();
 }
 
 void loop()
