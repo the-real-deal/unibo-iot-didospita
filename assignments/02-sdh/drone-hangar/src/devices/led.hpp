@@ -3,7 +3,7 @@
 #include "core/pins.hpp"
 #include "io/indicator.hpp"
 
-class Led : public Indicator
+class Led : public Indicator, public Setup
 {
 private:
   DigitalOutputPin pin;
@@ -11,8 +11,9 @@ private:
   void setValue(DigitalValue value);
 
 public:
-  Led(DigitalOutputPin pin);
+  Led(uint8_t pin);
 
+  void setup() override;
   void turnOn() override;
   void turnOff() override;
   bool isOn() override;

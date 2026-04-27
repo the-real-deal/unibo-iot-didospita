@@ -3,7 +3,7 @@
 #include <limits.h>
 #include <limits.h>
 
-UltrasonicSensor::UltrasonicSensor(DigitalInputPin echoPin, DigitalOutputPin triggerPin,
+UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                                    uint64_t readStartMicros, uint64_t readDelayMicros,
                                    uint64_t readTimeoutMicros, TemperatureSensor *tempSensor,
                                    float minDistanceMm, float maxDistanceMm)
@@ -16,6 +16,12 @@ UltrasonicSensor::UltrasonicSensor(DigitalInputPin echoPin, DigitalOutputPin tri
       minDistanceMm(minDistanceMm),
       maxDistanceMm(maxDistanceMm),
       distanceMm(0) {}
+
+void UltrasonicSensor::setup()
+{
+  this->echoPin.setup();
+  this->triggerPin.setup();
+}
 
 float UltrasonicSensor::getSoundSpeed()
 {

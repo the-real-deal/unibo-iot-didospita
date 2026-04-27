@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include "state.hpp"
+#include "setup.hpp"
 #include "timer.hpp"
 
 class Scheduler;
@@ -26,31 +27,29 @@ public:
   uint64_t getElapsedMillis();
 };
 
-class LogicThread
+class LogicThread : public Setup
 {
   friend Scheduler;
 
 protected:
-  virtual void setup() {}
   virtual void step(Context *context) = 0;
 
 public:
   virtual ~LogicThread() = default;
 };
 
-class ExternalInput
+class ExternalInput : public Setup
 {
   friend Scheduler;
 
 protected:
-  virtual void setup() {}
   virtual void read() = 0;
 
 public:
   virtual ~ExternalInput() = default;
 };
 
-class Scheduler
+class Scheduler : public Setup
 {
 private:
   Context context;
@@ -64,6 +63,6 @@ public:
   Scheduler(int periodMillis, GlobalState initialState);
   void addInput(ExternalInput *input);
   void addThread(LogicThread *thread);
-  void setup();
+  void setup() override;
   void advance();
 };

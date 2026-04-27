@@ -9,8 +9,11 @@ class PushButton : public Button, public ExternalInput
   DigitalInputPin pin;
   bool pressed;
 
-public:
-  PushButton(DigitalInputPin pin);
+protected:
+  void setup() override;
   void read() override;
+
+public:
+  PushButton(uint8_t pin);
   bool isPressed() override;
 };

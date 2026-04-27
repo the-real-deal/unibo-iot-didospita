@@ -25,9 +25,11 @@ protected:
   void read() override;
 
 public:
-  UltrasonicSensor(DigitalInputPin echoPin, DigitalOutputPin triggerPin,
+  UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
                    uint64_t readStartMicros, uint64_t readDelayMicros,
                    uint64_t readTimeoutMicros, TemperatureSensor *tempSensor,
                    float minDistanceMm, float maxDistanceMm);
+
+  void setup() override;
   float getDistanceMm() override;
 };

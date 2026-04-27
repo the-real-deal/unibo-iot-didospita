@@ -5,7 +5,7 @@
 LCD::LCD(LiquidCrystal_I2C lcd)
     : lcd(lcd), currentCol(0), currentRow(0) {}
 
-void LCD::begin()
+void LCD::setup()
 {
   this->lcd.init();
   this->lcd.backlight();

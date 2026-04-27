@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <stdint.h>
 
-#include "begin.hpp"
+#include "setup.hpp"
 
 enum class PinType : uint8_t
 {
@@ -11,7 +11,7 @@ enum class PinType : uint8_t
   Output = OUTPUT,
 };
 
-class BasePin : public DelayedBegin
+class BasePin : public Setup
 {
 protected:
   uint8_t pin;
@@ -19,7 +19,7 @@ protected:
   BasePin(uint8_t pin, PinType type);
 
 public:
-  void begin() override;
+  void setup() override;
   uint8_t getPin();
   PinType getType();
 };

@@ -8,11 +8,14 @@ SerialMessageService::SerialMessageService(uint64_t baud, char messageDelimiter,
     : baud(baud), messageDelimiter(messageDelimiter), syncByte(syncByte),
       currentMessage(nullptr) {}
 
-void SerialMessageService::begin()
+void SerialMessageService::setup()
 {
   Serial.begin(this->baud);
   while (!Serial)
     ;
+  
+  Serial.print(this->syncByte);
+  Serial.flush();
 }
 
 Message *SerialMessageService::getMessage() { return this->currentMessage; }
@@ -20,12 +23,6 @@ Message *SerialMessageService::getMessage() { return this->currentMessage; }
 bool SerialMessageService::messageAvailable()
 {
   return this->currentMessage != nullptr;
-}
-
-void SerialMessageService::setup()
-{
-  Serial.print(this->syncByte);
-  Serial.flush();
 }
 
 Message *SerialMessageService::readNewMessage()

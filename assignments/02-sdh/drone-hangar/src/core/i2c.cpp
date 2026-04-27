@@ -5,7 +5,7 @@
 
 I2CManager::I2CManager() : startAddress(MIN_ADDRESS) {}
 
-void I2CManager::begin()
+void I2CManager::setup()
 {
   Wire.begin();
 }

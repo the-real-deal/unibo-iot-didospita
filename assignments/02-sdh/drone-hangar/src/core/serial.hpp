@@ -5,9 +5,9 @@
 #include "config.h"
 #include "io/message.hpp"
 #include "scheduler.hpp"
-#include "begin.hpp"
+#include "setup.hpp"
 
-class SerialMessageService : public MessageService, public ExternalInput, public DelayedBegin
+class SerialMessageService : public MessageService, public ExternalInput
 {
 private:
   uint64_t baud;
@@ -16,15 +16,15 @@ private:
   Message *currentMessage;
 
 private:
-  Message* readNewMessage();
+  Message *readNewMessage();
 
 protected:
-  void setup() override;
   void read() override;
 
 public:
-  void begin() override;
   SerialMessageService(uint64_t baud, char messageDelimiter, char syncByte);
+
+  void setup() override;
   Message *getMessage() override;
   bool messageAvailable() override;
   void send(Message message) override;

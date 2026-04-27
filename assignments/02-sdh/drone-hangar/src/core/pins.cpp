@@ -4,7 +4,7 @@
 
 BasePin::BasePin(uint8_t pin, PinType type) : pin(pin), type(type) {}
 
-void BasePin::begin()
+void BasePin::setup()
 {
   pinMode(this->pin, static_cast<uint8_t>(type));
 }

@@ -22,11 +22,6 @@ private:
   TaskState<T> *stateCandidate;
 
 protected:
-  void setup() override
-  {
-    this->state->setup(static_cast<T *>(this));
-  }
-
   void step(Context *context) override
   {
     this->stateCandidate = nullptr;
@@ -47,6 +42,11 @@ public:
     delete this->state;
     delete this->stateCandidate;
   };
+
+  void setup() override
+  {
+    this->state->setup(static_cast<T *>(this));
+  }
 
   void switchState(TaskState<T> *state) { this->stateCandidate = state; }
 };

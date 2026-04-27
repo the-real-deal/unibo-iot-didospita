@@ -1,6 +1,11 @@
 #include "pir.hpp"
 
-PIRSensor::PIRSensor(DigitalInputPin pin) : pin(pin), value(DigitalValue::Low) {}
+PIRSensor::PIRSensor(uint8_t pin) : pin(pin), value(DigitalValue::Low) {}
+
+void PIRSensor::setup()
+{
+    this->pin.setup();
+}
 
 void PIRSensor::read() { this->value = this->pin.read(); }
 
