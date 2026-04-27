@@ -1,9 +1,7 @@
 #include "dht.hpp"
 
-DHTSensor::DHTSensor(uint8_t pin,
-                     DHTType type,
-                     float initialTemp) : dht(pin, static_cast<uint8_t>(type)),
-                                              temperature(initialTemp) {}
+DHTSensor::DHTSensor(uint8_t pin, DHTType type, float initialTemp) : dht(pin, static_cast<uint8_t>(type)),
+                                                                     temperature(initialTemp) {}
 
 void DHTSensor::setup()
 {
@@ -12,8 +10,7 @@ void DHTSensor::setup()
 
 void DHTSensor::read()
 {
-  // auto temp = this->dht.readTemperature();
-  auto temp = 28.40;
+  auto temp = this->dht.readTemperature();
   if (!isnan(temp))
   {
     this->temperature = temp;

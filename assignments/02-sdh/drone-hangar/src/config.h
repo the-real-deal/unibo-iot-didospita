@@ -16,7 +16,7 @@
 #define ALARM_LED_PIN 9     // L3
 
 // dht
-#define DHT_PIN 11 // TEMP
+#define DHT_PIN 2 // TEMP
 #define DHT_TYPE 11
 #define DHT_INITIAL_TEMP 20
 
