@@ -13,7 +13,6 @@ private:
   uint64_t baud;
   char messageDelimiter;
   char syncByte;
-  String buffer;
   Message *currentMessage;
 
 private:

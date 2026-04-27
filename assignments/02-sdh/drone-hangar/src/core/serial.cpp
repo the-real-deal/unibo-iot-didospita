@@ -28,49 +28,46 @@ void SerialMessageService::setup()
   Serial.flush();
 }
 
-Message* SerialMessageService::readNewMessage()
+Message *SerialMessageService::readNewMessage()
 {
-  while (Serial.available())
-  {
-    this->buffer += Serial.readString();
+  if (!Serial.available()) {
+    return nullptr;
   }
+  
+  auto buffer = Serial.readString();
 
-  int messageStartIndex = this->buffer.indexOf(this->messageDelimiter);
+  int messageStartIndex = buffer.indexOf(this->messageDelimiter);
   if (messageStartIndex == -1)
   {
     return nullptr;
   }
 
-  int typeDelimiterIndex = this->buffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
+  int typeDelimiterIndex = buffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
   if (typeDelimiterIndex == -1)
   {
     return nullptr;
   }
 
-  int terminatorIndex = this->buffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
+  int terminatorIndex = buffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
   if (terminatorIndex == -1)
   {
     return nullptr;
   }
 
-  String typeStr = this->buffer.substring(messageStartIndex + 1, typeDelimiterIndex);
-  String content = this->buffer.substring(typeDelimiterIndex + 1, terminatorIndex);
+  String typeString = buffer.substring(messageStartIndex + 1, typeDelimiterIndex);
+  String content = buffer.substring(typeDelimiterIndex + 1, terminatorIndex);
 
-  MessageType type = enumFromString<MessageType>(typeStr.c_str(), MESSAGE_TYPE_STRINGS);
-  auto message = new Message(type, content);
-  buffer = buffer.substring(terminatorIndex);
-  return message;
+  MessageType type = enumFromString<MessageType>(typeString.c_str(), MESSAGE_TYPE_STRINGS);
+  return new Message(type, content);
 }
 
 void SerialMessageService::read()
 {
-  auto newMessage = this->readNewMessage();
-
   if (this->messageAvailable())
   {
     delete this->currentMessage;
   }
-
+  auto newMessage = this->readNewMessage();
   this->currentMessage = newMessage;
 }
 
