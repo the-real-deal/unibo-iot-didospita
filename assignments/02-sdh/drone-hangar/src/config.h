@@ -16,7 +16,9 @@
 #define ALARM_LED_PIN 9     // L3
 
 // dht
-#define DHT_PIN 2 // TEMP
+// not all pins are valid for the DHT
+// https://github.com/adafruit/DHT-sensor-library/blob/f7d625462e6033f373e51f8c67f88fc429535b47/examples/DHTtester/DHTtester.ino#L11
+#define DHT_PIN 3 // TEMP
 #define DHT_TYPE 11
 #define DHT_INITIAL_TEMP 20
 
@@ -44,7 +46,7 @@
 #define PIR_PIN 6
 
 // servo
-#define SERVO_PIN 3
+#define SERVO_PIN 2
 #define SERVO_MIN_FREQ 500
 #define SERVO_MAX_FREQ 2500
 

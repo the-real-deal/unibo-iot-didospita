@@ -54,10 +54,10 @@ DDDTask dddTask(&sonar, &serialMessageService,
 DPDTask dpdTask(&pir, &serialMessageService);
 BlinkTask blinkTask(&inActionLed, BLINK_PERIOD_MS);
 StateChangeTask *stateChangeTask = nullptr; // depends on lcd
-AlarmTask alarmTask(&dht, &alarmLed,
-                    initialState, PREALARM_TEMP,
-                    PREALARM_TIME_MS, ALARM_TEMP,
-                    ALARM_TIME_MS);
+// AlarmTask alarmTask(&dht, &alarmLed,
+//                     initialState, PREALARM_TEMP,
+//                     PREALARM_TIME_MS, ALARM_TEMP,
+//                     ALARM_TIME_MS);
 ResetTask resetTask(&resetButton, initialState);
 
 void setup()
@@ -85,14 +85,16 @@ void setup()
   scheduler.addThread(&dpdTask);
   scheduler.addThread(&blinkTask);
   scheduler.addThread(stateChangeTask);
-  scheduler.addThread(&alarmTask);
+  // scheduler.addThread(&alarmTask);
   scheduler.addThread(&resetTask);
 
-  onLed.turnOn();
-  inActionLed.turnOff();
-  alarmLed.turnOff();
-
+  builtinLed.setup();
+  onLed.setup();
+  inActionLed.setup();
+  alarmLed.setup();
   scheduler.setup();
+  
+  onLed.turnOn();
 }
 
 void loop()
