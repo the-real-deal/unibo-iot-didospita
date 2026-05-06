@@ -1,5 +1,6 @@
 #pragma once
 
+#include "blocking.hpp"
 #include "core/tasks.hpp"
 #include "io/distance.hpp"
 #include "io/message.hpp"
@@ -21,12 +22,15 @@ private:
   public:
     void step(DDDTask *task, Context *context) override;
   };
+  IdleState idleState;
+  BlockedTaskState<DDDTask> blockedIdleState;
 
   class TakeoffReadingState : public TaskState<DDDTask>
   {
   public:
     void step(DDDTask *task, Context *context) override;
   };
+  TakeoffReadingState takeoffReadingState;
 
   class TakeoffDistanceCheckingState : public TaskState<DDDTask>
   {
@@ -38,12 +42,14 @@ private:
     void setup(DDDTask *task) override;
     void step(DDDTask *task, Context *context) override;
   };
+  TakeoffDistanceCheckingState takeoffDistanceCheckingState;
 
   class LandingReadingState : public TaskState<DDDTask>
   {
   public:
     void step(DDDTask *task, Context *context) override;
   };
+  LandingReadingState landingReadingState;
 
   class LandingDistanceCheckingState : public TaskState<DDDTask>
   {
@@ -55,6 +61,7 @@ private:
     void setup(DDDTask *task) override;
     void step(DDDTask *task, Context *context) override;
   };
+  LandingDistanceCheckingState landingDistanceCheckingState;
 
 public:
   DDDTask(DistanceSensor *droneDistanceSensor, MessageService *messageService,

@@ -2,39 +2,34 @@
 
 #include "core/tasks.hpp"
 
-template <typename T, typename B, typename S>
+template <typename T>
 class BlockedTaskState : public TaskState<T>
 {
 
 private:
-  B blockingState;
-  S *(*returnStateCreator)();
+  TaskState<T> *returnState;
+  GlobalState blockingState;
 
 public:
-  BlockedTaskState(B blockingState, S *(*returnStateCreator)())
-      : blockingState(blockingState), returnStateCreator(returnStateCreator) {}
+  BlockedTaskState(TaskState<T> *returnState, GlobalState blockingState)
+      : returnState(returnState), blockingState(blockingState) {}
+  BlockedTaskState(TaskState<T> *returnState) : BlockedTaskState(returnState, GlobalState::Alarm) {}
+
   void step(T *task, Context *context) override
   {
     if (context->getState() == blockingState)
     {
       return;
     }
-    task->switchState(returnStateCreator());
+    task->switchState(returnState);
   }
 };
 
-template <typename T, typename S>
-void blockOnAlarm(T *task, Context *context, S *(*returnStateCreator)())
+template <typename T>
+void blockOnAlarm(T *task, Context *context, BlockedTaskState<T> *blockedTaskState)
 {
   if (context->getState() == GlobalState::Alarm)
   {
-    task->switchState(new BlockedTaskState<T, GlobalState, S>(
-        GlobalState::Alarm, returnStateCreator));
+    task->switchState(blockedTaskState);
   }
-}
-template <typename T, typename S>
-void blockOnAlarm(T *task, Context *context)
-{
-  blockOnAlarm(task, context, static_cast<S *(*)()>([]()
-                                                   { return new S(); }));
 }

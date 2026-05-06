@@ -5,7 +5,7 @@
 
 #include "config.h"
 
-Timer::Timer(uint64_t periodMillis) : periodMillis(periodMillis) {}
+Timer::Timer(uint64_t periodMillis) : periodMillis(periodMillis), startTime(0) {}
 Timer::Timer() : Timer(0) {}
 
 uint64_t Timer::getElapsedMillis() { return millis() - this->startTime; }

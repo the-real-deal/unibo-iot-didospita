@@ -1,16 +1,17 @@
 #include "dpd.hpp"
 
-#include "blocking.hpp"
-
 DPDTask::DPDTask(PresenceSensor *dronePresenceSensor,
                  MessageService *messageService)
-    : Task<DPDTask>(new IdleState()),
+    : Task<DPDTask>(&this->idleState),
       dronePresenceSensor(dronePresenceSensor),
-      messageService(messageService) {}
+      messageService(messageService),
+      idleState(),
+      blockedIdleState(&this->idleState),
+      readingState() {}
 
 void DPDTask::IdleState::step(DPDTask *task, Context *context)
 {
-  blockOnAlarm<DPDTask, IdleState>(task, context);
+  blockOnAlarm(task, context, &task->blockedIdleState);
 
   switch (context->getState())
   {
@@ -19,7 +20,7 @@ void DPDTask::IdleState::step(DPDTask *task, Context *context)
         task->messageService->getMessage()->getType() ==
             MessageType::REQUEST_LANDING)
     {
-      task->switchState(new ReadingState());
+      task->switchState(&task->readingState);
     }
     break;
   default:
@@ -34,5 +35,5 @@ void DPDTask::ReadingState::step(DPDTask *task, Context *context)
   Serial.println(dronePresent);
   Serial.flush();
   context->setState(dronePresent ? GlobalState::Landing : GlobalState::Outside);
-  task->switchState(new IdleState());
+  task->switchState(&task->idleState);
 }

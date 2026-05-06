@@ -69,7 +69,6 @@ void setup()
   int lcdAddress = i2c.scan();
   auto lcd_raw = LiquidCrystal_I2C(lcdAddress, LCD_COLS, LCD_ROWS);
   lcd = new LCD(lcd_raw);
-  lcd->setup();
 
   stateChangeTask = new StateChangeTask(lcd, &serialMessageService);
 
@@ -93,6 +92,7 @@ void setup()
   inActionLed.setup();
   alarmLed.setup();
   scheduler.setup();
+  lcd->setup();
   
   onLed.turnOn();
 }

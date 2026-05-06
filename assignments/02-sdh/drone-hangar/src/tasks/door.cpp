@@ -1,25 +1,26 @@
 #include "door.hpp"
 
-#include "blocking.hpp"
-
 DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle,
                    int angleMargin, MessageService *messageService)
-    : Task<DoorTask>(new ClosedState()),
+    : Task<DoorTask>(&this->closedState),
       servo(servo),
       closedAngle(closedAngle),
       openAngle(openAngle),
       angleMargin(angleMargin),
-      messageService(messageService) {}
+      messageService(messageService),
+      closedState(),
+      blockedClosedState(&this->closedState),
+      openState() {}
 
 void DoorTask::ClosedState::step(DoorTask *task, Context *context)
 {
-  blockOnAlarm<DoorTask, ClosedState>(task, context);
+  blockOnAlarm(task, context, &task->blockedClosedState);
 
   switch (context->getState())
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    task->switchState(new OpenState());
+    task->switchState(&task->openState);
     break;
   case GlobalState::Inside:
     if (task->messageService->messageAvailable() &&
@@ -50,7 +51,7 @@ void DoorTask::OpenState::step(DoorTask *task, Context *context)
     }
     break;
   default:
-    task->switchState(new ClosedState());
+    task->switchState(&task->closedState);
     break;
   }
 }

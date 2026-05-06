@@ -1,18 +1,20 @@
 #include "stateChange.hpp"
 
-#include "blocking.hpp"
 #include "std/enum.hpp"
 
 StateChangeTask::StateChangeTask(Display *internalDisplay,
                                  MessageService *messageService)
-    : Task<StateChangeTask>(new PrintState()),
+    : Task<StateChangeTask>(&this->printState),
       internalDisplay(internalDisplay),
       messageService(messageService),
-      prevState(GlobalState::Outside) {}
+      prevState(GlobalState::Outside),
+      idleState(),
+      blockedIdleState(&this->idleState),
+      printState() {}
 
 void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
 {
-  blockOnAlarm<StateChangeTask, IdleState>(task, context);
+  blockOnAlarm(task, context, &task->blockedIdleState);
   GlobalState state = context->getState();
   switch (state)
   {
@@ -21,7 +23,7 @@ void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
   default:
     if (task->prevState != state)
     {
-      task->switchState(new PrintState());
+      task->switchState(&task->printState);
     }
     break;
   }
@@ -37,5 +39,5 @@ void StateChangeTask::PrintState::step(StateChangeTask *task,
   task->internalDisplay->print(stateString);
   task->messageService->send(Message(MessageType::STATE, stateString));
   task->prevState = state;
-  task->switchState(new IdleState());
+  task->switchState(&task->idleState);
 }

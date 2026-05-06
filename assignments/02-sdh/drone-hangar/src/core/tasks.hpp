@@ -25,10 +25,12 @@ protected:
   void step(Context *context) override
   {
     this->stateCandidate = nullptr;
-    this->state->step(static_cast<T *>(this), context);
+    if (this->state != nullptr)
+    {
+      this->state->step(static_cast<T *>(this), context);
+    }
     if (this->stateCandidate != nullptr)
     {
-      delete this->state;
       this->state = this->stateCandidate;
       this->state->setup(static_cast<T *>(this));
     }
@@ -37,15 +39,13 @@ protected:
 public:
   Task(TaskState<T> *initialState)
       : state(initialState), stateCandidate(nullptr) {};
-  ~Task()
-  {
-    delete this->state;
-    delete this->stateCandidate;
-  };
 
   void setup() override
   {
-    this->state->setup(static_cast<T *>(this));
+    if (this->state != nullptr)
+    {
+      this->state->setup(static_cast<T *>(this));
+    }
   }
 
   void switchState(TaskState<T> *state) { this->stateCandidate = state; }

@@ -1,9 +1,12 @@
 #include "blink.hpp"
 
 BlinkTask::BlinkTask(Indicator *blinkIndicator, uint64_t periodMillis)
-    : Task<BlinkTask>(new IdleState()),
+    : Task<BlinkTask>(&this->idleState),
       blinkIndicator(blinkIndicator),
-      periodMillis(periodMillis) {}
+      periodMillis(periodMillis),
+      idleState(),
+      onState(this),
+      offState(this) {}
 
 void BlinkTask::IdleState::step(BlinkTask *task, Context *context)
 {
@@ -15,7 +18,7 @@ void BlinkTask::IdleState::step(BlinkTask *task, Context *context)
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    task->switchState(new OnState(task));
+    task->switchState(&task->onState);
     break;
   default:
     break;
@@ -41,11 +44,11 @@ void BlinkTask::OnState::step(BlinkTask *task, Context *context)
   case GlobalState::Landing:
     if (this->timer.isFinished())
     {
-      task->switchState(new OffState(task));
+      task->switchState(&task->offState);
     }
     break;
   default:
-    task->switchState(new IdleState());
+    task->switchState(&task->idleState);
     break;
   }
 }
@@ -69,11 +72,11 @@ void BlinkTask::OffState::step(BlinkTask *task, Context *context)
   case GlobalState::Landing:
     if (this->timer.isFinished())
     {
-      task->switchState(new OnState(task));
+      task->switchState(&task->onState);
     }
     break;
   default:
-    task->switchState(new IdleState());
+    task->switchState(&task->idleState);
     break;
   }
 }

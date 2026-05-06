@@ -14,6 +14,7 @@ private:
   public:
     void step(BlinkTask *task, Context *context) override;
   };
+  IdleState idleState;
 
   class OnState : public TaskState<BlinkTask>
   {
@@ -25,6 +26,7 @@ private:
     void setup(BlinkTask *task) override;
     void step(BlinkTask *task, Context *context) override;
   };
+  OnState onState;
 
   class OffState : public TaskState<BlinkTask>
   {
@@ -36,6 +38,7 @@ private:
     void setup(BlinkTask *task) override;
     void step(BlinkTask *task, Context *context) override;
   };
+  OffState offState;
 
 public:
   BlinkTask(Indicator *blinkIndicator, uint64_t periodMillis);

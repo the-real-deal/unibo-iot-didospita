@@ -14,12 +14,14 @@ private:
   public:
     void step(ResetTask *task, Context *context) override;
   };
+  IdleState idleState;
 
   class WaitResetState : public TaskState<ResetTask>
   {
   public:
     void step(ResetTask *task, Context *context) override;
   };
+  WaitResetState waitResetState;
 
 public:
   ResetTask(Button *resetButton, GlobalState initialState);

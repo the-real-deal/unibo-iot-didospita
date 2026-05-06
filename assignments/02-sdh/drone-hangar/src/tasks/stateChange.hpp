@@ -1,5 +1,6 @@
 #pragma once
 
+#include "blocking.hpp"
 #include "core/tasks.hpp"
 #include "io/display.hpp"
 #include "io/message.hpp"
@@ -16,12 +17,15 @@ private:
   public:
     void step(StateChangeTask *task, Context *context) override;
   };
+  IdleState idleState;
+  BlockedTaskState<StateChangeTask> blockedIdleState;
 
   class PrintState : public TaskState<StateChangeTask>
   {
   public:
     void step(StateChangeTask *task, Context *context) override;
   };
+  PrintState printState;
 
 public:
   StateChangeTask(Display *internalDisplay, MessageService *messageService);

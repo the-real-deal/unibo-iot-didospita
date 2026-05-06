@@ -60,10 +60,7 @@ Message *SerialMessageService::readNewMessage()
 
 void SerialMessageService::read()
 {
-  if (this->messageAvailable())
-  {
-    delete this->currentMessage;
-  }
+  delete this->currentMessage;
   auto newMessage = this->readNewMessage();
   this->currentMessage = newMessage;
 }
