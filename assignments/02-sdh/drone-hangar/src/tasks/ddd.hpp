@@ -14,6 +14,7 @@ private:
   uint64_t outsideTimeMillis;
   float insideDistanceMm;
   uint64_t insideTimeMillis;
+  Timer timer;
 
   void sendDistance(float distance);
 
@@ -22,46 +23,38 @@ private:
   public:
     void step(DDDTask *task, Context *context) override;
   };
-  IdleState idleState;
-  BlockedTaskState<DDDTask> blockedIdleState;
+  static IdleState IDLE;
+  static BlockedTaskState<DDDTask> BLOCKED_IDLE;
 
   class TakeoffReadingState : public TaskState<DDDTask>
   {
   public:
     void step(DDDTask *task, Context *context) override;
   };
-  TakeoffReadingState takeoffReadingState;
+  static TakeoffReadingState TAKEOFF_READING;
 
   class TakeoffDistanceCheckingState : public TaskState<DDDTask>
   {
-  private:
-    Timer timer;
-
   public:
-    TakeoffDistanceCheckingState(DDDTask *task);
     void setup(DDDTask *task) override;
     void step(DDDTask *task, Context *context) override;
   };
-  TakeoffDistanceCheckingState takeoffDistanceCheckingState;
+  static TakeoffDistanceCheckingState TAKEOFF_DISTANCE_CHECKING;
 
   class LandingReadingState : public TaskState<DDDTask>
   {
   public:
     void step(DDDTask *task, Context *context) override;
   };
-  LandingReadingState landingReadingState;
+  static LandingReadingState LANDING_READING;
 
   class LandingDistanceCheckingState : public TaskState<DDDTask>
   {
-  private:
-    Timer timer;
-
   public:
-    LandingDistanceCheckingState(DDDTask *task);
     void setup(DDDTask *task) override;
     void step(DDDTask *task, Context *context) override;
   };
-  LandingDistanceCheckingState landingDistanceCheckingState;
+  static LandingDistanceCheckingState LANDING_DISTANCE_CHECKING;
 
 public:
   DDDTask(DistanceSensor *droneDistanceSensor, MessageService *messageService,

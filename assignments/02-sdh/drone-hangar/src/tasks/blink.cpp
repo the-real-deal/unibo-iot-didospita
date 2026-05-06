@@ -1,12 +1,14 @@
 #include "blink.hpp"
 
+BlinkTask::IdleState BlinkTask::IDLE;
+BlinkTask::OnState BlinkTask::ON;
+BlinkTask::OffState BlinkTask::OFF;
+
 BlinkTask::BlinkTask(Indicator *blinkIndicator, uint64_t periodMillis)
-    : Task<BlinkTask>(&this->idleState),
+    : Task<BlinkTask>(&BlinkTask::IDLE),
       blinkIndicator(blinkIndicator),
       periodMillis(periodMillis),
-      idleState(),
-      onState(this),
-      offState(this) {}
+      timer() {}
 
 void BlinkTask::IdleState::step(BlinkTask *task, Context *context)
 {
@@ -18,18 +20,17 @@ void BlinkTask::IdleState::step(BlinkTask *task, Context *context)
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    task->switchState(&task->onState);
+    task->switchState(&BlinkTask::ON);
     break;
   default:
     break;
   }
 }
 
-BlinkTask::OnState::OnState(BlinkTask *task) : timer(task->periodMillis) {}
-
 void BlinkTask::OnState::setup(BlinkTask *task)
 {
-  this->timer.start();
+  task->timer = Timer(task->periodMillis);
+  task->timer.start();
 }
 
 void BlinkTask::OnState::step(BlinkTask *task, Context *context)
@@ -42,22 +43,21 @@ void BlinkTask::OnState::step(BlinkTask *task, Context *context)
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    if (this->timer.isFinished())
+    if (task->timer.isFinished())
     {
-      task->switchState(&task->offState);
+      task->switchState(&BlinkTask::OFF);
     }
     break;
   default:
-    task->switchState(&task->idleState);
+    task->switchState(&BlinkTask::IDLE);
     break;
   }
 }
 
-BlinkTask::OffState::OffState(BlinkTask *task) : timer(task->periodMillis) {}
-
 void BlinkTask::OffState::setup(BlinkTask *task)
 {
-  this->timer.start();
+  task->timer = Timer(task->periodMillis);
+  task->timer.start();
 }
 
 void BlinkTask::OffState::step(BlinkTask *task, Context *context)
@@ -70,13 +70,13 @@ void BlinkTask::OffState::step(BlinkTask *task, Context *context)
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    if (this->timer.isFinished())
+    if (task->timer.isFinished())
     {
-      task->switchState(&task->onState);
+      task->switchState(&BlinkTask::ON);
     }
     break;
   default:
-    task->switchState(&task->idleState);
+    task->switchState(&BlinkTask::IDLE);
     break;
   }
 }

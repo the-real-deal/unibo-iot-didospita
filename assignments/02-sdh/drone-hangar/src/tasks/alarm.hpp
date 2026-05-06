@@ -16,59 +16,52 @@ private:
   uint64_t prealarmTimeMillis;
   float alarmTemp;
   uint64_t alarmTimeMillis;
+  Timer timer;
 
   class IdleState : public TaskState<AlarmTask>
   {
   public:
     void step(AlarmTask *task, Context *context) override;
   };
-  IdleState idleState;
-  BlockedTaskState<AlarmTask> blockIdleState;
+  static IdleState IDLE;
+  static BlockedTaskState<AlarmTask> BLOCK_IDLE;
 
   class PrealarmReadingState : public TaskState<AlarmTask>
   {
   public:
     void step(AlarmTask *task, Context *context) override;
   };
-  PrealarmReadingState prealarmReadingState;
+  static PrealarmReadingState PREALARM_READING;
 
   class PrealarmTempCheckingState : public TaskState<AlarmTask>
   {
-  private:
-    Timer timer;
-
   public:
-    PrealarmTempCheckingState(AlarmTask *task);
     void setup(AlarmTask *task) override;
     void step(AlarmTask *task, Context *context) override;
   };
-  PrealarmTempCheckingState prealarmTempCheckingState;
+  static PrealarmTempCheckingState PREALARM_TEMP_CHECKING;
 
   class WaitOperationsState : public TaskState<AlarmTask>
   {
   public:
     void step(AlarmTask *task, Context *context) override;
   };
-  WaitOperationsState waitOperationsState;
+  static WaitOperationsState WAIT_OPERATIONS;
 
   class AlarmReadingState : public TaskState<AlarmTask>
   {
   public:
     void step(AlarmTask *task, Context *context) override;
   };
-  AlarmReadingState alarmReadingState;
+  static AlarmReadingState ALARM_READING;
 
   class AlarmTempCheckingState : public TaskState<AlarmTask>
   {
-  private:
-    Timer timer;
-
   public:
-    AlarmTempCheckingState(AlarmTask *task);
     void setup(AlarmTask *task) override;
     void step(AlarmTask *task, Context *context) override;
   };
-  AlarmTempCheckingState alarmTempCheckingState;
+  static AlarmTempCheckingState ALARM_TEMP_CHECKING;
 
 public:
   AlarmTask(TemperatureSensor *hangarTempSensor, Indicator *alarmIndicator,

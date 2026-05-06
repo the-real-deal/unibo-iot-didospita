@@ -1,22 +1,24 @@
 #include "ddd.hpp"
 
+DDDTask::IdleState DDDTask::IDLE;
+BlockedTaskState<DDDTask> DDDTask::BLOCKED_IDLE(&DDDTask::IDLE);
+DDDTask::TakeoffReadingState DDDTask::TAKEOFF_READING;
+DDDTask::TakeoffDistanceCheckingState DDDTask::TAKEOFF_DISTANCE_CHECKING;
+DDDTask::LandingReadingState DDDTask::LANDING_READING;
+DDDTask::LandingDistanceCheckingState DDDTask::LANDING_DISTANCE_CHECKING;
+
 DDDTask::DDDTask(DistanceSensor *droneDistanceSensor,
                  MessageService *messageService, float outsideDistance,
                  uint64_t outsideTimeMillis, float insideDistance,
                  uint64_t insideTimeMillis)
-    : Task<DDDTask>(&this->idleState),
+    : Task<DDDTask>(&DDDTask::IDLE),
       droneDistanceSensor(droneDistanceSensor),
       messageService(messageService),
       outsideDistanceMm(outsideDistance),
       outsideTimeMillis(outsideTimeMillis),
       insideDistanceMm(insideDistance),
       insideTimeMillis(insideTimeMillis),
-      idleState(),
-      blockedIdleState(&this->idleState),
-      takeoffReadingState(),
-      takeoffDistanceCheckingState(this),
-      landingReadingState(),
-      landingDistanceCheckingState(this) {}
+      timer() {}
 
 void DDDTask::sendDistance(float distance)
 {
@@ -25,15 +27,15 @@ void DDDTask::sendDistance(float distance)
 
 void DDDTask::IdleState::step(DDDTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &task->blockedIdleState);
+  blockOnAlarm(task, context, &DDDTask::BLOCKED_IDLE);
 
   switch (context->getState())
   {
   case GlobalState::Takeoff:
-    task->switchState(&task->takeoffReadingState);
+    task->switchState(&DDDTask::TAKEOFF_READING);
     break;
   case GlobalState::Landing:
-    task->switchState(&task->landingReadingState);
+    task->switchState(&DDDTask::LANDING_READING);
     break;
   default:
     break;
@@ -45,33 +47,30 @@ void DDDTask::TakeoffReadingState::step(DDDTask *task, Context *context)
   auto distance = task->droneDistanceSensor->getDistanceMm();
   if (distance >= task->outsideDistanceMm)
   {
-    task->switchState(&task->takeoffDistanceCheckingState);
+    task->switchState(&DDDTask::TAKEOFF_DISTANCE_CHECKING);
   }
 }
 
-DDDTask::TakeoffDistanceCheckingState::TakeoffDistanceCheckingState(
-    DDDTask *task)
-    : timer(task->outsideTimeMillis) {}
-
 void DDDTask::TakeoffDistanceCheckingState::setup(DDDTask *task)
 {
-  this->timer.start();
+  task->timer = Timer(task->outsideTimeMillis);
+  task->timer.start();
 }
 
 void DDDTask::TakeoffDistanceCheckingState::step(DDDTask *task,
                                                  Context *context)
 {
-  if (this->timer.isFinished())
+  if (task->timer.isFinished())
   {
     context->setState(GlobalState::Outside);
-    task->switchState(&task->idleState);
+    task->switchState(&DDDTask::IDLE);
     return;
   }
 
   auto distance = task->droneDistanceSensor->getDistanceMm();
   if (distance < task->outsideDistanceMm)
   {
-    task->switchState(&task->takeoffReadingState);
+    task->switchState(&DDDTask::TAKEOFF_READING);
   }
 }
 
@@ -81,32 +80,29 @@ void DDDTask::LandingReadingState::step(DDDTask *task, Context *context)
   task->sendDistance(distance);
   if (distance <= task->insideDistanceMm)
   {
-    task->switchState(&task->landingDistanceCheckingState);
+    task->switchState(&DDDTask::LANDING_DISTANCE_CHECKING);
   }
 }
 
-DDDTask::LandingDistanceCheckingState::LandingDistanceCheckingState(
-    DDDTask *task)
-    : timer(task->insideTimeMillis) {}
-
 void DDDTask::LandingDistanceCheckingState::setup(DDDTask *task)
 {
-  this->timer.start();
+  task->timer = Timer(task->insideTimeMillis);
+  task->timer.start();
 }
 
 void DDDTask::LandingDistanceCheckingState::step(DDDTask *task,
                                                  Context *context)
 {
-  if (this->timer.isFinished())
+  if (task->timer.isFinished())
   {
     context->setState(GlobalState::Inside);
-    task->switchState(&task->idleState);
+    task->switchState(&DDDTask::IDLE);
     return;
   }
   auto distance = task->droneDistanceSensor->getDistanceMm();
   task->sendDistance(distance);
   if (distance > task->insideDistanceMm)
   {
-    task->switchState(&task->landingReadingState);
+    task->switchState(&DDDTask::LANDING_READING);
   }
 }

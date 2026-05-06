@@ -8,37 +8,30 @@ class BlinkTask : public Task<BlinkTask>
 private:
   Indicator *blinkIndicator;
   uint64_t periodMillis;
+  Timer timer;
 
   class IdleState : public TaskState<BlinkTask>
   {
   public:
     void step(BlinkTask *task, Context *context) override;
   };
-  IdleState idleState;
+  static IdleState IDLE;
 
   class OnState : public TaskState<BlinkTask>
   {
-  private:
-    Timer timer;
-
   public:
-    OnState(BlinkTask *task);
     void setup(BlinkTask *task) override;
     void step(BlinkTask *task, Context *context) override;
   };
-  OnState onState;
+  static OnState ON;
 
   class OffState : public TaskState<BlinkTask>
   {
-  private:
-    Timer timer;
-
   public:
-    OffState(BlinkTask *task);
     void setup(BlinkTask *task) override;
     void step(BlinkTask *task, Context *context) override;
   };
-  OffState offState;
+  static OffState OFF;
 
 public:
   BlinkTask(Indicator *blinkIndicator, uint64_t periodMillis);

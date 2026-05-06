@@ -19,15 +19,15 @@ private:
   public:
     void step(DoorTask *task, Context *context) override;
   };
-  ClosedState closedState;
-  BlockedTaskState<DoorTask> blockedClosedState;
+  static ClosedState CLOSED;
+  static BlockedTaskState<DoorTask> BLOCKED_CLOSED;
 
   class OpenState : public TaskState<DoorTask>
   {
   public:
     void step(DoorTask *task, Context *context) override;
   };
-  OpenState openState;
+  static OpenState OPEN;
 
 public:
   DoorTask(ServoMotor *servo, int closedAngle, int openAngle,

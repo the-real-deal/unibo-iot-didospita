@@ -60,8 +60,17 @@ StateChangeTask *stateChangeTask = nullptr; // depends on lcd
 //                     ALARM_TIME_MS);
 ResetTask resetTask(&resetButton, initialState);
 
+extern int __heap_start, *__brkval;
+
+int freeMemory()
+{
+  int v;
+  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+}
+
 void setup()
 {
+  int freeMemStart = freeMemory();
   serialMessageService.setup();
   I2CManager i2c;
   i2c.setup();
@@ -93,12 +102,26 @@ void setup()
   alarmLed.setup();
   scheduler.setup();
   lcd->setup();
-  
+
   onLed.turnOn();
+
+  int freeMemEnd = freeMemory();
+  Serial.print(F("Free SRAM: "));
+  Serial.println(freeMemStart);
+  Serial.println(F("SETUP FINISHED"));
+  Serial.print(F("Free SRAM: "));
+  Serial.println(freeMemEnd);
+  Serial.flush();
 }
 
 void loop()
 {
+  Serial.println(F("LOOP"));
+  Serial.flush();
   builtinLed.toggle();
+  Serial.println(F("MID LOOP"));
+  Serial.flush();
   scheduler.advance();
+  Serial.println(F("END LOOP"));
+  Serial.flush();
 }

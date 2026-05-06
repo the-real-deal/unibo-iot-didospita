@@ -16,15 +16,15 @@ private:
   public:
     void step(DPDTask *task, Context *context) override;
   };
-  IdleState idleState;
-  BlockedTaskState<DPDTask> blockedIdleState;
+  static IdleState IDLE;
+  static BlockedTaskState<DPDTask> BLOCKED_IDLE;
 
   class ReadingState : public TaskState<DPDTask>
   {
   public:
     void step(DPDTask *task, Context *context) override;
   };
-  ReadingState readingState;
+  static ReadingState READING;
 
 public:
   DPDTask(PresenceSensor *dronePresenceSensor, MessageService *messageService);

@@ -1,26 +1,27 @@
 #include "door.hpp"
 
+DoorTask::ClosedState DoorTask::CLOSED;
+BlockedTaskState<DoorTask> DoorTask::BLOCKED_CLOSED(&DoorTask::CLOSED);
+DoorTask::OpenState DoorTask::OPEN;
+
 DoorTask::DoorTask(ServoMotor *servo, int closedAngle, int openAngle,
                    int angleMargin, MessageService *messageService)
-    : Task<DoorTask>(&this->closedState),
+    : Task<DoorTask>(&DoorTask::CLOSED),
       servo(servo),
       closedAngle(closedAngle),
       openAngle(openAngle),
       angleMargin(angleMargin),
-      messageService(messageService),
-      closedState(),
-      blockedClosedState(&this->closedState),
-      openState() {}
+      messageService(messageService) {}
 
 void DoorTask::ClosedState::step(DoorTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &task->blockedClosedState);
+  blockOnAlarm(task, context, &DoorTask::BLOCKED_CLOSED);
 
   switch (context->getState())
   {
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    task->switchState(&task->openState);
+    task->switchState(&DoorTask::OPEN);
     break;
   case GlobalState::Inside:
     if (task->messageService->messageAvailable() &&
@@ -51,7 +52,7 @@ void DoorTask::OpenState::step(DoorTask *task, Context *context)
     }
     break;
   default:
-    task->switchState(&task->closedState);
+    task->switchState(&DoorTask::CLOSED);
     break;
   }
 }

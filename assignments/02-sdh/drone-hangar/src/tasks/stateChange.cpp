@@ -2,19 +2,20 @@
 
 #include "std/enum.hpp"
 
+StateChangeTask::IdleState StateChangeTask::IDLE;
+BlockedTaskState<StateChangeTask> StateChangeTask::BLOCKED_IDLE(&StateChangeTask::IDLE);
+StateChangeTask::PrintState StateChangeTask::PRINT;
+
 StateChangeTask::StateChangeTask(Display *internalDisplay,
                                  MessageService *messageService)
-    : Task<StateChangeTask>(&this->printState),
+    : Task<StateChangeTask>(&StateChangeTask::PRINT),
       internalDisplay(internalDisplay),
       messageService(messageService),
-      prevState(GlobalState::Outside),
-      idleState(),
-      blockedIdleState(&this->idleState),
-      printState() {}
+      prevState(GlobalState::Outside) {}
 
 void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &task->blockedIdleState);
+  blockOnAlarm(task, context, &StateChangeTask::BLOCKED_IDLE);
   GlobalState state = context->getState();
   switch (state)
   {
@@ -23,7 +24,7 @@ void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
   default:
     if (task->prevState != state)
     {
-      task->switchState(&task->printState);
+      task->switchState(&StateChangeTask::PRINT);
     }
     break;
   }
@@ -39,5 +40,5 @@ void StateChangeTask::PrintState::step(StateChangeTask *task,
   task->internalDisplay->print(stateString);
   task->messageService->send(Message(MessageType::STATE, stateString));
   task->prevState = state;
-  task->switchState(&task->idleState);
+  task->switchState(&StateChangeTask::IDLE);
 }

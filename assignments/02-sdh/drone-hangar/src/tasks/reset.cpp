@@ -1,11 +1,12 @@
 #include "reset.hpp"
 
+ResetTask::IdleState ResetTask::IDLE;
+ResetTask::WaitResetState ResetTask::WAIT_RESET;
+
 ResetTask::ResetTask(Button *resetButton, GlobalState initialState)
-    : Task<ResetTask>(&this->idleState),
+    : Task<ResetTask>(&ResetTask::IDLE),
       resetButton(resetButton),
-      prevState(initialState),
-      idleState(),
-      waitResetState() {}
+      prevState(initialState) {}
 
 void ResetTask::IdleState::step(ResetTask *task, Context *context)
 {
@@ -15,7 +16,7 @@ void ResetTask::IdleState::step(ResetTask *task, Context *context)
   case GlobalState::Prealarm:
     break;
   case GlobalState::Alarm:
-    task->switchState(&task->waitResetState);
+    task->switchState(&ResetTask::WAIT_RESET);
     break;
   default:
     task->prevState = state;
@@ -28,6 +29,6 @@ void ResetTask::WaitResetState::step(ResetTask *task, Context *context)
   if (task->resetButton->isPressed())
   {
     context->setState(task->prevState);
-    task->switchState(&task->idleState);
+    task->switchState(&ResetTask::IDLE);
   }
 }

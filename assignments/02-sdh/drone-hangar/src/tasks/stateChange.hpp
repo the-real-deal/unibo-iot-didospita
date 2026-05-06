@@ -17,15 +17,15 @@ private:
   public:
     void step(StateChangeTask *task, Context *context) override;
   };
-  IdleState idleState;
-  BlockedTaskState<StateChangeTask> blockedIdleState;
+  static IdleState IDLE;
+  static BlockedTaskState<StateChangeTask> BLOCKED_IDLE;
 
   class PrintState : public TaskState<StateChangeTask>
   {
   public:
     void step(StateChangeTask *task, Context *context) override;
   };
-  PrintState printState;
+  static PrintState PRINT;
 
 public:
   StateChangeTask(Display *internalDisplay, MessageService *messageService);
