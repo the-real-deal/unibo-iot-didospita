@@ -3,16 +3,17 @@
 #include <limits.h>
 #include <limits.h>
 
-UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
+UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin, TemperatureSensor *tempSensor,
                                    uint32_t readStartMicros, uint32_t readDelayMicros,
-                                   uint32_t readTimeoutMicros, TemperatureSensor *tempSensor,
+                                   uint32_t readTimeoutMicros, uint32_t readOORMarginMicros,
                                    float minDistanceMm, float maxDistanceMm)
     : echoPin(echoPin),
       triggerPin(triggerPin),
+      tempSensor(tempSensor),
       readStartMicros(readStartMicros),
       readDelayMicros(readDelayMicros),
       readTimeoutMicros(readTimeoutMicros),
-      tempSensor(tempSensor),
+      readOORMarginMicros(readOORMarginMicros),
       minDistanceMm(minDistanceMm),
       maxDistanceMm(maxDistanceMm),
       distanceMm(0) {}
@@ -50,7 +51,7 @@ void UltrasonicSensor::read()
   uint32_t readTime = micros() - readStart;
   if (pulse == 0)
   {
-    this->distanceMm = readTime < this->readTimeoutMicros ? this->minDistanceMm : this->maxDistanceMm;
+    this->distanceMm = readTime < (this->readTimeoutMicros - this->readOORMarginMicros) ? this->minDistanceMm : this->maxDistanceMm;
   }
   else
   {

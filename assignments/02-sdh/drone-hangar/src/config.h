@@ -60,6 +60,7 @@
 #define SONAR_READ_START_US 3
 #define SONAR_READ_DELAY_US 5
 #define SONAR_READ_TIMEOUT_US (30L * 1000L) // 30ms =~ 5m
+#define SONAR_READ_OOR_MARGIN_US (5L * 1000L) // pulseIn takes slightly lower than the timeout when out of range
 #define SONAR_MIN_DISTANCE_MM 50
 #define SONAR_MAX_DISTANCE_MM 3000
 
