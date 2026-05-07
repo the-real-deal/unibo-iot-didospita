@@ -5,7 +5,7 @@
 template <typename T>
 const char *enumToString(T value, const char *const enumStrings[])
 {
-  auto strRepr = enumStrings[static_cast<size_t>(value)];
+  const char *strRepr = enumStrings[static_cast<size_t>(value)];
   return strRepr;
 }
 
@@ -16,7 +16,7 @@ T enumFromString(const char *value, const char *const (&enumStrings)[N])
   {
     if (strcmp(value, enumStrings[i]) == 0)
     {
-      auto enumVal = static_cast<T>(i);
+      T enumVal = static_cast<T>(i);
       return enumVal;
     }
   }

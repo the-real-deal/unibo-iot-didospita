@@ -41,12 +41,12 @@ void Scheduler::setup()
 {
   for (size_t i = 0; i < this->n_inputs; i++)
   {
-    auto input = this->inputs[i];
+    ExternalInput *input = this->inputs[i];
     input->setup();
   }
   for (size_t i = 0; i < this->n_threads; i++)
   {
-    auto thread = this->threads[i];
+    LogicThread *thread = this->threads[i];
     thread->setup();
   }
   this->timer.start();
@@ -58,12 +58,12 @@ void Scheduler::advance()
 
   for (size_t i = 0; i < this->n_inputs; i++)
   {
-    auto input = this->inputs[i];
+    ExternalInput *input = this->inputs[i];
     input->read();
   }
   for (size_t i = 0; i < this->n_threads; i++)
   {
-    auto thread = this->threads[i];
+    LogicThread *thread = this->threads[i];
     thread->step(&this->context);
   }
 

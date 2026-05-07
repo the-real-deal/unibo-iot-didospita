@@ -35,7 +35,7 @@ void StateChangeTask::PrintState::step(StateChangeTask *task,
                                        Context *context)
 {
   GlobalState state = context->getState();
-  auto stateString = enumToString(state, GLOBAL_STATE_STRINGS);
+  const char *stateString = enumToString(state, GLOBAL_STATE_STRINGS);
 
   task->internalDisplay->clear();
   task->internalDisplay->print(stateString);

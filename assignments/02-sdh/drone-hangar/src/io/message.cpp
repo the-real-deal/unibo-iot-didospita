@@ -9,6 +9,6 @@ MessageType Message::getType() { return this->type; }
 
 const char *Message::getContent()
 {
-    auto contentStr = this->content.c_str();
+    const char* contentStr = this->content.c_str();
     return contentStr;
 }

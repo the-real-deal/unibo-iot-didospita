@@ -50,7 +50,7 @@
 #define PIR_PIN 6
 
 // servo
-#define SERVO_PIN 2
+#define SERVO_PIN 11
 #define SERVO_MIN_FREQ 500
 #define SERVO_MAX_FREQ 2500
 

@@ -25,8 +25,8 @@ void UltrasonicSensor::setup()
 
 float UltrasonicSensor::getSoundSpeed()
 {
-  auto temp = this->tempSensor->getTemperature();
-  auto soundSpeed = 331.5 + 0.6 * temp;
+  float temp = this->tempSensor->getTemperature();
+  float soundSpeed = 331.5 + 0.6 * temp;
   return soundSpeed;
 }
 
@@ -54,7 +54,7 @@ void UltrasonicSensor::read()
   }
   else
   {
-    auto distance = this->pulseToDistance(pulse);
+    float distance = this->pulseToDistance(pulse);
     this->distanceMm = min(this->maxDistanceMm, max(distance, this->minDistanceMm));
   }
 }

@@ -10,7 +10,7 @@ void DHTSensor::setup()
 
 void DHTSensor::read()
 {
-  auto temp = this->dht.readTemperature();
+  float temp = this->dht.readTemperature();
   if (!isnan(temp))
   {
     this->temperature = temp;

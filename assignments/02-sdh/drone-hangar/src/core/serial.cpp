@@ -31,7 +31,7 @@ Message *SerialMessageService::readNewMessage()
     return nullptr;
   }
 
-  auto buffer = Serial.readString();
+  String buffer = Serial.readString();
 
   int messageStartIndex = buffer.indexOf(SERIAL_MESSAGE_DELIMITER);
   if (messageStartIndex == -1)
@@ -61,14 +61,14 @@ Message *SerialMessageService::readNewMessage()
 void SerialMessageService::read()
 {
   delete this->currentMessage;
-  auto newMessage = this->readNewMessage();
+  Message *newMessage = this->readNewMessage();
   this->currentMessage = newMessage;
 }
 
 void SerialMessageService::send(Message message)
 {
-  auto typeStr = enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS);
-  auto contentStr = message.getContent();
+  const char* typeStr = enumToString<MessageType>(message.getType(), MESSAGE_TYPE_STRINGS);
+  const char* contentStr = message.getContent();
 
   Serial.flush();
   Serial.print(SERIAL_MESSAGE_DELIMITER);
