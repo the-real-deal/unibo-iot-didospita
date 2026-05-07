@@ -71,3 +71,6 @@
 
 // blink
 #define BLINK_PERIOD_MS 500
+
+// dpd
+#define DPD_REQUEST_LANDING_TIMEOUT_MS 5000

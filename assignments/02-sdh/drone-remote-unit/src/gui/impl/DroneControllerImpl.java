@@ -20,13 +20,9 @@ public class DroneControllerImpl implements DroneController {
 
     @Override
     public void sendMessage(Message msg) {
-        String statusMsg;
-        if (this.messageService.send(msg)) {
-            statusMsg = "Message sent!!!";
-        } else {
-            statusMsg = "Error in sending...";
+        if (!this.messageService.send(msg)) {
+            this.managerView.displayError("Error in sending message " + msg, "MESSAGE STATUS");
         }
-        this.managerView.displayMessage(statusMsg, "MESSAGE STATUS");
     }
 
     @Override

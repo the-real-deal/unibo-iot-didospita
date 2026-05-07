@@ -41,9 +41,6 @@ void DDDTask::IdleState::step(DDDTask *task, Context *context)
 void DDDTask::TakeoffReadingState::step(DDDTask *task, Context *context)
 {
   float distance = task->droneDistanceSensor->getDistanceMm();
-  Serial.print(F("DISTANCE: "));
-  Serial.println(distance);
-  Serial.flush();
   if (distance >= OUTSIDE_DISTANCE_MM)
   {
     task->switchState(&DDDTask::TAKEOFF_DISTANCE_CHECKING);
@@ -59,9 +56,6 @@ void DDDTask::TakeoffDistanceCheckingState::setup(DDDTask *task)
 void DDDTask::TakeoffDistanceCheckingState::step(DDDTask *task,
                                                  Context *context)
 {
-  Serial.print(F("ELAPSED: "));
-  Serial.println(task->timer.getElapsedMillis());
-  Serial.flush();
   if (task->timer.isFinished())
   {
     context->setState(GlobalState::Outside);

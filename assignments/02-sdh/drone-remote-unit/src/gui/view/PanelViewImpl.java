@@ -94,8 +94,8 @@ public class PanelViewImpl extends JFrame implements PanelView {
     }
 
     @Override
-    public void displayMessage(String messagge, String title) {
-        JOptionPane.showMessageDialog(myJPanel, messagge, title, JOptionPane.INFORMATION_MESSAGE);
+    public void displayError(String error, String title) {
+        JOptionPane.showMessageDialog(myJPanel, error, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override

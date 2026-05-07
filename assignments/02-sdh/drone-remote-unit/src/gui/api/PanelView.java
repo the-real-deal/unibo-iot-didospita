@@ -8,7 +8,7 @@ public interface PanelView {
      * @param messagge to be displayed.
      * @param title of the messagge window.
      */
-    void displayMessage(String messagge, String title); 
+    void displayError(String messagge, String title); 
     void setController(DroneController controller);
     void updateHangarState(HangarState state);
     void updateDistance(String distance);

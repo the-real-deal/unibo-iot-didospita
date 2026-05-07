@@ -10,6 +10,7 @@ class DPDTask : public Task<DPDTask>
 private:
   PresenceSensor *dronePresenceSensor;
   MessageService *messageService;
+  Timer timer;
 
   class IdleState : public TaskState<DPDTask>
   {
@@ -22,6 +23,7 @@ private:
   class ReadingState : public TaskState<DPDTask>
   {
   public:
+    void setup(DPDTask *task) override;
     void step(DPDTask *task, Context *context) override;
   };
   static ReadingState READING;
