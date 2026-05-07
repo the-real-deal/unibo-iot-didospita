@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "config.h"
+#include "std/debug.hpp"
 #include "core/i2c.hpp"
 #include "core/scheduler.hpp"
 #include "core/serial.hpp"
@@ -24,7 +25,7 @@
 GlobalState initialState = GlobalState::Inside;
 Scheduler scheduler(SCHEDULER_PERIOD_MS, initialState);
 
-LCD *lcd = nullptr; // initialized in setup
+LCD lcd;
 
 SerialMessageService serialMessageService(SERIAL_BAUD,
                                           SERIAL_MESSAGE_DELIMITER,
@@ -53,20 +54,12 @@ DDDTask dddTask(&sonar, &serialMessageService,
                 INSIDE_DISTANCE_MM, INSIDE_TIME_MS);
 DPDTask dpdTask(&pir, &serialMessageService);
 BlinkTask blinkTask(&inActionLed, BLINK_PERIOD_MS);
-StateChangeTask *stateChangeTask = nullptr; // depends on lcd
-// AlarmTask alarmTask(&dht, &alarmLed,
-//                     initialState, PREALARM_TEMP,
-//                     PREALARM_TIME_MS, ALARM_TEMP,
-//                     ALARM_TIME_MS);
+StateChangeTask stateChangeTask(&lcd, &serialMessageService);
+AlarmTask alarmTask(&dht, &alarmLed,
+                    initialState, PREALARM_TEMP,
+                    PREALARM_TIME_MS, ALARM_TEMP,
+                    ALARM_TIME_MS);
 ResetTask resetTask(&resetButton, initialState);
-
-extern int __heap_start, *__brkval;
-
-int freeMemory()
-{
-  int v;
-  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
-}
 
 void setup()
 {
@@ -76,10 +69,7 @@ void setup()
   i2c.setup();
 
   int lcdAddress = i2c.scan();
-  auto lcd_raw = LiquidCrystal_I2C(lcdAddress, LCD_COLS, LCD_ROWS);
-  lcd = new LCD(lcd_raw);
-
-  stateChangeTask = new StateChangeTask(lcd, &serialMessageService);
+  lcd.begin(lcdAddress, LCD_COLS, LCD_ROWS);
 
   scheduler.addInput(&serialMessageService);
   scheduler.addInput(&pir);
@@ -92,8 +82,8 @@ void setup()
   scheduler.addThread(&dddTask);
   scheduler.addThread(&dpdTask);
   scheduler.addThread(&blinkTask);
-  scheduler.addThread(stateChangeTask);
-  // scheduler.addThread(&alarmTask);
+  scheduler.addThread(&stateChangeTask);
+  scheduler.addThread(&alarmTask);
   scheduler.addThread(&resetTask);
 
   builtinLed.setup();
@@ -101,27 +91,12 @@ void setup()
   inActionLed.setup();
   alarmLed.setup();
   scheduler.setup();
-  lcd->setup();
 
   onLed.turnOn();
-
-  int freeMemEnd = freeMemory();
-  Serial.print(F("Free SRAM: "));
-  Serial.println(freeMemStart);
-  Serial.println(F("SETUP FINISHED"));
-  Serial.print(F("Free SRAM: "));
-  Serial.println(freeMemEnd);
-  Serial.flush();
 }
 
 void loop()
 {
-  Serial.println(F("LOOP"));
-  Serial.flush();
   builtinLed.toggle();
-  Serial.println(F("MID LOOP"));
-  Serial.flush();
   scheduler.advance();
-  Serial.println(F("END LOOP"));
-  Serial.flush();
 }

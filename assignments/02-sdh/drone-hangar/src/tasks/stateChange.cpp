@@ -1,6 +1,7 @@
 #include "stateChange.hpp"
 
 #include "std/enum.hpp"
+#include "std/debug.hpp"
 
 StateChangeTask::IdleState StateChangeTask::IDLE;
 BlockedTaskState<StateChangeTask> StateChangeTask::BLOCKED_IDLE(&StateChangeTask::IDLE);

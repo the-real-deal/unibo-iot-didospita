@@ -10,24 +10,24 @@ class UltrasonicSensor : public DistanceSensor, public ExternalInput
 private:
   DigitalInputPin echoPin;
   DigitalOutputPin triggerPin;
-  uint64_t readStartMicros;
-  uint64_t readDelayMicros;
-  uint64_t readTimeoutMicros;
+  uint32_t readStartMicros;
+  uint32_t readDelayMicros;
+  uint32_t readTimeoutMicros;
   TemperatureSensor *tempSensor;
   float minDistanceMm;
   float maxDistanceMm;
   float distanceMm;
 
   float getSoundSpeed();
-  float pulseToDistance(uint64_t pulse);
+  float pulseToDistance(uint32_t pulse);
 
 protected:
   void read() override;
 
 public:
   UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin,
-                   uint64_t readStartMicros, uint64_t readDelayMicros,
-                   uint64_t readTimeoutMicros, TemperatureSensor *tempSensor,
+                   uint32_t readStartMicros, uint32_t readDelayMicros,
+                   uint32_t readTimeoutMicros, TemperatureSensor *tempSensor,
                    float minDistanceMm, float maxDistanceMm);
 
   void setup() override;

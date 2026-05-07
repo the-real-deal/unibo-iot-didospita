@@ -9,8 +9,8 @@ DDDTask::LandingDistanceCheckingState DDDTask::LANDING_DISTANCE_CHECKING;
 
 DDDTask::DDDTask(DistanceSensor *droneDistanceSensor,
                  MessageService *messageService, float outsideDistance,
-                 uint64_t outsideTimeMillis, float insideDistance,
-                 uint64_t insideTimeMillis)
+                 uint32_t outsideTimeMillis, float insideDistance,
+                 uint32_t insideTimeMillis)
     : Task<DDDTask>(&DDDTask::IDLE),
       droneDistanceSensor(droneDistanceSensor),
       messageService(messageService),

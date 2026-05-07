@@ -32,9 +32,6 @@ void DPDTask::IdleState::step(DPDTask *task, Context *context)
 void DPDTask::ReadingState::step(DPDTask *task, Context *context)
 {
   auto dronePresent = task->dronePresenceSensor->isPresent();
-  Serial.print(F("DRONE PRESENT: "));
-  Serial.println(dronePresent);
-  Serial.flush();
   context->setState(dronePresent ? GlobalState::Landing : GlobalState::Outside);
   task->switchState(&DPDTask::IDLE);
 }

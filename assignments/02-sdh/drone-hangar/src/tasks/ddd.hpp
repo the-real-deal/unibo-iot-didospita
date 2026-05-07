@@ -11,9 +11,9 @@ private:
   DistanceSensor *droneDistanceSensor;
   MessageService *messageService;
   float outsideDistanceMm;
-  uint64_t outsideTimeMillis;
+  uint32_t outsideTimeMillis;
   float insideDistanceMm;
-  uint64_t insideTimeMillis;
+  uint32_t insideTimeMillis;
   Timer timer;
 
   void sendDistance(float distance);
@@ -58,6 +58,6 @@ private:
 
 public:
   DDDTask(DistanceSensor *droneDistanceSensor, MessageService *messageService,
-          float outsideDistance, uint64_t outsideTimeMillis,
-          float insideDistance, uint64_t insideTimeMillis);
+          float outsideDistance, uint32_t outsideTimeMillis,
+          float insideDistance, uint32_t insideTimeMillis);
 };

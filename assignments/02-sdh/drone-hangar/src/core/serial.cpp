@@ -4,7 +4,7 @@
 
 #include "std/enum.hpp"
 
-SerialMessageService::SerialMessageService(uint64_t baud, char messageDelimiter, char syncByte)
+SerialMessageService::SerialMessageService(uint32_t baud, char messageDelimiter, char syncByte)
     : baud(baud), messageDelimiter(messageDelimiter), syncByte(syncByte),
       currentMessage(nullptr) {}
 

@@ -2,26 +2,20 @@
 
 #include <Arduino.h>
 
-LCD::LCD(LiquidCrystal_I2C lcd)
-    : lcd(lcd), currentCol(0), currentRow(0) {}
+LCD::LCD(): lcd(0, 0, 0) {}
 
-void LCD::setup()
+void LCD::begin(uint8_t address, uint8_t cols, uint8_t rows)
 {
+  this->lcd = LiquidCrystal_I2C(address, cols, rows);
   this->lcd.init();
   this->lcd.backlight();
-  this->clear();
+  this->lcd.clear();
 }
 
 void LCD::setCursor(uint8_t col, uint8_t row)
 {
   this->lcd.setCursor(col, row);
-  this->currentCol = col;
-  this->currentRow = row;
 }
-
-uint8_t LCD::col() { return this->currentCol; }
-
-uint8_t LCD::row() { return this->currentRow; }
 
 void LCD::clear()
 {

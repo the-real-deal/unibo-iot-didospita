@@ -10,7 +10,7 @@
 class SerialMessageService : public MessageService, public ExternalInput
 {
 private:
-  uint64_t baud;
+  uint32_t baud;
   char messageDelimiter;
   char syncByte;
   Message *currentMessage;
@@ -22,7 +22,7 @@ protected:
   void read() override;
 
 public:
-  SerialMessageService(uint64_t baud, char messageDelimiter, char syncByte);
+  SerialMessageService(uint32_t baud, char messageDelimiter, char syncByte);
 
   void setup() override;
   Message *getMessage() override;

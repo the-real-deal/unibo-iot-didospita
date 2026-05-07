@@ -42,8 +42,8 @@ class DigitalInputPin : public BasePin
 public:
   DigitalInputPin(uint8_t pin);
   DigitalValue read();
-  uint64_t readPulse(DigitalValue value);
-  uint64_t readPulse(DigitalValue value, uint64_t timeout);
+  uint32_t readPulse(DigitalValue value);
+  uint32_t readPulse(DigitalValue value, uint32_t timeout);
 };
 
 class AnalogOutputPin : public BasePin
@@ -56,12 +56,9 @@ public:
 class AnalogInputPin : public BasePin
 {
 private:
-  static const uint64_t MAX_READ_VALUE = 1023;
-  size_t scale;
+  static const uint32_t MAX_READ_VALUE = 1023;
 
 public:
-  static const size_t NO_SCALE = 0;
-  AnalogInputPin(uint8_t pin, size_t scale = AnalogInputPin::NO_SCALE);
+  AnalogInputPin(uint8_t pin);
   double read();
-  size_t scaledRead();
 };

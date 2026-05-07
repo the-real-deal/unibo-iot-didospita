@@ -18,13 +18,13 @@ class Context
 private:
   GlobalState state;
   GlobalState stateCandidate;
-  uint64_t elapsedMillis;
+  uint32_t elapsedMillis;
 
 public:
   Context(GlobalState initialState);
   GlobalState getState();
   void setState(GlobalState state);
-  uint64_t getElapsedMillis();
+  uint32_t getElapsedMillis();
 };
 
 class LogicThread : public Setup

@@ -4,7 +4,7 @@ BlinkTask::IdleState BlinkTask::IDLE;
 BlinkTask::OnState BlinkTask::ON;
 BlinkTask::OffState BlinkTask::OFF;
 
-BlinkTask::BlinkTask(Indicator *blinkIndicator, uint64_t periodMillis)
+BlinkTask::BlinkTask(Indicator *blinkIndicator, uint32_t periodMillis)
     : Task<BlinkTask>(&BlinkTask::IDLE),
       blinkIndicator(blinkIndicator),
       periodMillis(periodMillis),

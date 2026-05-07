@@ -13,9 +13,9 @@ private:
   Indicator *alarmIndicator;
   GlobalState prevState;
   float prealarmTemp;
-  uint64_t prealarmTimeMillis;
+  uint32_t prealarmTimeMillis;
   float alarmTemp;
-  uint64_t alarmTimeMillis;
+  uint32_t alarmTimeMillis;
   Timer timer;
 
   class IdleState : public TaskState<AlarmTask>
@@ -66,6 +66,6 @@ private:
 public:
   AlarmTask(TemperatureSensor *hangarTempSensor, Indicator *alarmIndicator,
             GlobalState initialState, float prealarmTemp,
-            uint64_t prealarmTimeMillis, float alarmTemp,
-            uint64_t alarmTimeMillis);
+            uint32_t prealarmTimeMillis, float alarmTemp,
+            uint32_t alarmTimeMillis);
 };

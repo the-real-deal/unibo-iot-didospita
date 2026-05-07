@@ -1,6 +1,7 @@
 #include "scheduler.hpp"
 
 #include "std/enum.hpp"
+#include "std/debug.hpp"
 
 Context::Context(GlobalState initialState)
     : state(initialState),
@@ -11,7 +12,7 @@ GlobalState Context::getState() { return this->state; }
 
 void Context::setState(GlobalState state) { this->stateCandidate = state; }
 
-uint64_t Context::getElapsedMillis() { return this->elapsedMillis; }
+uint32_t Context::getElapsedMillis() { return this->elapsedMillis; }
 
 Scheduler::Scheduler(int periodMillis, GlobalState initialState)
     : context(initialState), timer(periodMillis), inputs(), n_inputs(0), threads(), n_threads(0) {}
