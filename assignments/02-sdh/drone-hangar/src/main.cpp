@@ -63,7 +63,6 @@ ResetTask resetTask(&resetButton, initialState);
 
 void setup()
 {
-  int freeMemStart = freeMemory();
   serialMessageService.setup();
   I2CManager i2c;
   i2c.setup();
