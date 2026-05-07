@@ -1,5 +1,6 @@
 #include "alarm.hpp"
 
+#include "config.h"
 #include "std/enum.hpp"
 
 AlarmTask::IdleState AlarmTask::IDLE;
@@ -11,17 +12,11 @@ AlarmTask::AlarmReadingState AlarmTask::ALARM_READING;
 AlarmTask::AlarmTempCheckingState AlarmTask::ALARM_TEMP_CHECKING;
 
 AlarmTask::AlarmTask(TemperatureSensor *hangarTempSensor,
-                     Indicator *alarmIndicator, GlobalState initialState,
-                     float prealarmTemp, uint32_t prealarmTimeMillis,
-                     float alarmTemp, uint32_t alarmTimeMillis)
+                     Indicator *alarmIndicator, GlobalState initialState)
     : Task<AlarmTask>(&AlarmTask::IDLE),
       hangarTempSensor(hangarTempSensor),
       alarmIndicator(alarmIndicator),
       prevState(initialState),
-      prealarmTemp(prealarmTemp),
-      prealarmTimeMillis(prealarmTimeMillis),
-      alarmTemp(alarmTemp),
-      alarmTimeMillis(alarmTimeMillis),
       timer() {}
 
 void AlarmTask::IdleState::step(AlarmTask *task, Context *context)
@@ -52,7 +47,7 @@ void AlarmTask::PrealarmReadingState::step(AlarmTask *task, Context *context)
   case GlobalState::Inside:
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    if (task->hangarTempSensor->getTemperature() >= task->prealarmTemp)
+    if (task->hangarTempSensor->getTemperature() >= PREALARM_TEMP)
     {
       task->switchState(&AlarmTask::PREALARM_TEMP_CHECKING);
     }
@@ -65,7 +60,7 @@ void AlarmTask::PrealarmReadingState::step(AlarmTask *task, Context *context)
 
 void AlarmTask::PrealarmTempCheckingState::setup(AlarmTask *task)
 {
-  task->timer = Timer(task->prealarmTimeMillis);
+  task->timer = Timer(PREALARM_TIME_MS);
   task->timer.start();
 }
 
@@ -76,7 +71,7 @@ void AlarmTask::PrealarmTempCheckingState::step(AlarmTask *task,
   {
     task->switchState(&AlarmTask::WAIT_OPERATIONS);
   }
-  else if (task->hangarTempSensor->getTemperature() < task->prealarmTemp)
+  else if (task->hangarTempSensor->getTemperature() < PREALARM_TEMP)
   {
     task->switchState(&AlarmTask::PREALARM_READING);
   }
@@ -101,11 +96,11 @@ void AlarmTask::WaitOperationsState::step(AlarmTask *task, Context *context)
 void AlarmTask::AlarmReadingState::step(AlarmTask *task, Context *context)
 {
   float temp = task->hangarTempSensor->getTemperature();
-  if (temp >= task->alarmTemp)
+  if (temp >= ALARM_TEMP)
   {
     task->switchState(&AlarmTask::ALARM_TEMP_CHECKING);
   }
-  else if (temp < task->prealarmTemp)
+  else if (temp < PREALARM_TEMP)
   {
     context->setState(task->prevState);
     task->switchState(&AlarmTask::PREALARM_READING);
@@ -114,7 +109,7 @@ void AlarmTask::AlarmReadingState::step(AlarmTask *task, Context *context)
 
 void AlarmTask::AlarmTempCheckingState::setup(AlarmTask *task)
 {
-  task->timer = Timer(task->alarmTimeMillis);
+  task->timer = Timer(ALARM_TIME_MS);
   task->timer.start();
 }
 
@@ -128,7 +123,7 @@ void AlarmTask::AlarmTempCheckingState::step(AlarmTask *task,
     context->setState(GlobalState::Alarm);
     task->switchState(&AlarmTask::IDLE);
   }
-  else if (task->hangarTempSensor->getTemperature() < task->alarmTemp)
+  else if (task->hangarTempSensor->getTemperature() < ALARM_TEMP)
   {
     task->switchState(&AlarmTask::ALARM_READING);
   }

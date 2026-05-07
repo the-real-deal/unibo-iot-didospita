@@ -9,9 +9,6 @@ class DoorTask : public Task<DoorTask>
 {
 private:
   ServoMotor *servo;
-  int closedAngle;
-  int openAngle;
-  int angleMargin;
   MessageService *messageService;
 
   class ClosedState : public TaskState<DoorTask>
@@ -30,6 +27,5 @@ private:
   static OpenState OPEN;
 
 public:
-  DoorTask(ServoMotor *servo, int closedAngle, int openAngle,
-           int angleMargin, MessageService *messageService);
+  DoorTask(ServoMotor *servo, MessageService *messageService);
 };

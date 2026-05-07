@@ -2,19 +2,18 @@
 
 #include <Arduino.h>
 
+#include "config.h"
 #include "std/enum.hpp"
 
-SerialMessageService::SerialMessageService(uint32_t baud, char messageDelimiter, char syncByte)
-    : baud(baud), messageDelimiter(messageDelimiter), syncByte(syncByte),
-      currentMessage(nullptr) {}
+SerialMessageService::SerialMessageService() : currentMessage(nullptr) {}
 
 void SerialMessageService::setup()
 {
-  Serial.begin(this->baud);
+  Serial.begin(SERIAL_BAUD);
   while (!Serial)
     ;
-  
-  Serial.print(this->syncByte);
+
+  Serial.print(SERIAL_SYNC_BYTE);
   Serial.flush();
 }
 
@@ -27,25 +26,26 @@ bool SerialMessageService::messageAvailable()
 
 Message *SerialMessageService::readNewMessage()
 {
-  if (!Serial.available()) {
+  if (!Serial.available())
+  {
     return nullptr;
   }
-  
+
   auto buffer = Serial.readString();
 
-  int messageStartIndex = buffer.indexOf(this->messageDelimiter);
+  int messageStartIndex = buffer.indexOf(SERIAL_MESSAGE_DELIMITER);
   if (messageStartIndex == -1)
   {
     return nullptr;
   }
 
-  int typeDelimiterIndex = buffer.indexOf(this->messageDelimiter, messageStartIndex + 1);
+  int typeDelimiterIndex = buffer.indexOf(SERIAL_MESSAGE_DELIMITER, messageStartIndex + 1);
   if (typeDelimiterIndex == -1)
   {
     return nullptr;
   }
 
-  int terminatorIndex = buffer.indexOf(this->messageDelimiter, typeDelimiterIndex + 1);
+  int terminatorIndex = buffer.indexOf(SERIAL_MESSAGE_DELIMITER, typeDelimiterIndex + 1);
   if (terminatorIndex == -1)
   {
     return nullptr;
@@ -71,11 +71,11 @@ void SerialMessageService::send(Message message)
   auto contentStr = message.getContent();
 
   Serial.flush();
-  Serial.print(this->messageDelimiter);
+  Serial.print(SERIAL_MESSAGE_DELIMITER);
   Serial.print(typeStr);
-  Serial.print(this->messageDelimiter);
+  Serial.print(SERIAL_MESSAGE_DELIMITER);
   Serial.print(contentStr);
-  Serial.print(this->messageDelimiter);
+  Serial.print(SERIAL_MESSAGE_DELIMITER);
   Serial.print('\n');
   Serial.flush();
 }

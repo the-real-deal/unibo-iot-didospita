@@ -3,7 +3,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-I2CManager::I2CManager() : startAddress(MIN_ADDRESS) {}
+#include "config.h"
+
+I2CManager::I2CManager() : startAddress(I2C_MIN_ADDRESS) {}
 
 void I2CManager::setup()
 {
@@ -12,7 +14,7 @@ void I2CManager::setup()
 
 uint8_t I2CManager::scan()
 {
-  for (uint8_t address = this->startAddress; address <= MAX_ADDRESS;
+  for (uint8_t address = this->startAddress; address <= I2C_MAX_ADDRESS;
        address++)
   {
     Wire.beginTransmission(address);

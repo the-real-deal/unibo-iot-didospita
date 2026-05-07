@@ -7,7 +7,6 @@ class BlinkTask : public Task<BlinkTask>
 {
 private:
   Indicator *blinkIndicator;
-  uint32_t periodMillis;
   Timer timer;
 
   class IdleState : public TaskState<BlinkTask>
@@ -34,5 +33,5 @@ private:
   static OffState OFF;
 
 public:
-  BlinkTask(Indicator *blinkIndicator, uint32_t periodMillis);
+  BlinkTask(Indicator *blinkIndicator);
 };

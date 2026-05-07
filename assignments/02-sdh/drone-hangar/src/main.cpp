@@ -27,9 +27,7 @@ Scheduler scheduler(SCHEDULER_PERIOD_MS, initialState);
 
 LCD lcd;
 
-SerialMessageService serialMessageService(SERIAL_BAUD,
-                                          SERIAL_MESSAGE_DELIMITER,
-                                          SERIAL_SYNC_BYTE);
+SerialMessageService serialMessageService;
 PIRSensor pir(PIR_PIN);
 ArduinoServoMotor servo(SERVO_PIN,
                         SERVO_MIN_FREQ, SERVO_MAX_FREQ,
@@ -46,19 +44,12 @@ Led onLed(ON_LED_PIN);
 Led inActionLed(IN_ACTION_LED_PIN);
 Led alarmLed(ALARM_LED_PIN);
 
-DoorTask doorTask(&servo,
-                  DOOR_CLOSED_ANGLE, DOOR_OPEN_ANGLE,
-                  DOOR_ANGLE_MARGIN, &serialMessageService);
-DDDTask dddTask(&sonar, &serialMessageService,
-                OUTSIDE_DISTANCE_MM, OUTSIDE_TIME_MS,
-                INSIDE_DISTANCE_MM, INSIDE_TIME_MS);
+DoorTask doorTask(&servo, &serialMessageService);
+DDDTask dddTask(&sonar, &serialMessageService);
 DPDTask dpdTask(&pir, &serialMessageService);
-BlinkTask blinkTask(&inActionLed, BLINK_PERIOD_MS);
+BlinkTask blinkTask(&inActionLed);
 StateChangeTask stateChangeTask(&lcd, &serialMessageService);
-AlarmTask alarmTask(&dht, &alarmLed,
-                    initialState, PREALARM_TEMP,
-                    PREALARM_TIME_MS, ALARM_TEMP,
-                    ALARM_TIME_MS);
+AlarmTask alarmTask(&dht, &alarmLed, initialState);
 ResetTask resetTask(&resetButton, initialState);
 
 void setup()

@@ -22,6 +22,10 @@
 #define DHT_TYPE 11
 #define DHT_INITIAL_TEMP 20
 
+// i2c
+#define I2C_MIN_ADDRESS 0
+#define I2C_MAX_ADDRESS 126
+
 // reset
 #define RESET_BUTTON_PIN 10 // RESET
 

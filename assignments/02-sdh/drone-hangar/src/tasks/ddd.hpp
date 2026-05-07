@@ -10,10 +10,6 @@ class DDDTask : public Task<DDDTask>
 private:
   DistanceSensor *droneDistanceSensor;
   MessageService *messageService;
-  float outsideDistanceMm;
-  uint32_t outsideTimeMillis;
-  float insideDistanceMm;
-  uint32_t insideTimeMillis;
   Timer timer;
 
   void sendDistance(float distance);
@@ -57,7 +53,5 @@ private:
   static LandingDistanceCheckingState LANDING_DISTANCE_CHECKING;
 
 public:
-  DDDTask(DistanceSensor *droneDistanceSensor, MessageService *messageService,
-          float outsideDistance, uint32_t outsideTimeMillis,
-          float insideDistance, uint32_t insideTimeMillis);
+  DDDTask(DistanceSensor *droneDistanceSensor, MessageService *messageService);
 };
