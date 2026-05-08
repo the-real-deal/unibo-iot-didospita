@@ -1,7 +1,7 @@
 #pragma once
 
 // general
-#define OUTSIDE_DISTANCE_MM 500 // D1
+#define OUTSIDE_DISTANCE_MM 400 // D1
 #define OUTSIDE_TIME_MS 3000    // T1
 #define INSIDE_DISTANCE_MM 100  // D2
 #define INSIDE_TIME_MS 3000     // T2
