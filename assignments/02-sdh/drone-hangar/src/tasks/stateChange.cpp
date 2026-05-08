@@ -16,7 +16,6 @@ StateChangeTask::StateChangeTask(Display *internalDisplay,
 
 void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &StateChangeTask::BLOCKED_IDLE);
   GlobalState state = context->getState();
   switch (state)
   {

@@ -24,12 +24,3 @@ public:
     task->switchState(returnState);
   }
 };
-
-template <typename T>
-void blockOnAlarm(T *task, Context *context, BlockedTaskState<T> *blockedTaskState)
-{
-  if (context->getState() == GlobalState::Alarm)
-  {
-    task->switchState(blockedTaskState);
-  }
-}

@@ -15,7 +15,11 @@ DPDTask::DPDTask(PresenceSensor *dronePresenceSensor,
 
 void DPDTask::IdleState::step(DPDTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &DPDTask::BLOCKED_IDLE);
+  if (context->getState() == GlobalState::Alarm)
+  {
+    task->switchState(&DPDTask::BLOCKED_IDLE);
+    return;
+  }
 
   switch (context->getState())
   {

@@ -13,7 +13,11 @@ DoorTask::DoorTask(ServoMotor *servo, MessageService *messageService)
 
 void DoorTask::ClosedState::step(DoorTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &DoorTask::BLOCKED_CLOSED);
+  if (context->getState() == GlobalState::Alarm)
+  {
+    task->switchState(&DoorTask::BLOCKED_CLOSED);
+    return;
+  }
 
   switch (context->getState())
   {

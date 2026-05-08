@@ -1,10 +1,11 @@
 #include "alarm.hpp"
 
 #include "config.h"
+#include "core/state.hpp"
 #include "std/enum.hpp"
 
 AlarmTask::IdleState AlarmTask::IDLE;
-BlockedTaskState<AlarmTask> AlarmTask::BLOCK_IDLE(&AlarmTask::IDLE);
+BlockedTaskState<AlarmTask> AlarmTask::BLOCKED_IDLE(&AlarmTask::IDLE);
 AlarmTask::PrealarmReadingState AlarmTask::PREALARM_READING;
 AlarmTask::PrealarmTempCheckingState AlarmTask::PREALARM_TEMP_CHECKING;
 AlarmTask::WaitOperationsState AlarmTask::WAIT_OPERATIONS;
@@ -21,7 +22,11 @@ AlarmTask::AlarmTask(TemperatureSensor *hangarTempSensor,
 
 void AlarmTask::IdleState::step(AlarmTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &AlarmTask::BLOCK_IDLE);
+  if (context->getState() == GlobalState::Alarm)
+  {
+    task->switchState(&AlarmTask::BLOCKED_IDLE);
+    return;
+  }
 
   if (task->alarmIndicator->isOn())
   {
@@ -47,7 +52,8 @@ void AlarmTask::PrealarmReadingState::step(AlarmTask *task, Context *context)
   case GlobalState::Inside:
   case GlobalState::Takeoff:
   case GlobalState::Landing:
-    if (task->hangarTempSensor->getTemperature() >= PREALARM_TEMP)
+    float temp = task->hangarTempSensor->getTemperature();
+    if (temp >= PREALARM_TEMP)
     {
       task->switchState(&AlarmTask::PREALARM_TEMP_CHECKING);
     }

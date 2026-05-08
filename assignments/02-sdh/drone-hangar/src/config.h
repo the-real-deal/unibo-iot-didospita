@@ -5,10 +5,10 @@
 #define OUTSIDE_TIME_MS 3000    // T1
 #define INSIDE_DISTANCE_MM 100  // D2
 #define INSIDE_TIME_MS 3000     // T2
-#define PREALARM_TEMP 30        // Temp1
+#define PREALARM_TEMP 28        // Temp1
 #define PREALARM_TIME_MS 2000   // T3
-#define ALARM_TEMP 35           // Temp2
-#define ALARM_TIME_MS 1000      // T4
+#define ALARM_TEMP 30           // Temp2
+#define ALARM_TIME_MS 2000      // T4
 
 // leds
 #define ON_LED_PIN 7        // L1

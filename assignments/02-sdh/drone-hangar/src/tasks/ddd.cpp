@@ -23,7 +23,11 @@ void DDDTask::sendDistance(float distance)
 
 void DDDTask::IdleState::step(DDDTask *task, Context *context)
 {
-  blockOnAlarm(task, context, &DDDTask::BLOCKED_IDLE);
+  if (context->getState() == GlobalState::Alarm)
+  {
+    task->switchState(&DDDTask::BLOCKED_IDLE);
+    return;
+  }
 
   switch (context->getState())
   {

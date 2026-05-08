@@ -20,7 +20,7 @@ private:
     void step(AlarmTask *task, Context *context) override;
   };
   static IdleState IDLE;
-  static BlockedTaskState<AlarmTask> BLOCK_IDLE;
+  static BlockedTaskState<AlarmTask> BLOCKED_IDLE;
 
   class PrealarmReadingState : public TaskState<AlarmTask>
   {

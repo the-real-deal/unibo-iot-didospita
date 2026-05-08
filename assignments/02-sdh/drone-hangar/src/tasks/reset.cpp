@@ -14,6 +14,7 @@ void ResetTask::IdleState::step(ResetTask *task, Context *context)
   switch (state)
   {
   case GlobalState::Prealarm:
+    // do not store prealarm as previous state
     break;
   case GlobalState::Alarm:
     task->switchState(&ResetTask::WAIT_RESET);
