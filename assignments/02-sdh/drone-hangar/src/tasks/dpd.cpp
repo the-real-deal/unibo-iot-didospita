@@ -40,7 +40,8 @@ void DPDTask::ReadingState::setup(DPDTask *task)
 
 void DPDTask::ReadingState::step(DPDTask *task, Context *context)
 {
-  if (task->dronePresenceSensor->isPresent())
+  bool dronePresent = task->dronePresenceSensor->isPresent();
+  if (dronePresent)
   {
     context->setState(GlobalState::Landing);
   }
