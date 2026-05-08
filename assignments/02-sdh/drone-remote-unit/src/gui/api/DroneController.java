@@ -13,6 +13,6 @@ public interface DroneController {
 
     void setView(PanelView view);
 
-    void updateViewStatus();
+    void updateViewStatus() throws InterruptedException;
 
 }

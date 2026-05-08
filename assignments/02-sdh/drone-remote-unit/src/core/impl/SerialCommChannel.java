@@ -22,7 +22,6 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 	private static final char SERIAL_SYNC_BYTE = '\0';
 	private SerialPort serialPort;
 	private BlockingQueue<Message> queue;
-	private Message currentMsg;
 	private StringBuffer serialBuffer = new StringBuffer("");
 
 	public SerialCommChannel(String port, int rate) throws Exception {
@@ -60,7 +59,6 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 					// reset
 					serialBuffer.delete(0, serialSyncIndex + 1);
 					this.queue.clear();
-					this.currentMsg = null;
 				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -115,12 +113,12 @@ public class SerialCommChannel implements MessageService, SerialPortEventListene
 
 	@Override
 	public Message readMessage() throws InterruptedException {
-		return this.currentMsg = messageAvailable() ? this.queue.take() : null;
+		return messageAvailable() ? this.queue.take() : null;
 	}
 
 	@Override
 	public boolean messageAvailable() {
-		return this.currentMsg != null;
+		return !this.queue.isEmpty();
 	}
 
 	@Override
