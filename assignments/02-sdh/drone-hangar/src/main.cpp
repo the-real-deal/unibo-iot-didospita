@@ -29,14 +29,9 @@ LCD lcd;
 
 SerialMessageService serialMessageService;
 PIRSensor pir(PIR_PIN);
-ArduinoServoMotor servo(SERVO_PIN,
-                        SERVO_MIN_FREQ, SERVO_MAX_FREQ,
-                        DOOR_CLOSED_ANGLE);
+ArduinoServoMotor servo(SERVO_PIN, DOOR_CLOSED_ANGLE);
 DHTSensor dht(DHT_PIN, static_cast<DHTType>(DHT_TYPE), DHT_INITIAL_TEMP);
-UltrasonicSensor sonar(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN, &dht,
-                       SONAR_READ_START_US, SONAR_READ_DELAY_US,
-                       SONAR_READ_TIMEOUT_US, SONAR_READ_OOR_MARGIN_US,
-                       SONAR_MIN_DISTANCE_MM, SONAR_MAX_DISTANCE_MM);
+UltrasonicSensor sonar(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN, &dht);
 PushButton resetButton(RESET_BUTTON_PIN);
 
 Led builtinLed(LED_BUILTIN);

@@ -3,19 +3,12 @@
 #include <limits.h>
 #include <limits.h>
 
-UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin, TemperatureSensor *tempSensor,
-                                   uint32_t readStartMicros, uint32_t readDelayMicros,
-                                   uint32_t readTimeoutMicros, uint32_t readOORMarginMicros,
-                                   float minDistanceMm, float maxDistanceMm)
+#include "config.h"
+
+UltrasonicSensor::UltrasonicSensor(uint8_t echoPin, uint8_t triggerPin, TemperatureSensor *tempSensor)
     : echoPin(echoPin),
       triggerPin(triggerPin),
       tempSensor(tempSensor),
-      readStartMicros(readStartMicros),
-      readDelayMicros(readDelayMicros),
-      readTimeoutMicros(readTimeoutMicros),
-      readOORMarginMicros(readOORMarginMicros),
-      minDistanceMm(minDistanceMm),
-      maxDistanceMm(maxDistanceMm),
       distanceMm(0) {}
 
 void UltrasonicSensor::setup()
@@ -40,23 +33,23 @@ float UltrasonicSensor::pulseToDistance(uint32_t pulse)
 void UltrasonicSensor::read()
 {
   this->triggerPin.write(DigitalValue::Low);
-  delayMicroseconds(this->readStartMicros);
+  delayMicroseconds(SONAR_READ_START_US);
   this->triggerPin.write(DigitalValue::High);
-  delayMicroseconds(this->readDelayMicros);
+  delayMicroseconds(SONAR_READ_DELAY_US);
   this->triggerPin.write(DigitalValue::Low);
 
   uint32_t readStart = micros();
   uint32_t pulse =
-      this->echoPin.readPulse(DigitalValue::High, this->readTimeoutMicros);
+      this->echoPin.readPulse(DigitalValue::High, SONAR_READ_TIMEOUT_US);
   uint32_t readTime = micros() - readStart;
   if (pulse == 0)
   {
-    this->distanceMm = readTime < (this->readTimeoutMicros - this->readOORMarginMicros) ? this->minDistanceMm : this->maxDistanceMm;
+    this->distanceMm = readTime < (SONAR_READ_TIMEOUT_US - SONAR_READ_OOR_MARGIN_US) ? SONAR_MIN_DISTANCE_MM : SONAR_MAX_DISTANCE_MM;
   }
   else
   {
     float distance = this->pulseToDistance(pulse);
-    this->distanceMm = min(this->maxDistanceMm, max(distance, this->minDistanceMm));
+    this->distanceMm = min(SONAR_MAX_DISTANCE_MM, max(distance, SONAR_MIN_DISTANCE_MM));
   }
 }
 

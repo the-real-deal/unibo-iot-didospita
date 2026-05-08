@@ -41,6 +41,7 @@ void DDDTask::IdleState::step(DDDTask *task, Context *context)
 void DDDTask::TakeoffReadingState::step(DDDTask *task, Context *context)
 {
   float distance = task->droneDistanceSensor->getDistanceMm();
+  task->sendDistance(distance);
   if (distance >= OUTSIDE_DISTANCE_MM)
   {
     task->switchState(&DDDTask::TAKEOFF_DISTANCE_CHECKING);
@@ -62,8 +63,8 @@ void DDDTask::TakeoffDistanceCheckingState::step(DDDTask *task,
     task->switchState(&DDDTask::IDLE);
     return;
   }
-
   float distance = task->droneDistanceSensor->getDistanceMm();
+  task->sendDistance(distance);
   if (distance < OUTSIDE_DISTANCE_MM)
   {
     task->switchState(&DDDTask::TAKEOFF_READING);
