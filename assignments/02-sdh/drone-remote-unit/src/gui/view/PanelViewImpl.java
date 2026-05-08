@@ -14,7 +14,6 @@ import gui.api.DroneController;
 import gui.api.PanelView;
 
 public class PanelViewImpl extends JFrame implements PanelView {
-
     private DroneController controller;
     private final JPanel myJPanel = new JPanel();
 
@@ -46,7 +45,6 @@ public class PanelViewImpl extends JFrame implements PanelView {
         JLabel lblStatusDrone = new JLabel("Status Drone:");
         lblStatusDrone.setFont(new Font("Arial", Font.BOLD, 14));
         lblStatusDroneVal = new JLabel("IDLE");
-        lblStatusDroneVal.setForeground(Color.BLUE);
 
         JLabel lblStatusHangar = new JLabel("Status Hangar:");
         lblStatusHangar.setFont(new Font("Arial", Font.BOLD, 14));
