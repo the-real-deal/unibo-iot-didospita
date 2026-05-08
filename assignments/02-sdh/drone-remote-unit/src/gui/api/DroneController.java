@@ -9,7 +9,7 @@ public interface DroneController {
      * 
      * @param mesg the message to send.
      */
-    void sendMessage(Message msg);
+    boolean sendMessage(Message msg);
 
     void setView(PanelView view);
 

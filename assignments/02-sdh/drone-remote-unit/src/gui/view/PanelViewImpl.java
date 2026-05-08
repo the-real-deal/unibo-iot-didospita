@@ -73,14 +73,24 @@ public class PanelViewImpl extends JFrame implements PanelView {
         btnTakeoff.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.sendMessage(new MessageImpl(MessageType.REQUEST_TAKEOFF));
+                var msg = new MessageImpl(MessageType.REQUEST_TAKEOFF);
+                buttonsSetEnabled(false);
+                if (!controller.sendMessage(msg)) {
+                    displayWarning("Error in sending message " + msg);
+                }
+                buttonsSetEnabled(true);
             }
         });
 
         btnLanding.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.sendMessage(new MessageImpl(MessageType.REQUEST_LANDING));
+                var msg = new MessageImpl(MessageType.REQUEST_LANDING);
+                buttonsSetEnabled(false);
+                if (!controller.sendMessage(msg)) {
+                    displayWarning("Error in sending message " + msg);
+                }
+                buttonsSetEnabled(true);
             }
         });
 
@@ -91,9 +101,8 @@ public class PanelViewImpl extends JFrame implements PanelView {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    @Override
-    public void displayError(String error, String title) {
-        JOptionPane.showMessageDialog(myJPanel, error, title, JOptionPane.INFORMATION_MESSAGE);
+    public void displayWarning(String warning) {
+        JOptionPane.showMessageDialog(myJPanel, warning, null, JOptionPane.WARNING_MESSAGE);
     }
 
     @Override
@@ -101,23 +110,44 @@ public class PanelViewImpl extends JFrame implements PanelView {
         this.controller = controller;
     }
 
+    private void buttonsSetEnabled(boolean enable) {
+        btnTakeoff.setEnabled(enable);
+        btnLanding.setEnabled(enable);
+    }
+
     @Override
     public void updateHangarState(HangarState state) {
-        var status = state.getDisplayName();
         switch (state) {
             case ALARM:
-            case PREALARM:
-                lblStatusHangarVal.setText(status);
+                lblStatusHangarVal.setText("ALARM");
+                buttonsSetEnabled(false);
                 break;
             case INSIDE:
-            case OUTSIDE:
+                lblStatusDroneVal.setText("REST");
                 lblStatusHangarVal.setText("NORMAL");
-                // no break, go to default
-            default:
-                lblStatusDroneVal.setText(status);
+                lblDistanceVal.setText("-");
+                buttonsSetEnabled(true);
+                break;
+            case LANDING:
+                lblStatusDroneVal.setText("LANDING");
+                lblStatusHangarVal.setText("NORMAL");
+                buttonsSetEnabled(false);
+                break;
+                case OUTSIDE:
+                lblStatusDroneVal.setText("OPERATING");
+                lblStatusHangarVal.setText("NORMAL");
+                lblDistanceVal.setText("-");
+                buttonsSetEnabled(true);
+                break;
+            case PREALARM:
+                buttonsSetEnabled(false);
+                break;
+            case TAKEOFF:
+                lblStatusDroneVal.setText("TAKING OFF");
+                lblStatusHangarVal.setText("NORMAL");
+                buttonsSetEnabled(false);
                 break;
         }
-        
     }
 
     @Override

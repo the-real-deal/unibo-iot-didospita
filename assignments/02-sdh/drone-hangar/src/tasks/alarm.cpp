@@ -2,7 +2,6 @@
 
 #include "config.h"
 #include "core/state.hpp"
-#include "std/enum.hpp"
 
 AlarmTask::IdleState AlarmTask::IDLE;
 BlockedTaskState<AlarmTask> AlarmTask::BLOCKED_IDLE(&AlarmTask::IDLE);

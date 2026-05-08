@@ -14,10 +14,6 @@ public enum HangarState {
     this.displayName = displayName;
   }
 
-  public String getDisplayName() {
-    return this.displayName;
-  }
-
   public static HangarState fromDisplayName(String displayName) {
     for (HangarState mt : values()) {
       if (mt.displayName.equals(displayName)) {
