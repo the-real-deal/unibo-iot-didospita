@@ -126,7 +126,7 @@ void AlarmTask::AlarmTempCheckingState::step(AlarmTask *task,
     task->alarmIndicator->turnOn();
 
     context->setState(GlobalState::Alarm);
-    task->switchState(&AlarmTask::IDLE);
+    task->switchState(&AlarmTask::BLOCKED_IDLE);
   }
   else if (task->hangarTempSensor->getTemperature() < ALARM_TEMP)
   {
