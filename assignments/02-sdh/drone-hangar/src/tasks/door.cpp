@@ -31,6 +31,7 @@ void DoorTask::ClosedState::step(DoorTask *task, Context *context)
             MessageType::REQUEST_TAKEOFF)
     {
       context->setState(GlobalState::Takeoff);
+      task->switchState(&DoorTask::OPEN);
     }
     // no break, do default behaviour
   default:
