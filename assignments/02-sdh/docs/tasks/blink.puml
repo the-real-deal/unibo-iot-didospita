@@ -1,0 +1,7 @@
+@startuml BlinkTask
+!pragma layout elk
+hide empty description
+
+state "Idle" as idle
+
+@enduml

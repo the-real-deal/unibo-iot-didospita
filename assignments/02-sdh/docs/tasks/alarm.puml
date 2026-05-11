@@ -55,5 +55,6 @@ alarmTempReading -r-> alarmTempMonitoring : temp >= ALARM_TEMP
 alarmTempReading -u-> prealarm : temp <= PREALARM_TEMP
 alarmTempMonitoring -l-> alarmTempReading : temp < ALARM_TEMP
 alarmTempMonitoring -r-> endAlarm : timer ended
+alarm -u-> blocked : / state = Alarm, alarm led on
 
 @enduml
