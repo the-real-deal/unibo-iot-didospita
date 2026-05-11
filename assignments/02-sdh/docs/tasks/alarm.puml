@@ -1,5 +1,5 @@
 @startuml AlarmTask
-!pragma layout elk
+!pragma layout smetana
 hide empty description
 
 title "Alarm task"
@@ -36,25 +36,27 @@ state "Alarm monitoring" as alarm {
 }
 
 start -d-> idle
-idle -r-> blocked : state == Alarm
-blocked -l-> idle : state != Alarm
+
+idle -d-> blocked : state == Alarm
+
+blocked -u-> idle : state != Alarm
 idle -d-> prealarm : state == Inside || Takeoff || Landing
 
-startPrealarm -r-> prealarmTempReading
-prealarmTempReading -r-> prealarmTempMonitoring : temp >= PREALARM_TEMP
+startPrealarm -d-> prealarmTempReading
+prealarmTempReading -d-> prealarmTempMonitoring : temp >= PREALARM_TEMP
 prealarmTempReading -u-> idle : state != Inside || Takeoff || Landing
-prealarmTempMonitoring -l-> prealarmTempReading : temp < PREALARM_TEMP
-prealarmTempMonitoring -r-> endPrealarm : timer ended
+prealarmTempMonitoring -u-> prealarmTempReading : temp < PREALARM_TEMP
+prealarmTempMonitoring -d-> endPrealarm : timer ended
 
 prealarm -d-> waitOperations
 
 waitOperations -d-> alarm : state != Takeoff || Landing
 
-startAlarm -u-> alarmTempReading
-alarmTempReading -r-> alarmTempMonitoring : temp >= ALARM_TEMP
+startAlarm -d-> alarmTempReading
+alarmTempReading -d-> alarmTempMonitoring : temp >= ALARM_TEMP
 alarmTempReading -u-> prealarm : temp <= PREALARM_TEMP
-alarmTempMonitoring -l-> alarmTempReading : temp < ALARM_TEMP
-alarmTempMonitoring -r-> endAlarm : timer ended
+alarmTempMonitoring -u-> alarmTempReading : temp < ALARM_TEMP
+alarmTempMonitoring -d-> endAlarm : timer ended
 alarm -u-> blocked : / state = Alarm, alarm led on
 
 @enduml
