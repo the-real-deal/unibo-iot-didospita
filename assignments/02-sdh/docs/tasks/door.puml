@@ -1,0 +1,26 @@
+@startuml BlinkTask
+!pragma layout elk
+hide empty description
+
+title "Door task"
+
+state start <<start>>
+
+state "Closed" as closed
+closed : entry / servo = DOOR_CLOSED_ANGLE
+
+state "Blocked" as blocked
+
+state "Open" as open
+open : entry / servo = DOOR_OPEN_ANGLE
+
+start -d-> closed
+
+closed -l-> blocked : state == Alarm
+blocked -r-> closed : state != Alarm
+closed -r-> open : message available [REQUEST_TAKEOFF] / state = Takeoff
+closed -r-> open : state == Takeoff || Landing
+
+open -l-> closed : state != Takeoff || Landing
+
+@enduml
