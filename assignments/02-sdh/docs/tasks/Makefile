@@ -1,0 +1,19 @@
+PLANTUML?=plantuml
+PLANTUML_FORMAT?=svg
+PLANTUML_EXT?=puml
+PLANTUML_OUT_EXT?=$(PLANTUML_FORMAT)
+
+SOURCES:=$(wildcard *.$(PLANTUML_EXT))
+TARGETS:=$(SOURCES:.$(PLANTUML_EXT)=.$(PLANTUML_OUT_EXT))
+
+.PHONY: all build
+
+all: build
+
+build: $(TARGETS)
+
+%.$(PLANTUML_OUT_EXT): %.$(PLANTUML_EXT)
+	$(PLANTUML) -f $(PLANTUML_FORMAT) -p < $< > $@
+
+clean:
+	rm -f $(TARGETS)

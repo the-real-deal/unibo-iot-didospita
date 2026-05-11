@@ -1,0 +1,12 @@
+@startuml alarm
+
+state "Idle" as idle
+state "Blocked" as blocked
+state "Pre-alarm monitoring" as prealarm
+state "Alarm monitoring" as alarm
+
+[*] --> idle
+
+idle --> blocked
+
+@enduml
