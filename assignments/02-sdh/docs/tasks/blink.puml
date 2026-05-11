@@ -2,6 +2,31 @@
 !pragma layout elk
 hide empty description
 
+state start <<start>>
+
 state "Idle" as idle
+idle : entry / blink led off
+
+state "Blocked" as blocked
+
+state "On" as on
+on : entry / blink led on
+on : entry / timer = BLINK_PERIOD
+
+state "Off" as off
+off : entry / blink led off
+off : entry / timer = BLINK_PERIOD
+
+start --> idle
+idle --> on : state == Takeoff || Landing
+
+idle --> blocked : state == Alarm
+blocked --> idle : state != Alarm
+
+on --> off : timer ended
+off --> on : timer ended
+
+on --> idle : state != Takeoff || Landing
+off --> idle : state != Takeoff || Landing
 
 @enduml

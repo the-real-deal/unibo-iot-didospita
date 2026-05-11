@@ -11,52 +11,35 @@ idle : entry / alarm led off
 
 state "Blocked" as blocked
 
-state "Prealarm monitoring" as prealarm {
-    state startPrealarm <<start>>
+state "Prealarm temperature reading" as prealarmTempReading
 
-    state "Temperature reading" as prealarmTempReading
-
-    state "Temperature monitoring" as prealarmTempMonitoring
-    prealarmTempMonitoring : entry / timer = PREALARM_TIME
-
-    state endPrealarm <<end>>
-}
+state "Prealarm temperature monitoring" as prealarmTempMonitoring
+prealarmTempMonitoring : entry / timer = PREALARM_TIME
 
 state "Wait operations" as waitOperations
 
-state "Alarm monitoring" as alarm {
-    state startAlarm <<start>>
+state "Alarm temperature reading" as alarmTempReading
 
-    state "Temperature reading" as alarmTempReading
-
-    state "Temperature monitoring" as alarmTempMonitoring
-    alarmTempMonitoring : entry / timer = ALARM_TIME
-
-    state endAlarm <<end>>
-}
+state "Alarm temperature monitoring" as alarmTempMonitoring
+alarmTempMonitoring : entry / timer = ALARM_TIME
 
 start -d-> idle
 
-idle -d-> blocked : state == Alarm
+idle -r-> blocked : state == Alarm
+blocked -l-> idle : state != Alarm
 
-blocked -u-> idle : state != Alarm
-idle -d-> prealarm : state == Inside || Takeoff || Landing
+idle -d-> prealarmTempReading : state == Inside || Takeoff || Landing
 
-startPrealarm -d-> prealarmTempReading
 prealarmTempReading -d-> prealarmTempMonitoring : temp >= PREALARM_TEMP
 prealarmTempReading -u-> idle : state != Inside || Takeoff || Landing
 prealarmTempMonitoring -u-> prealarmTempReading : temp < PREALARM_TEMP
-prealarmTempMonitoring -d-> endPrealarm : timer ended
+prealarmTempMonitoring -r-> waitOperations : timer ended
 
-prealarm -d-> waitOperations
+waitOperations -r-> alarmTempReading : state != Takeoff || Landing
 
-waitOperations -d-> alarm : state != Takeoff || Landing
-
-startAlarm -d-> alarmTempReading
 alarmTempReading -d-> alarmTempMonitoring : temp >= ALARM_TEMP
-alarmTempReading -u-> prealarm : temp <= PREALARM_TEMP
+alarmTempReading -l-> prealarmTempReading : temp <= PREALARM_TEMP
 alarmTempMonitoring -u-> alarmTempReading : temp < ALARM_TEMP
-alarmTempMonitoring -d-> endAlarm : timer ended
-alarm -u-> blocked : / state = Alarm, alarm led on
+alarmTempMonitoring -u-> blocked : timer ended / state = Alarm, alarm led on
 
 @enduml
