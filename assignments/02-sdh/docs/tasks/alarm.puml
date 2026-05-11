@@ -1,50 +1,59 @@
 @startuml AlarmTask
+!pragma layout elk
 hide empty description
 
 title "Alarm task"
 
+state start <<start>>
+
 state "Idle" as idle
 idle : entry / alarm led off
-[*] --> idle
 
 state "Blocked" as blocked
-idle -r-> blocked : state == Alarm / block
-blocked -l-> idle : state != Alarm / unblock
-
-idle --> prealarm : state == Inside || Takeoff || Landing / start prealarm monitoring
 
 state "Prealarm monitoring" as prealarm {
-    state "Temperature reading" as prealarmTempReading
-    state "stop prealarm monitoring" as stopPrealarm <<exitPoint>>
+    state startPrealarm <<start>>
 
-    [*] -r-> prealarmTempReading
-    prealarmTempReading -r-> prealarmTempMonitoring : temp >= PREALARM_TEMP / monitor temperature
-    prealarmTempReading -u-> stopPrealarm : state != Inside || Takeoff || Landing / stop prealarm monitoring
+    state "Temperature reading" as prealarmTempReading
 
     state "Temperature monitoring" as prealarmTempMonitoring
     prealarmTempMonitoring : entry / timer = PREALARM_TIME
-    prealarmTempMonitoring -l-> prealarmTempReading : temp < PREALARM_TEMP / resume temperature reading
-    prealarmTempMonitoring -r-> [*] : timer ended / complete prealarm monitoring
+
+    state endPrealarm <<end>>
 }
-stopPrealarm -u-> idle
-prealarm -d-> waitOperations : / wait ongoing operations
 
 state "Wait operations" as waitOperations
-waitOperations -d-> alarm : state != Takeoff || Landing / switch to alarm monitoring
 
 state "Alarm monitoring" as alarm {
-    state "Temperature reading" as alarmTempReading
-    state "return to prealarm" as stopAlarm <<exitPoint>>
+    state startAlarm <<start>>
 
-    [*] -r-> alarmTempReading
-    alarmTempReading -r-> alarmTempMonitoring : temp >= ALARM_TEMP / monitor temperature
-    alarmTempReading -u-> stopAlarm : temp <= PREALARM_TEMP / return to prealarm monitoring
+    state "Temperature reading" as alarmTempReading
 
     state "Temperature monitoring" as alarmTempMonitoring
     alarmTempMonitoring : entry / timer = ALARM_TIME
-    alarmTempMonitoring -l-> alarmTempReading : temp < ALARM_TEMP / resume temperature reading
-    alarmTempMonitoring -r-> [*] : timer ended / enter alarm state
+
+    state endAlarm <<end>>
 }
-stopAlarm -u-> prealarm
+
+start -d-> idle
+idle -r-> blocked : state == Alarm
+blocked -l-> idle : state != Alarm
+idle -d-> prealarm : state == Inside || Takeoff || Landing
+
+startPrealarm -r-> prealarmTempReading
+prealarmTempReading -r-> prealarmTempMonitoring : temp >= PREALARM_TEMP
+prealarmTempReading -u-> idle : state != Inside || Takeoff || Landing
+prealarmTempMonitoring -l-> prealarmTempReading : temp < PREALARM_TEMP
+prealarmTempMonitoring -r-> endPrealarm : timer ended
+
+prealarm -d-> waitOperations
+
+waitOperations -d-> alarm : state != Takeoff || Landing
+
+startAlarm -u-> alarmTempReading
+alarmTempReading -r-> alarmTempMonitoring : temp >= ALARM_TEMP
+alarmTempReading -u-> prealarm : temp <= PREALARM_TEMP
+alarmTempMonitoring -l-> alarmTempReading : temp < ALARM_TEMP
+alarmTempMonitoring -r-> endAlarm : timer ended
 
 @enduml
