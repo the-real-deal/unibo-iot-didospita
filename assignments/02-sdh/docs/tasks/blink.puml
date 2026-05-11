@@ -1,6 +1,8 @@
 @startuml BlinkTask
-!pragma layout elk
+!pragma layout smetana
 hide empty description
+
+title "Blink task"
 
 state start <<start>>
 
@@ -17,16 +19,17 @@ state "Off" as off
 off : entry / blink led off
 off : entry / timer = BLINK_PERIOD
 
-start --> idle
-idle --> on : state == Takeoff || Landing
+start -d-> idle
 
-idle --> blocked : state == Alarm
-blocked --> idle : state != Alarm
+idle -l-> blocked : state == Alarm
+blocked -r-> idle : state != Alarm
 
-on --> off : timer ended
-off --> on : timer ended
+idle -r-> on : state == Takeoff || Landing
 
-on --> idle : state != Takeoff || Landing
-off --> idle : state != Takeoff || Landing
+on -d-> off : timer ended
+off -u-> on : timer ended
+
+on -l-> idle : state != Takeoff || Landing
+off -l-> idle : state != Takeoff || Landing
 
 @enduml
