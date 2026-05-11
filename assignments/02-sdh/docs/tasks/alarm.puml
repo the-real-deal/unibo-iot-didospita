@@ -1,5 +1,5 @@
 @startuml AlarmTask
-!pragma layout smetana
+!pragma layout elk
 hide empty description
 
 title "Alarm task"

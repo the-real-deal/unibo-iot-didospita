@@ -1,0 +1,39 @@
+@startuml BlinkTask
+!pragma layout elk
+hide empty description
+
+title "DDD task"
+
+state start <<start>>
+
+state "Idle" as idle
+
+state "Blocked" as blocked
+
+state "Takeoff reading" as takeoffReading
+
+state "Takeoff monitoring" as takeoffMonitoring
+takeoffMonitoring : entry / timer = OUTSIDE_TIME
+
+state "Landing reading" as landingReading
+
+state "Landing monitoring" as landingMonitoring
+landingMonitoring : entry / timer = INSIDE_TIME
+
+start -d-> idle
+
+idle -d-> blocked : state == Alarm
+blocked -u-> idle : state != Alarm
+
+idle -r-> takeoffReading : state == Takeoff
+idle -l-> landingReading : state == Landing
+
+takeoffReading -d-> takeoffMonitoring : distance >= OUTSIDE_DISTANCE
+takeoffMonitoring -u-> takeoffReading : distance < OUTSIDE_DISTANCE
+takeoffMonitoring -l-> idle : timer ended / state = Outside
+
+landingReading -d-> landingMonitoring : distance <= INSIDE_DISTANCE
+landingMonitoring -u-> landingReading : distance > INSIDE_DISTANCE
+landingMonitoring -r-> idle : timer ended / state = Inside
+
+@enduml
