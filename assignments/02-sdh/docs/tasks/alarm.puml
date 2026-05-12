@@ -30,11 +30,11 @@ blocked -l-> idle : state != Alarm
 idle -d-> prealarmTempReading : state == Inside || Takeoff || Landing
 
 prealarmTempReading -d-> prealarmTempMonitoring : temp >= PREALARM_TEMP
-prealarmTempReading -u-> idle : state != Inside || Takeoff || Landing
+prealarmTempReading -u-> idle : state != Inside && Takeoff && Landing
 prealarmTempMonitoring -u-> prealarmTempReading : temp < PREALARM_TEMP
 prealarmTempMonitoring -r-> waitOperations : timer ended
 
-waitOperations -r-> alarmTempReading : state != Takeoff || Landing / prevState = state, state = Prealarm
+waitOperations -r-> alarmTempReading : state != Takeoff && Landing / prevState = state, state = Prealarm
 
 alarmTempReading -d-> alarmTempMonitoring : temp >= ALARM_TEMP
 alarmTempReading -l-> prealarmTempReading : temp <= PREALARM_TEMP / state = prevState

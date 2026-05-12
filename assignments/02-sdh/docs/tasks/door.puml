@@ -20,6 +20,6 @@ blocked -d-> closed : state != Alarm
 closed -d-> open : message available [REQUEST_TAKEOFF] / state = Takeoff
 closed -u-> open : state == Takeoff || Landing
 
-open -l-> closed : state != Takeoff || Landing
+open -l-> closed : state != Takeoff && Landing
 
 @enduml

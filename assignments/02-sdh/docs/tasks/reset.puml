@@ -11,7 +11,7 @@ state "Wait reset" as waitReset
 
 start -d-> idle
 
-idle -r-> idle : state != Prealarm || Alarm / prevState = state
+idle -r-> idle : state != Prealarm && Alarm / prevState = state
 idle -d-> waitReset : state == Alarm
 
 waitReset -u-> idle : button pressed / state = prevState

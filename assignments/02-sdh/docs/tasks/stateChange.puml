@@ -1,0 +1,20 @@
+@startuml StateChangeTask
+hide empty description
+
+title "State change task"
+
+state start <<start>>
+
+state "Print" as print
+print : entry / display state
+print : entry / send state
+print : entry / prevState = state
+
+state "Idle" as idle
+
+start -d-> print
+
+print -d-> idle
+idle -u-> print : state != Prealarm && prevState
+
+@enduml

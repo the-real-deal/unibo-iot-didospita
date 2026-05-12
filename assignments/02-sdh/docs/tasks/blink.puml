@@ -28,7 +28,7 @@ idle -r-> on : state == Takeoff || Landing
 on -d-> off : timer ended
 off -u-> on : timer ended
 
-on -l-> idle : state != Takeoff || Landing
-off -l-> idle : state != Takeoff || Landing
+on -l-> idle : state != Takeoff && Landing
+off -l-> idle : state != Takeoff && Landing
 
 @enduml
