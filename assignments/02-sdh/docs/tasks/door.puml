@@ -1,4 +1,4 @@
-@startuml BlinkTask
+@startuml DoorTask
 !pragma layout elk
 hide empty description
 

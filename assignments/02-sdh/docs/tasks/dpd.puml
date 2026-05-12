@@ -1,0 +1,26 @@
+@startuml DPDTask
+!pragma layout elk
+hide empty description
+
+title "DPD task"
+
+state start <<start>>
+
+state "Idle" as idle
+
+state "Blocked" as blocked
+
+state "Reading" as reading
+reading : entry / timer = REQUEST_LANDING_TIMEOUT
+
+start -d-> idle
+
+idle -l-> blocked : state == Alarm
+blocked -r-> idle : state != Alarm
+
+idle -r-> reading : state == Outside && message available [REQUEST_LANDING]
+
+reading -l-> idle : drone present / state = Landing
+reading -l-> idle : timer ended / state = Outside
+
+@enduml
