@@ -1,5 +1,4 @@
 @startuml AlarmTask
-!pragma layout elk
 hide empty description
 
 title "Alarm task"

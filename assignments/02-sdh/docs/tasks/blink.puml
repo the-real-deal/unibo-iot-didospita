@@ -1,5 +1,4 @@
 @startuml BlinkTask
-!pragma layout elk
 hide empty description
 
 title "Blink task"

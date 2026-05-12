@@ -1,5 +1,4 @@
 @startuml DDDTask
-!pragma layout elk
 hide empty description
 
 title "DDD task"
