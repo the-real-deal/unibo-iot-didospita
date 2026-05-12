@@ -52,7 +52,6 @@ void DPDTask::ReadingState::step(DPDTask *task, Context *context)
   else if (task->timer.isFinished())
   {
     context->setState(GlobalState::Outside);
-    task->switchState(&DPDTask::IDLE);
   }
   else
   {
