@@ -1,4 +1,5 @@
 @startuml DoorTask
+!pragma layout smetana
 hide empty description
 
 title "Door task"
@@ -17,8 +18,8 @@ start -r-> closed
 
 closed -u-> blocked : state == Alarm
 blocked -d-> closed : state != Alarm
-closed -d-> open : message available [REQUEST_TAKEOFF] / state = Takeoff
-closed -u-> open : state == Takeoff || Landing
+closed -d-> open : state == Inside && message available [REQUEST_TAKEOFF] / state = Takeoff
+closed -u-> open : state == Landing
 
 open -l-> closed : state != Takeoff && Landing
 

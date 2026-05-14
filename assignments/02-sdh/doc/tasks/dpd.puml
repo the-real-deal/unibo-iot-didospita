@@ -1,4 +1,5 @@
 @startuml DPDTask
+!pragma layout smetana
 hide empty description
 
 title "DPD task"

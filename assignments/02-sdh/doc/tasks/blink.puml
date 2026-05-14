@@ -1,4 +1,5 @@
 @startuml BlinkTask
+!pragma layout smetana
 hide empty description
 
 title "Blink task"

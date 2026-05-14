@@ -1,4 +1,5 @@
 @startuml DDDTask
+!pragma layout smetana
 hide empty description
 
 title "DDD task"

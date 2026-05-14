@@ -1,4 +1,5 @@
 @startuml ResetTask
+!pragma layout smetana
 hide empty description
 
 title "Reset task"
