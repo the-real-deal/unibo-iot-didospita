@@ -18,7 +18,7 @@ start -r-> idle
 idle -u-> blocked : state == Alarm
 blocked -d-> idle : state != Alarm
 
-idle -d-> reading : state == Outside && message available [REQUEST_LANDING]
+idle -d-> reading : message available [REQUEST_LANDING] && state == Outside
 
 reading -u-> idle : drone present / state = Landing
 reading -u-> idle : timer ended / state = Outside
