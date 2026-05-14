@@ -21,7 +21,6 @@ void DoorTask::ClosedState::step(DoorTask *task, Context *context)
 
   switch (context->getState())
   {
-  case GlobalState::Takeoff:
   case GlobalState::Landing:
     task->switchState(&DoorTask::OPEN);
     break;

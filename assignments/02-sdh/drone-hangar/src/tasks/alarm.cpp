@@ -21,12 +21,6 @@ AlarmTask::AlarmTask(TemperatureSensor *hangarTempSensor,
 
 void AlarmTask::IdleState::step(AlarmTask *task, Context *context)
 {
-  if (context->getState() == GlobalState::Alarm)
-  {
-    task->switchState(&AlarmTask::BLOCKED_IDLE);
-    return;
-  }
-
   if (task->alarmIndicator->isOn())
   {
     task->alarmIndicator->turnOff();
