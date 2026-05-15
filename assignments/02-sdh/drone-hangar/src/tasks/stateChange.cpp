@@ -17,16 +17,9 @@ StateChangeTask::StateChangeTask(Display *internalDisplay,
 void StateChangeTask::IdleState::step(StateChangeTask *task, Context *context)
 {
   GlobalState state = context->getState();
-  switch (state)
+  if (task->prevState != state)
   {
-  case GlobalState::Prealarm:
-    break;
-  default:
-    if (task->prevState != state)
-    {
-      task->switchState(&StateChangeTask::PRINT);
-    }
-    break;
+    task->switchState(&StateChangeTask::PRINT);
   }
 }
 
