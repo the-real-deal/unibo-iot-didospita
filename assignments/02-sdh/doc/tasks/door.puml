@@ -2,8 +2,6 @@
 !pragma layout smetana
 hide empty description
 
-title "Door task"
-
 state start <<start>>
 
 state "Closed" as closed

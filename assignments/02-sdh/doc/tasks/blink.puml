@@ -2,8 +2,6 @@
 !pragma layout smetana
 hide empty description
 
-title "Blink task"
-
 state start <<start>>
 
 state "Idle" as idle
