@@ -9,14 +9,18 @@ state "Idle" as idle
 state "Blocked" as blocked
 
 state "Takeoff reading" as takeoffReading
+takeoffReading : do / send distance
 
 state "Takeoff monitoring" as takeoffMonitoring
 takeoffMonitoring : entry / timer = OUTSIDE_TIME
+takeoffMonitoring : do / send distance
 
 state "Landing reading" as landingReading
+landingReading : do / send distance
 
 state "Landing monitoring" as landingMonitoring
 landingMonitoring : entry / timer = INSIDE_TIME
+landingMonitoring : do / send distance
 
 start -d-> idle
 
