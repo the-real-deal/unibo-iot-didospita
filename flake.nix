@@ -33,6 +33,10 @@
               javaPackages.compiler.openjdk21
               # build tools
               gnumake
+              # js
+              bun
+              prettier
+              typescript-language-server
             ];
             shellHook = ''
               set -a
