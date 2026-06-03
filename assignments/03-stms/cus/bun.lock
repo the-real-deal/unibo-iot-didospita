@@ -16,6 +16,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "@serialport/bindings-interface@1.2.2": "patches/@serialport%2Fbindings-interface@1.2.2.patch",
+  },
   "packages": {
     "@serialport/binding-mock": ["@serialport/binding-mock@10.2.2", "", { "dependencies": { "@serialport/bindings-interface": "^1.2.1", "debug": "^4.3.3" } }, "sha512-HAFzGhk9OuFMpuor7aT5G1ChPgn5qSsklTFOTUX72Rl6p0xwcSVsRtG/xaGp6bxpN7fI9D/S8THLBWbBgS6ldw=="],
 

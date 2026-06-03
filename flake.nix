@@ -37,7 +37,13 @@
               bun
               prettier
               typescript-language-server
+              stdenv.cc.cc.lib # for serialport
             ];
+            env = {
+              LD_LIBRARY_PATH = lib.makeLibraryPath [
+                stdenv.cc.cc.lib
+              ];
+            };
             shellHook = ''
               set -a
               source .env 2>/dev/null

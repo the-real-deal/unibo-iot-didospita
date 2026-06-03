@@ -13,5 +13,8 @@
   "dependencies": {
     "express": "^5.2.1",
     "serialport": "^13.0.0"
+  },
+  "patchedDependencies": {
+    "@serialport/bindings-interface@1.2.2": "patches/@serialport%2Fbindings-interface@1.2.2.patch"
   }
 }

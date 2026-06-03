@@ -1,13 +1,9 @@
-import { env } from "bun"
 import express from "express"
+import { EnvVarType, getEnv } from "../../utils/env"
+import http, { Server } from "http"
 
-const PORT = (() => {
-  try {
-    return parseInt(env.CUS_PORT || "")
-  } catch {
-    return 3000
-  }
-})()
+const HOSTNAME = getEnv("HTTP_HOSTNAME", EnvVarType.String) ?? "localhost"
+const PORT = getEnv("HTTP_PORT", EnvVarType.Number) ?? 3000
 
 const app = express()
 
@@ -16,8 +12,25 @@ app.get("/{:name}", (req, res) => {
   res.send(`Hello, ${name}!`)
 })
 
-export default function startHTTPServer(port: number = PORT) {
-  app.listen(PORT, () => {
-    console.log(`Example app listening on port http://localhost:${PORT}`)
+interface HTTPServerStartOptions {
+  hostname?: string
+  port?: number
+}
+export async function startHTTPServer(
+  options: HTTPServerStartOptions = {},
+): Promise<Server> {
+  const { port, hostname } = {
+    ...{ port: PORT, hostname: HOSTNAME },
+    ...options,
+  }
+
+  return new Promise((resolve, reject) => {
+    try {
+      const server = http.createServer(app)
+      server.listen(port, hostname)
+      resolve(server)
+    } catch (err) {
+      reject(err)
+    }
   })
 }
