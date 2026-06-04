@@ -17,8 +17,8 @@ export async function subscribeToTopics(
   callbacks: TopicCallbacksMap,
   options: TopicSubscriptionOptions = {},
 ) {
-  const callbacksMap = sanitizeCallbacksMap(callbacks, options.baseTopic)
-  const topics = Object.keys(callbacksMap)
+  callbacks = sanitizeCallbacksMap(callbacks, options.baseTopic)
+  const topics = Object.keys(callbacks)
   console.debug("Subscribing to topics:", topics)
 
   const rejectedTopics = await subscribeClient(client, topics, subscribeOptions)
@@ -32,12 +32,12 @@ export async function subscribeToTopics(
   console.debug("Topics handlers attached")
 }
 
-function sanitizeCallbacksMap(
-  handlers: TopicCallbacksMap,
+export function sanitizeCallbacksMap(
+  callbacks: TopicCallbacksMap,
   baseTopic?: string,
 ): TopicCallbacksMap {
   return Object.fromEntries(
-    Object.entries(handlers).map(([topic, handler]) => [
+    Object.entries(callbacks).map(([topic, handler]) => [
       baseTopic === undefined
         ? sanitizeTopic(topic)
         : joinTopics(baseTopic, topic),
@@ -60,11 +60,16 @@ async function subscribeClient(
   return rejectedTopics
 }
 
-function attachCallbacks(client: MqttClient, handlers: TopicCallbacksMap) {
+function attachCallbacks(client: MqttClient, callbacks: TopicCallbacksMap) {
   client.on("message", (topic, payload, packet) => {
-    const handler = handlers[topic]
-    if (handler !== undefined) {
-      handler(topic, payload, packet)
+    console.info(`Received mqtt message at ${topic}:`, {
+      cmd: packet.cmd,
+      qos: packet.qos,
+      payloadSize: payload.length,
+    })
+    const callback = callbacks[topic]
+    if (callback !== undefined) {
+      callback(topic, payload, packet)
     }
   })
 }

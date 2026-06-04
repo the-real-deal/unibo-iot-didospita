@@ -7,7 +7,7 @@ import {
 
 const callbacks: TopicCallbacksMap = {
   hello: (topic, payload, packet) => {
-    console.log("Message arrived:", { topic, payload, packet })
+    console.log("Message arrived:", payload.toString())
   },
 }
 
