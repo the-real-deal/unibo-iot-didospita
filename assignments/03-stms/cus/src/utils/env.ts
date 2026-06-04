@@ -1,19 +1,30 @@
-const ENV_PREFIX = "IOT_ASSIGNMENT_O3_CUS"
-
 export enum EnvVarType {
   String,
   Number,
   Boolean,
 }
 
+let envPrefix: string | null = null
+
+export function setEnvPrefix(prefix: string) {
+  envPrefix = prefix
+}
+
+function sanitizeEnvKey(key: string): string {
+  return envPrefix === null ? key : `${envPrefix}_${key}`
+}
+
 export function getEnv(key: string, type: EnvVarType.String): string | undefined
 export function getEnv(key: string, type: EnvVarType.Number): number | undefined
-export function getEnv(key: string, type: EnvVarType.Boolean): boolean | undefined
+export function getEnv(
+  key: string,
+  type: EnvVarType.Boolean,
+): boolean | undefined
 export function getEnv(
   key: string,
   type: EnvVarType,
 ): string | number | boolean | undefined {
-  key = `${ENV_PREFIX}_${key}`
+  key = sanitizeEnvKey(key)
 
   const envValue = process.env[key]
   if (envValue === undefined) {

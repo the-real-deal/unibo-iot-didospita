@@ -1,9 +1,5 @@
 import { DelimiterParser, SerialPort } from "serialport"
-import type { PortInfo } from "@serialport/bindings-interface"
-import { EnvVarType, getEnv } from "../../utils/env"
-
-const SERIAL_BAUD_RATE = getEnv("SERIAL_BAUD_RATE", EnvVarType.Number) ?? 9600
-const SERIAL_DELIMITER = getEnv("SERIAL_DELIMITER", EnvVarType.String) ?? "\n"
+import { type PortInfo } from "@serialport/bindings-interface"
 
 function portHasDevice(port: PortInfo) {
   return (
@@ -20,11 +16,7 @@ export async function findSerialDevice(): Promise<PortInfo | undefined> {
 }
 
 function openSerialPort(path: string, baudRate: number): SerialPort {
-  const serialPort = new SerialPort({
-    path,
-    baudRate,
-    autoOpen: false,
-  })
+  const serialPort = new SerialPort({ path, baudRate, autoOpen: false })
   try {
     serialPort.open()
     console.debug("Successfully opened serial port")
@@ -41,22 +33,11 @@ function attachParser(serialPort: SerialPort, delimiter: string) {
   serialPort.pipe(parser)
 }
 
-interface SerialConnectionOptions {
-  baudRate?: number
-  delimiter?: string
-}
-
 export async function connectToSerial(
   path: string,
-  options: SerialConnectionOptions = {},
+  delimiter: string,
+  baudRate: number,
 ): Promise<SerialPort> {
-  let { baudRate, delimiter } = {
-    ...{
-      baudRate: SERIAL_BAUD_RATE,
-      delimiter: SERIAL_DELIMITER,
-    },
-    ...options,
-  }
   const serialPort = openSerialPort(path, baudRate)
   attachParser(serialPort, delimiter)
   return serialPort
