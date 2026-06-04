@@ -1,44 +1,29 @@
-import { DelimiterParser, SerialPort } from "serialport"
-import { type PortInfo } from "@serialport/bindings-interface"
+import { DelimiterParser, type SerialPort } from "serialport"
+import { findSerialDevice, openSerialPort } from "../../serial"
 
-function portHasDevice(port: PortInfo) {
-  return (
-    port.serialNumber !== undefined ||
-    port.vendorId !== undefined ||
-    port.manufacturer !== undefined
-  )
+const parser = new DelimiterParser({ delimiter: "\n", includeDelimiter: false })
+parser.on("data", console.log)
+
+export interface SerialPortStartOptions {
+  path?: string
 }
 
-export async function findSerialDevice(): Promise<PortInfo | undefined> {
-  const availablePorts = await SerialPort.list()
-  const portInfo = availablePorts.find(portHasDevice)
-  return portInfo
-}
-
-function openSerialPort(path: string, baudRate: number): SerialPort {
-  const serialPort = new SerialPort({ path, baudRate, autoOpen: false })
-  try {
-    serialPort.open()
-    console.debug("Successfully opened serial port")
-  } catch {
-    throw new Error(`Failed to open the serial port: ${serialPort.path}`)
-  }
-  return serialPort
-}
-
-function attachParser(serialPort: SerialPort, delimiter: string) {
-  const parser = new DelimiterParser({ delimiter, includeDelimiter: false })
-  parser.on("data", console.log)
-
-  serialPort.pipe(parser)
-}
-
-export async function connectToSerial(
-  path: string,
-  delimiter: string,
+export async function startSerialPort(
   baudRate: number,
+  options: SerialPortStartOptions = {},
 ): Promise<SerialPort> {
+  let path = options.path
+  if (path === undefined) {
+    const portInfo = await findSerialDevice()
+    if (portInfo === undefined) {
+      throw new Error("No serial device found")
+    }
+    console.debug("Serial device found at:", portInfo.path)
+    path = portInfo.path
+  }
+
   const serialPort = openSerialPort(path, baudRate)
-  attachParser(serialPort, delimiter)
+  serialPort.pipe(parser)
+  console.debug("Attached serial port messages parser")
   return serialPort
 }

@@ -1,6 +1,6 @@
 import { startHTTPServer } from "./api/http"
 import { startMQTTClient } from "./api/mqtt"
-import { connectToSerial, findSerialDevice } from "./api/serial"
+import { startSerialPort } from "./api/serial"
 import { sanitizeQoS } from "./mqtt/qos"
 import { EnvVarType, getEnv, setEnvPrefix } from "./utils/env"
 import { serverAddressString } from "./utils/http"
@@ -19,35 +19,43 @@ const MQTT_QOS = (() => {
   return qos === undefined ? 0 : (sanitizeQoS(qos) ?? 0)
 })()
 
+const SERIAL_PORT = getEnv("SERIAL_PORT", EnvVarType.String)
 const SERIAL_BAUD_RATE = getEnv("SERIAL_BAUD_RATE", EnvVarType.Number) ?? 9600
-const SERIAL_DELIMITER = getEnv("SERIAL_DELIMITER", EnvVarType.String) ?? "\n"
 
-const httpServer = await startHTTPServer(HTTP_HOSTNAME, HTTP_PORT)
-const httpAddress = serverAddressString(httpServer.address())
-if (httpAddress === null) {
-  console.warn("Failed to get http server address")
-} else {
-  console.info("HTTP server started at:", httpAddress)
+try {
+  const httpServer = await startHTTPServer(HTTP_HOSTNAME, HTTP_PORT)
+  const httpAddress = serverAddressString(httpServer.address())
+  if (httpAddress === null) {
+    console.warn("Failed to get http server address")
+  } else {
+    console.info("HTTP server started at:", httpAddress)
+  }
+} catch (err) {
+  console.error("Failed to start http server")
 }
 
-await startMQTTClient(
-  MQTT_BROKER_URL,
-  {
-    qos: MQTT_QOS,
-  },
-  {
-    topicSubscription: {
-      baseTopic: MQTT_BASE_TOPIC,
+try {
+  await startMQTTClient(
+    MQTT_BROKER_URL,
+    {
+      qos: MQTT_QOS,
     },
-  },
-)
-console.info("MQTT client started")
+    {
+      topicSubscription: {
+        baseTopic: MQTT_BASE_TOPIC,
+      },
+    },
+  )
+  console.info("MQTT client started")
+} catch (err) {
+  console.error("Failed to start MQTT client")
+}
 
-const portInfo = await findSerialDevice()
-if (portInfo === undefined) {
-  console.warn("No serial device found")
-} else {
-  console.info("Serial device found at:", portInfo.path)
-  connectToSerial(portInfo.path, SERIAL_DELIMITER, SERIAL_BAUD_RATE)
-  console.info("Listening on serial port:", portInfo.path)
+try {
+  const serialPort = await startSerialPort(SERIAL_BAUD_RATE, {
+    path: SERIAL_PORT,
+  })
+  console.info("Serial port attached at:", serialPort.path)
+} catch (err) {
+  console.error("Failed to attach serial port")
 }
