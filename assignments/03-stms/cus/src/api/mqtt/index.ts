@@ -7,7 +7,7 @@ import {
 
 const callbacks: TopicCallbacksMap = {
   hello: (topic, payload, packet) => {
-    console.log("Message arrived:", payload.toString())
+    console.log("MQTT hello:", payload.toString())
   },
 }
 

@@ -5,6 +5,7 @@ const app = express()
 
 app.get("/{:name}", (req, res) => {
   const name = req.params.name || "world"
+  console.log("HTTP hello:", name)
   res.send(`Hello, ${name}!`)
 })
 

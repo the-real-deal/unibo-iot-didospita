@@ -2,7 +2,9 @@ import { DelimiterParser, type SerialPort } from "serialport"
 import { findSerialDevice, openSerialPort } from "../../serial/index.js"
 
 const parser = new DelimiterParser({ delimiter: "\n", includeDelimiter: false })
-parser.on("data", console.log)
+parser.on("data", (chunk: Buffer) => {
+  console.log("Serial hello:", chunk.toString())
+})
 
 export interface SerialPortStartOptions {
   path?: string
