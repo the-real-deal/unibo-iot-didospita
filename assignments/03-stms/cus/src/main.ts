@@ -2,20 +2,20 @@ import { startHTTPServer } from "./api/http/index.js"
 import { startMQTTClient } from "./api/mqtt/index.js"
 import { startSerialPort } from "./api/serial/index.js"
 import { sanitizeQoS } from "./mqtt/qos.js"
-import { EnvVarType, getEnv, setEnvPrefix } from "./utils/env.js"
+import { getEnvNumber, getEnvString, setEnvPrefix } from "./utils/env.js"
 import { serverAddressString } from "./utils/http.js"
 
 setEnvPrefix("IOT_ASSIGNMENT_O3")
 
-const HTTP_HOSTNAME = getEnv("HTTP_HOSTNAME", EnvVarType.String) ?? "0.0.0.0"
-const HTTP_PORT = getEnv("HTTP_PORT", EnvVarType.Number) ?? 3000
+const HTTP_HOSTNAME = getEnvString("HTTP_HOSTNAME") ?? "0.0.0.0"
+const HTTP_PORT = getEnvNumber("HTTP_PORT") ?? 3000
 
 const MQTT_BROKER_URL =
-  getEnv("MQTT_BROKER_URL", EnvVarType.String) ?? "broker.mqtt-dashboard.com"
+  getEnvString("MQTT_BROKER_URL") ?? "broker.mqtt-dashboard.com"
 const MQTT_BASE_TOPIC =
-  getEnv("MQTT_BASE_TOPIC", EnvVarType.String) ?? "unibo-iot-didospita/assignment03"
+  getEnvString("MQTT_BASE_TOPIC") ?? "unibo-iot-didospita/assignment03"
 const MQTT_QOS = (() => {
-  const envQoS = getEnv("MQTT_QOS", EnvVarType.Number)
+  const envQoS = getEnvNumber("MQTT_QOS")
   if (envQoS === undefined) {
     return 0
   }
@@ -26,8 +26,8 @@ const MQTT_QOS = (() => {
   return qos
 })()
 
-const SERIAL_PORT = getEnv("SERIAL_PORT", EnvVarType.String)
-const SERIAL_BAUD_RATE = getEnv("SERIAL_BAUD_RATE", EnvVarType.Number) ?? 9600
+const SERIAL_PORT = getEnvString("SERIAL_PORT")
+const SERIAL_BAUD_RATE = getEnvNumber("SERIAL_BAUD_RATE") ?? 9600
 
 try {
   const httpServer = await startHTTPServer(HTTP_HOSTNAME, HTTP_PORT)
