@@ -11,6 +11,7 @@ function portHasDevice(port: PortInfo) {
 
 export async function findSerialDevice(): Promise<PortInfo | undefined> {
   const availablePorts = await SerialPort.list()
+  console.debug("Available ports:", availablePorts)
   const portInfo = availablePorts.find(portHasDevice)
   return portInfo
 }
