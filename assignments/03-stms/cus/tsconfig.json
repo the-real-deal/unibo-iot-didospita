@@ -1,18 +1,13 @@
 {
   "compilerOptions": {
-    // Environment setup & latest features
-    "lib": ["ESNext"],
     "target": "ESNext",
-    "module": "Preserve",
-    "moduleDetection": "force",
-    "jsx": "react-jsx",
-    "allowJs": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
 
-    // Bundler mode
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "noEmit": true,
+    // Output
+    "rootDir": "src",
+    "outDir": "dist",
+    "noEmit": false,
 
     // Strictness
     "strict": true,
@@ -24,5 +19,5 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noPropertyAccessFromIndexSignature": true,
-  }
+  },
 }

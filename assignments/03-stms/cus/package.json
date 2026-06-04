@@ -1,22 +1,25 @@
 {
   "name": "cus",
-  "module": "src/main.ts",
+  "main": "dist/main.js",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "^1.3.14",
-    "@types/express": "^5.0.6",
-    "@types/mqtt": "^2.5.0"
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "tsx watch src/main.ts",
+    "postinstall": "patch-package"
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "devDependencies": {
+    "@serialport/bindings-interface": "^1.2.2",
+    "@types/express": "^5.0.6",
+    "@types/serialport": "^8.0.5",
+    "patch-package": "^8.0.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "express": "^5.2.1",
     "mqtt": "^5.15.1",
     "serialport": "^13.0.0"
-  },
-  "patchedDependencies": {
-    "@serialport/bindings-interface@1.2.2": "patches/@serialport%2Fbindings-interface@1.2.2.patch"
   }
 }

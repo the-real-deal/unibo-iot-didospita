@@ -3,7 +3,7 @@ import {
   subscribeToTopics,
   type TopicCallbacksMap,
   type TopicSubscriptionOptions,
-} from "../../mqtt/subscription"
+} from "../../mqtt/subscription.js"
 
 const callbacks: TopicCallbacksMap = {
   hello: (topic, payload, packet) => {

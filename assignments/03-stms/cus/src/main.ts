@@ -1,9 +1,9 @@
-import { startHTTPServer } from "./api/http"
-import { startMQTTClient } from "./api/mqtt"
-import { startSerialPort } from "./api/serial"
-import { sanitizeQoS } from "./mqtt/qos"
-import { EnvVarType, getEnv, setEnvPrefix } from "./utils/env"
-import { serverAddressString } from "./utils/http"
+import { startHTTPServer } from "./api/http/index.js"
+import { startMQTTClient } from "./api/mqtt/index.js"
+import { startSerialPort } from "./api/serial/index.js"
+import { sanitizeQoS } from "./mqtt/qos.js"
+import { EnvVarType, getEnv, setEnvPrefix } from "./utils/env.js"
+import { serverAddressString } from "./utils/http.js"
 
 setEnvPrefix("IOT_ASSIGNMENT_O3")
 

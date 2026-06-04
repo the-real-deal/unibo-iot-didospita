@@ -10,6 +10,7 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
+        libcpp = pkgs.stdenv.cc.cc.lib; # for serialport
       in
       {
         devShell =
@@ -34,14 +35,15 @@
               # build tools
               gnumake
               # js
-              bun
+              nodejs
               prettier
               typescript-language-server
-              stdenv.cc.cc.lib # for serialport
+              # serialport
+              libcpp
             ];
             env = {
               LD_LIBRARY_PATH = lib.makeLibraryPath [
-                stdenv.cc.cc.lib
+                libcpp
               ];
             };
             shellHook = ''

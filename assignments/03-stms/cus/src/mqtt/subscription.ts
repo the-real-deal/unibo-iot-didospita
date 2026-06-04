@@ -3,9 +3,11 @@ import {
   type IClientSubscribeOptions,
   type OnMessageCallback,
 } from "mqtt"
-import { joinTopics, sanitizeTopic } from "./topic"
+import { joinTopics, sanitizeTopic } from "./topic.js"
 
-export type TopicCallbacksMap = Dict<OnMessageCallback>
+export type TopicCallbacksMap = {
+  [topic: string]: OnMessageCallback
+}
 
 export interface TopicSubscriptionOptions {
   baseTopic?: string

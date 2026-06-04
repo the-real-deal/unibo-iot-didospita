@@ -1,5 +1,5 @@
 import { DelimiterParser, type SerialPort } from "serialport"
-import { findSerialDevice, openSerialPort } from "../../serial"
+import { findSerialDevice, openSerialPort } from "../../serial/index.js"
 
 const parser = new DelimiterParser({ delimiter: "\n", includeDelimiter: false })
 parser.on("data", console.log)
@@ -12,14 +12,16 @@ export async function startSerialPort(
   baudRate: number,
   options: SerialPortStartOptions = {},
 ): Promise<SerialPort> {
-  let path = options.path
-  if (path === undefined) {
+  let path: string
+  if (options.path === undefined) {
     const portInfo = await findSerialDevice()
     if (portInfo === undefined) {
       throw new Error("No serial device found")
     }
     console.debug("Serial device found at:", portInfo.path)
     path = portInfo.path
+  } else {
+    path = options.path
   }
 
   const serialPort = openSerialPort(path, baudRate)
