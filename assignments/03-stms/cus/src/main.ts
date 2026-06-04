@@ -15,8 +15,15 @@ const MQTT_BROKER_URL =
 const MQTT_BASE_TOPIC =
   getEnv("MQTT_BASE_TOPIC", EnvVarType.String) ?? "unibo-iot-didospita/assignment03"
 const MQTT_QOS = (() => {
-  const qos = getEnv("MQTT_QOS", EnvVarType.Number)
-  return qos === undefined ? 0 : (sanitizeQoS(qos) ?? 0)
+  const envQoS = getEnv("MQTT_QOS", EnvVarType.Number)
+  if (envQoS === undefined) {
+    return 0
+  }
+  const qos = sanitizeQoS(envQoS)
+  if (qos === null) {
+    throw new Error(`Invalid QoS value: ${envQoS}`)
+  }
+  return qos
 })()
 
 const SERIAL_PORT = getEnv("SERIAL_PORT", EnvVarType.String)
