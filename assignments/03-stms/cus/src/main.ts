@@ -13,7 +13,7 @@ const HTTP_PORT = getEnv("HTTP_PORT", EnvVarType.Number) ?? 3000
 const MQTT_BROKER_URL =
   getEnv("MQTT_BROKER_URL", EnvVarType.String) ?? "broker.mqtt-dashboard.com"
 const MQTT_BASE_TOPIC =
-  getEnv("MQTT_BASE_TOPIC", EnvVarType.String) ?? "unibo-iot-didospita"
+  getEnv("MQTT_BASE_TOPIC", EnvVarType.String) ?? "unibo-iot-didospita/assignment03"
 const MQTT_QOS = (() => {
   const qos = getEnv("MQTT_QOS", EnvVarType.Number)
   return qos === undefined ? 0 : (sanitizeQoS(qos) ?? 0)
