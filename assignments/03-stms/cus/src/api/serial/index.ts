@@ -1,9 +1,10 @@
 import { DelimiterParser, type SerialPort } from "serialport"
 import { findSerialDevice, openSerialPort } from "../../serial/index.js"
+import { serialMessageParser } from "../../serial/message.js"
 
-const parser = new DelimiterParser({ delimiter: "\n", includeDelimiter: false })
-parser.on("data", (chunk: Buffer) => {
-  console.log("Serial hello:", chunk.toString())
+const parser = serialMessageParser({
+  "SERIAL_SYNC": (_) => console.warn("Serial sync"),
+  "LOG": (message) => console.info("Serial log:", message.payload),
 })
 
 export interface SerialPortStartOptions {
