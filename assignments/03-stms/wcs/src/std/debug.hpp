@@ -1,3 +1,3 @@
 #pragma once
 
-int freeMemory();
+int freeRam();
