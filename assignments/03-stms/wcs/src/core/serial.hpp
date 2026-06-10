@@ -9,6 +9,10 @@
 #define ARDUINO_SERIAL_BAUD 9600
 #endif
 
+#ifndef SERIAL_MESSAGE_DELIMITER
+#define SERIAL_MESSAGE_DELIMITER ':'
+#endif
+
 class SerialManager : public Setup
 {
 private:

@@ -24,7 +24,7 @@ void SerialManager::sendMessage(SerialMessageType type, const char *message)
   else
   {
     Serial.print(typeString);
-    Serial.print(":");
+    Serial.print(SERIAL_MESSAGE_DELIMITER);
     Serial.println(message);
   }
   Serial.flush();
