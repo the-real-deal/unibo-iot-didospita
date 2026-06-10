@@ -3,7 +3,6 @@
 #include <Arduino.h>
 
 #include "setup.hpp"
-#include "message.hpp"
 
 #ifndef ARDUINO_SERIAL_BAUD
 #define ARDUINO_SERIAL_BAUD 9600
@@ -13,10 +12,21 @@
 #define SERIAL_MESSAGE_DELIMITER ':'
 #endif
 
+enum class SerialMessageType
+{
+  SerialSync,
+  Log,
+};
+const char *const SERIAL_MESSAGE_TYPE_STRINGS[] = {
+    "SERIAL_SYNC",
+    "LOG",
+};
+
 class SerialManager : public Setup
 {
 private:
   void sendMessage(SerialMessageType type, const char *message);
+
 public:
   SerialManager();
   void setup() override;

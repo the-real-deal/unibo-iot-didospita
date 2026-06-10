@@ -32,10 +32,10 @@ void SerialManager::sendMessage(SerialMessageType type, const char *message)
 
 void SerialManager::serialSync()
 {
-  this->sendMessage(SerialMessageType::SERIAL_SYNC, nullptr);
+  this->sendMessage(SerialMessageType::SerialSync, nullptr);
 }
 
 void SerialManager::log(const char *message)
 {
-  this->sendMessage(SerialMessageType::LOG, message);
+  this->sendMessage(SerialMessageType::Log, message);
 }
