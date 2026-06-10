@@ -45,26 +45,3 @@ double AnalogInputPin::read()
   return static_cast<double>(analogRead(this->pin)) /
          static_cast<double>(AnalogInputPin::MAX_READ_VALUE);
 }
-
-InterruptPin::InterruptPin(uint8_t pin, InterruptMode mode, interruptFunctionType handler)
-    : pin(pin), mode(mode), handler(handler) {}
-
-void InterruptPin::setup()
-{
-  enableInterrupt(this->pin, this->handler, static_cast<uint8_t>(this->mode));
-}
-
-uint8_t InterruptPin::getPin()
-{
-  return this->pin;
-}
-
-InterruptMode InterruptPin::getMode()
-{
-  return this->mode;
-}
-
-interruptFunctionType InterruptPin::getHandler()
-{
-  return this->handler;
-}

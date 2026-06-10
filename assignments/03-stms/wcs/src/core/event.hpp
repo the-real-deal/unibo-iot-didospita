@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <Arduino.h>
 
-#include "std/collections.h"
+#include "std/collections.hpp"
 
 #ifndef EVENT_QUEUE_SIZE
 #define EVENT_QUEUE_SIZE 10
@@ -79,14 +79,19 @@ public:
         }
 
         noInterrupts();
-        EventSignal<Type> *event = this->eventQueue.popFirst();
+        EventSignal<Type> *event = *this->eventQueue.get(0);
         interrupts();
 
         for (size_t i = 0; i < this->observers.size(); i++)
         {
-            EventObserver<Type> *observer = this->observers[i];
+            EventObserver<Type> *observer = *this->observers.get(i);
             observer->onEvent(event);
         }
+
+        delete event;
+        noInterrupts();
+        this->eventQueue.deleteAt(0);
+        interrupts();
     }
 };
 

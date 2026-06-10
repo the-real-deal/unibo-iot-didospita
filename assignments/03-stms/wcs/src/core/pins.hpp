@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <EnableInterrupt.h>
 
 #include "setup.hpp"
 
@@ -62,28 +61,4 @@ private:
 public:
   AnalogInputPin(uint8_t pin);
   double read();
-};
-
-enum class InterruptMode : uint8_t
-{
-  Rising = RISING,
-  Falling = FALLING,
-  Change = CHANGE,
-  High = HIGH,
-  Low = LOW,
-};
-
-class InterruptPin : public Setup
-{
-private:
-  uint8_t pin;
-  InterruptMode mode;
-  interruptFunctionType handler;
-
-public:
-  InterruptPin(uint8_t pin, InterruptMode mode, interruptFunctionType handler);
-  virtual void setup() override;
-  uint8_t getPin();
-  InterruptMode getMode();
-  interruptFunctionType getHandler();
 };

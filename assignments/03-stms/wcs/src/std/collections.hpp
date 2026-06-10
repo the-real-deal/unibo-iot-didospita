@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+#include "pair.hpp"
+
 // Queue operations not implemented with head and tail pointer to reduce memory usage
 template <typename T, size_t N>
 class Array
@@ -21,16 +23,16 @@ public:
 
     size_t capacity() const { return N; }
 
-    T get(size_t index)
-    {
-        if (index >= this->count)
-        {
-            return T();
-        }
-        return this->data[index];
-    }
+    bool indexOutOfBounds(size_t index) { return index >= this->count; }
 
-    T operator[](size_t index) { return this->get(index); }
+    T *get(size_t index)
+    {
+        if (this->indexOutOfBounds(index))
+        {
+            return nullptr;
+        }
+        return &this->data[index];
+    }
 
     bool pushLast(T value)
     {
@@ -58,28 +60,31 @@ public:
         return true;
     }
 
-    T popLast()
+    bool deleteAt(size_t index)
     {
-        if (this->isEmpty())
+        if (this->indexOutOfBounds(index))
         {
-            return T();
+            return false;
+        }
+        for (size_t i = index; i < this->count - 1; i++)
+        {
+            this->data[i] = this->data[i + 1];
         }
         this->count--;
-        return this->data[this->count];
+        return true;
     }
 
-    T popFirst()
+    template <typename Predicate>
+    Pair<T*, size_t> find(Predicate predicate)
     {
-        if (this->isEmpty())
+        for (size_t i = 0; i < this->count; i++)
         {
-            return T();
+            T* value = this->get(i);
+            if (predicate(value))
+            {
+                return Pair<T*, size_t>(value, i);
+            }
         }
-        T value = this->data[0];
-        for (size_t i = 1; i < this->count; i++)
-        {
-            this->data[i - 1] = this->data[i];
-        }
-        this->count--;
-        return value;
-    };
+        return Pair<T*, size_t>(nullptr, 0);
+    }
 };
