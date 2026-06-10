@@ -2,8 +2,11 @@
 
 #include "Arduino.h"
 
-PushButton::PushButton(uint8_t pin, InterruptHandler onPress, InterruptHandler onRelease)
-    : pin(pin, InterruptMode::Change, this, PushButton::interruptHandler) {}
+PushButton::PushButton(uint8_t pin)
+    : pin(pin,
+          InterruptMode::Change,
+          BTN_DEBOUNCE_MILLIS,
+          InterruptCallback(this, PushButton::interruptHandler)) {}
 
 void PushButton::interruptHandler(void *ctx, InterruptPinState state)
 {

@@ -28,43 +28,55 @@ enum class InterruptPinState
     Rising,
 };
 
-using InterruptHandler = void (*)(void *, InterruptPinState);
-
-class Interrupt
+class InterruptCallback
 {
+public:
+    using Fn = void (*)(void *, InterruptPinState);
+
 private:
-    uint8_t pin;
-    void *handlerContext;
-    InterruptHandler handler;
+    void *context;
+    Fn fn;
 
 public:
-    Interrupt(uint8_t pin, void *handlerContext, InterruptHandler handler);
-    Interrupt();
-
-    uint8_t getPin();
-    InterruptHandler getHandler();
-    void *getHandlerContext();
+    InterruptCallback(void *context, Fn fn);
+    InterruptCallback();
     bool hasHandler();
+    void call(InterruptPinState pinState);
 };
 
 class InterruptPin : public Setup
 {
 private:
-    static Array<Interrupt, INTERRUPTS_MAX_PINS> interrupts;
+    class InterruptHandle
+    {
+    public:
+        uint8_t pin;
+        uint32_t debounceMillis;
+        InterruptCallback callback;
+        uint32_t lastEventTime;
 
-    uint8_t pin;
+        InterruptHandle(uint8_t pin, uint32_t debounceMillis, InterruptCallback callback);
+        InterruptHandle();
+
+        bool isDebouncing();
+    };
+
+    static Array<InterruptHandle, INTERRUPTS_MAX_PINS> interrupts;
+
+    InterruptHandle handle;
     InterruptMode mode;
-    void *context;
-    InterruptHandler handler;
 
-    static Pair<Interrupt *, size_t> findPinInterrupt(uint8_t pin);
+    static Pair<InterruptHandle *, size_t> findPinInterrupt(uint8_t pin);
     static void interruptHandler();
 
 public:
-    InterruptPin(uint8_t pin, InterruptMode mode, void *context, InterruptHandler handler);
+    InterruptPin(uint8_t pin, InterruptMode mode,
+                 uint32_t debounceMillis, InterruptCallback callback);
     ~InterruptPin();
 
     virtual void setup() override;
     uint8_t getPin();
     InterruptMode getMode();
+    uint32_t getDebounceMillis();
+    uint32_t getLastEventTime();
 };

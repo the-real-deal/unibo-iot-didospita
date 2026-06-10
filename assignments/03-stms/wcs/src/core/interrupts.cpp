@@ -27,46 +27,65 @@ uint8_t rawInterruptMode(InterruptMode mode)
     return 0;
 }
 
-Interrupt::Interrupt(uint8_t pin, void *handlerContext, InterruptHandler handler)
-    : pin(pin), handlerContext(handlerContext), handler(handler) {}
+InterruptCallback::InterruptCallback(void *context, Fn fn)
+    : context(context), fn(fn) {}
 
-Interrupt::Interrupt() : pin(), handlerContext(), handler() {}
+InterruptCallback::InterruptCallback() : InterruptCallback(nullptr, nullptr) {}
 
-uint8_t Interrupt::getPin() { return this->pin; }
+bool InterruptCallback::hasHandler()
+{
+    return this->fn != nullptr;
+}
 
-InterruptHandler Interrupt::getHandler() { return this->handler; }
+void InterruptCallback::call(InterruptPinState pinState)
+{
+    if (this->hasHandler())
+    {
+        this->fn(this->context, pinState);
+    }
+}
 
-void *Interrupt::getHandlerContext() { return this->handlerContext; }
+InterruptPin::InterruptHandle::InterruptHandle(uint8_t pin, uint32_t debounceMillis, InterruptCallback callback)
+    : pin(pin), debounceMillis(debounceMillis), callback(callback), lastEventTime() {}
 
-bool Interrupt::hasHandler() { return this->handler != nullptr; }
+InterruptPin::InterruptHandle::InterruptHandle()
+    : InterruptPin::InterruptHandle(0, 0, InterruptCallback()) {}
 
-Array<Interrupt, INTERRUPTS_MAX_PINS> InterruptPin::interrupts;
+bool InterruptPin::InterruptHandle::isDebouncing()
+{
+    return millis() - this->lastEventTime < this->debounceMillis;
+}
 
-Pair<Interrupt *, size_t> InterruptPin::findPinInterrupt(uint8_t pin)
+Array<InterruptPin::InterruptHandle, INTERRUPTS_MAX_PINS> InterruptPin::interrupts;
+
+Pair<InterruptPin::InterruptHandle *, size_t> InterruptPin::findPinInterrupt(uint8_t pin)
 {
     return InterruptPin::interrupts.find(
-        [pin](Interrupt *i)
-        { return i->getPin() == pin && i->hasHandler(); });
+        [pin](InterruptHandle *h)
+        { return h->pin == pin && h->callback.hasHandler(); });
 }
 
 void InterruptPin::interruptHandler()
 {
-    Pair<Interrupt *, size_t> interrupt = InterruptPin::findPinInterrupt(arduinoInterruptedPin);
-    if (interrupt.left == nullptr)
+    Pair<InterruptHandle *, size_t> interrupt = InterruptPin::findPinInterrupt(arduinoInterruptedPin);
+    if (interrupt.left == nullptr || interrupt.left->isDebouncing())
     {
         return;
     }
+
     InterruptPinState pinState = arduinoPinState == 0 ? InterruptPinState::Falling
                                                       : InterruptPinState::Rising;
-    interrupt.left->getHandler()(interrupt.left->getHandlerContext(), pinState);
+    interrupt.left->lastEventTime = millis();
+    interrupt.left->callback.call(pinState);
 }
 
-InterruptPin::InterruptPin(uint8_t pin, InterruptMode mode, void *context, InterruptHandler handler)
-    : pin(pin), mode(mode), context(context), handler(handler) {}
+InterruptPin::InterruptPin(uint8_t pin, InterruptMode mode,
+                           uint32_t debounceMillis, InterruptCallback callback)
+    : handle(pin, debounceMillis, callback), mode(mode) {}
 
 InterruptPin::~InterruptPin()
 {
-    Pair<Interrupt *, size_t> existingInterrupt = InterruptPin::findPinInterrupt(this->pin);
+    Pair<InterruptHandle *, size_t> existingInterrupt = InterruptPin::findPinInterrupt(this->handle.pin);
     if (existingInterrupt.left == nullptr)
     {
         return;
@@ -76,15 +95,19 @@ InterruptPin::~InterruptPin()
 
 void InterruptPin::setup()
 {
-    Pair<Interrupt *, size_t> existingInterrupt = InterruptPin::findPinInterrupt(this->pin);
+    Pair<InterruptHandle *, size_t> existingInterrupt = InterruptPin::findPinInterrupt(this->handle.pin);
     if (existingInterrupt.left != nullptr)
     {
         exit(-1);
     }
-    InterruptPin::interrupts.pushLast(Interrupt(this->pin, this->context, this->handler));
-    enableInterrupt(this->pin, InterruptPin::interruptHandler, rawInterruptMode(this->mode));
+    InterruptPin::interrupts.pushLast(this->handle);
+    enableInterrupt(this->handle.pin, InterruptPin::interruptHandler, rawInterruptMode(this->mode));
 }
 
-uint8_t InterruptPin::getPin() { return this->pin; }
+uint8_t InterruptPin::getPin() { return this->handle.pin; }
 
 InterruptMode InterruptPin::getMode() { return this->mode; }
+
+uint32_t InterruptPin::getDebounceMillis() { return this->handle.debounceMillis; }
+
+uint32_t InterruptPin::getLastEventTime() { return this->handle.lastEventTime; }
