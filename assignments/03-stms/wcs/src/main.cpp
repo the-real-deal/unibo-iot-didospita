@@ -1,14 +1,18 @@
 #include <Arduino.h>
 
-void setup() {
-  Serial.begin(9600);
-  delay(2000); 
+#include "core/serial.hpp"
 
-  Serial.println("SERIAL_SYNC");
-  Serial.println("setup() finished");
+SerialManager serialManager;
+
+void setup()
+{
+  serialManager.setup();
+
+  serialManager.log("setup() is running");
 }
 
-void loop() {
-  Serial.println("LOG:loop() is running");
+void loop()
+{
+  serialManager.log("loop() is running");
   delay(1000);
 }

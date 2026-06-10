@@ -1,10 +1,19 @@
-import { DelimiterParser, type SerialPort } from "serialport"
+import { type SerialPort } from "serialport"
 import { findSerialDevice, openSerialPort } from "../../serial/index.js"
 import { serialMessageParser } from "../../serial/message.js"
 
+let serialSynced = false
+
 const parser = serialMessageParser({
-  "SERIAL_SYNC": (_) => console.warn("Serial sync"),
-  "LOG": (message) => console.info("Serial log:", message.payload),
+  SERIAL_SYNC: (_) => {
+    console.warn("Serial sync")
+    serialSynced = true
+  },
+  LOG: (message) => {
+    if (serialSynced) {
+      console.info("Serial log:", message.payload)
+    }
+  },
 })
 
 export interface SerialPortStartOptions {
