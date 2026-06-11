@@ -3,8 +3,13 @@
 #include "core/serial.hpp"
 #include "devices/button.hpp"
 
+#ifndef BTN_EVENT_FAMILY
+#define BTN_EVENT_FAMILY 0
+#endif
+
 SerialManager serialManager;
-PushButton button(2);
+EventManager eventManager;
+PushButton button(2, BTN_EVENT_FAMILY, &eventManager);
 
 void logPress(PushButton *btn)
 {
@@ -28,12 +33,13 @@ void setup()
   button.onPress(logPress);
   button.onRelease(logRelease);
   button.setup();
-  
+
   serialManager.log("setup() finished");
 }
 
 void loop()
 {
   serialManager.log("loop() is running");
-  delay(1000);
+  eventManager.handleEvents();
+  delay(200);
 }
