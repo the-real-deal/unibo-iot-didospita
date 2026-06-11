@@ -64,6 +64,12 @@ public:
 
     bool generateEvent(EventSignal<Type> *event)
     {
+        if (this->eventQueue.isFull())
+        {
+            EventSignal<Type> *event = *this->eventQueue.get(0);
+            delete event;
+            this->eventQueue.deleteAt(0);
+        }
         return this->eventQueue.pushLast(event);
     }
 
