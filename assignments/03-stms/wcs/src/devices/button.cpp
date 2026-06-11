@@ -6,19 +6,38 @@ PushButton::PushButton(uint8_t pin)
     : pin(pin,
           InterruptMode::Change,
           BTN_DEBOUNCE_MILLIS,
-          InterruptCallback(this, PushButton::interruptHandler)) {}
+          InterruptCallback(this, PushButton::interruptHandler)),
+      onPressCallback(), onReleaseCallback() {}
 
-void PushButton::interruptHandler(void *ctx, InterruptPinState state)
+void PushButton::interruptHandler(void *ctx, InterruptPinState pinState)
 {
     PushButton *button = static_cast<PushButton *>(ctx);
-    Serial.print(F("Button on pin "));
-    Serial.print(button->pin.getPin());
-    Serial.print(F(" changed to "));
-    Serial.println(state == InterruptPinState::Falling ? F("Falling") : F("Rising"));
-    Serial.flush();
+    switch (pinState)
+    {
+    case InterruptPinState::Rising:
+        button->callCallback(button->onPressCallback);
+        break;
+    case InterruptPinState::Falling:
+        button->callCallback(button->onReleaseCallback);
+        break;
+    }
+}
+
+void PushButton::callCallback(ButtonCallback callback)
+{
+    if (callback != nullptr)
+    {
+        callback(this);
+    }
 }
 
 void PushButton::setup()
 {
     this->pin.setup();
 }
+
+uint8_t PushButton::getPin() { return this->pin.getPin(); }
+
+void PushButton::onPress(ButtonCallback callback) { this->onPressCallback = callback; }
+
+void PushButton::onRelease(ButtonCallback callback) { this->onReleaseCallback = callback; }
