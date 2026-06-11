@@ -27,6 +27,6 @@ private:
     static void interruptHandler(void *ctx, InterruptPinState state);
 
 public:
-    PushButton(uint8_t pin, EventFamily family, EventManager* eventManager);
+    PushButton(uint8_t pin, EventFamily family, EventsManager* eventManager);
     virtual void setup() override;
 };

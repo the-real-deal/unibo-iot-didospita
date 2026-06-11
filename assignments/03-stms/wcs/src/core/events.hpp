@@ -13,11 +13,7 @@
 #define MAX_EVENT_OBSERVERS 5
 #endif
 
-#ifndef MAX_EVENT_SOURCES
-#define MAX_EVENT_SOURCES 5
-#endif
-
-class EventManager;
+class EventsManager;
 
 using EventFamily = uint8_t;
 
@@ -44,7 +40,7 @@ public:
 
 class EventSignalObserver
 {
-    friend EventManager;
+    friend EventsManager;
 
 protected:
     EventFamily family;
@@ -71,14 +67,14 @@ public:
     EventObserver(EventFamily family) : EventSignalObserver(family) {}
 };
 
-class EventManager
+class EventsManager
 {
 private:
     Array<EventSignal *, EVENT_QUEUE_SIZE> eventQueue;
     Array<EventSignalObserver *, MAX_EVENT_OBSERVERS> observers;
 
 public:
-    EventManager() : eventQueue(), observers() {};
+    EventsManager() : eventQueue(), observers() {};
 
     bool registerObserver(EventSignalObserver *observer)
     {
@@ -135,7 +131,7 @@ class EventSource
 {
 protected:
     EventFamily family;
-    EventManager *eventManager;
+    EventsManager *eventManager;
 
     bool generateEvent(T eventData)
     {
@@ -147,6 +143,16 @@ protected:
     }
 
 public:
-    EventSource(EventFamily family, EventManager *eventManager)
+    EventSource(EventFamily family, EventsManager *eventManager)
         : family(family), eventManager(eventManager) {}
+};
+
+template <typename T>
+class SyncEventSource : public EventSource<T>
+{
+public:
+    SyncEventSource(EventFamily family, EventsManager *eventManager)
+        : EventSource<T>(family, eventManager) {}
+
+    virtual void checkEvents() = 0;
 };

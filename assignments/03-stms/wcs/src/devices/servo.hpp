@@ -3,8 +3,9 @@
 #include <Servo.h>
 #include <stdint.h>
 
-#include "core/setup.hpp"
+#include "io.hpp"
 #include "core/pins.hpp"
+#include "core/events.hpp"
 
 #ifndef SERVO_MIN_FREQ
 #define SERVO_MIN_FREQ 500
@@ -14,18 +15,17 @@
 #define SERVO_MAX_FREQ 2500
 #endif
 
-class ArduinoServoMotor : public Setup
+class ServoMotor : public ExternalInput
 {
 private:
   Servo servo;
   uint8_t pin;
   int angle;
 
-protected:
-  void setup() override;
-
 public:
-  ArduinoServoMotor(uint8_t pin, int initialAngle);
+  ServoMotor(uint8_t pin, int initialAngle);
+  void setup() override;
+  void read() override;
   int getAngle();
   void setAngle(int angle);
 };

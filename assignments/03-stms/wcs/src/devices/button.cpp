@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 
-PushButton::PushButton(uint8_t pin, EventFamily family, EventManager *eventManager)
+PushButton::PushButton(uint8_t pin, EventFamily family, EventsManager *eventManager)
     : EventSource(family, eventManager),
       pin(pin,
           InterruptMode::Change,

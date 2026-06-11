@@ -1,22 +1,32 @@
 #include <Arduino.h>
 
+#include "config.h"
+
 #include "core/serial.hpp"
 #include "devices/button.hpp"
+#include "devices/servo.hpp"
+#include "devices/potentiometer.hpp"
 
 #ifndef BTN_EVENT_FAMILY
 #define BTN_EVENT_FAMILY 0
 #endif
 
-class BtnLogObserver: public EventObserver<ButtonEvent> {
+#ifndef POT_EVENT_FAMILY
+#define POT_EVENT_FAMILY 1
+#endif
+
+class BtnLogObserver : public EventObserver<ButtonEvent>
+{
 protected:
-  void onEvent(ButtonEvent eventData) override {
+  void onEvent(ButtonEvent eventData) override
+  {
     Serial.print(F("BTN "));
     switch (eventData)
     {
-      case ButtonEvent::Press:
+    case ButtonEvent::Press:
       Serial.println(F("PRESS"));
       break;
-    
+
     case ButtonEvent::Release:
       Serial.println(F("RELEASE"));
       break;
@@ -28,11 +38,34 @@ public:
   BtnLogObserver() : EventObserver(BTN_EVENT_FAMILY) {}
 };
 
+class PotLogObserver : public EventObserver<PotentiometerEvent>
+{
+private:
+  ServoMotor *servo;
+
+protected:
+  void onEvent(PotentiometerEvent eventData) override
+  {
+    this->servo->read();
+    Serial.print(F("POT :"));
+    Serial.println(eventData.value);
+    Serial.print(F("SERVO :"));
+    Serial.println(this->servo->getAngle());
+    Serial.flush();
+  }
+
+public:
+  PotLogObserver(ServoMotor *servo) : EventObserver(POT_EVENT_FAMILY), servo(servo) {}
+};
+
 SerialManager serialManager;
-EventManager eventManager;
-PushButton button(2, BTN_EVENT_FAMILY, &eventManager);
+EventsManager eventManager;
+PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
+Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
+ServoMotor servo(SERVO_PIN, 0);
 
 BtnLogObserver btnObserver;
+PotLogObserver potObserver(&servo);
 
 void setup()
 {
@@ -40,7 +73,11 @@ void setup()
   serialManager.log("setup() started");
 
   eventManager.registerObserver(&btnObserver);
+  eventManager.registerObserver(&potObserver);
+  
   button.setup();
+  potentiomenter.setup();
+  servo.setup();
 
   serialManager.log("setup() finished");
 }
@@ -48,6 +85,7 @@ void setup()
 void loop()
 {
   serialManager.log("loop() is running");
+  potentiomenter.checkEvents();
   eventManager.handleEvents();
   delay(200);
 }
