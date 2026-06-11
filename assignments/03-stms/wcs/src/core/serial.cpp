@@ -8,9 +8,8 @@ SerialManager::SerialManager() {}
 
 void SerialManager::setup()
 {
-  Serial.begin(ARDUINO_SERIAL_BAUD);
-  while (!Serial)
-    ;
+  Serial.begin(SERIAL_BAUD);
+  delay(SERIAL_DELAY_MS);
   this->serialSync();
 }
 

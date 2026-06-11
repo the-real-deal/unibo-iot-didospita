@@ -46,12 +46,13 @@ private:
 protected:
   void onEvent(PotentiometerEvent eventData) override
   {
-    this->servo->read();
+    int angle = (160 * eventData.value) + 10;
     Serial.print(F("POT :"));
-    Serial.println(eventData.value);
-    Serial.print(F("SERVO :"));
-    Serial.println(this->servo->getAngle());
+    Serial.print(eventData.value);
+    Serial.print(F("/"));
+    Serial.println(angle);
     Serial.flush();
+    this->servo->setAngle(angle);
   }
 
 public:
@@ -62,7 +63,7 @@ SerialManager serialManager;
 EventsManager eventManager;
 PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
 Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
-ServoMotor servo(SERVO_PIN, 0);
+ServoMotor servo(SERVO_PIN, 10);
 
 BtnLogObserver btnObserver;
 PotLogObserver potObserver(&servo);
@@ -87,5 +88,5 @@ void loop()
   serialManager.log("loop() is running");
   potentiomenter.checkEvents();
   eventManager.handleEvents();
-  delay(200);
+  delay(50);
 }

@@ -4,8 +4,12 @@
 
 #include "setup.hpp"
 
-#ifndef ARDUINO_SERIAL_BAUD
-#define ARDUINO_SERIAL_BAUD 9600
+#ifndef SERIAL_BAUD
+#define SERIAL_BAUD 9600
+#endif
+
+#ifndef SERIAL_DELAY_MS
+#define SERIAL_DELAY_MS 2000
 #endif
 
 #ifndef SERIAL_MESSAGE_DELIMITER
