@@ -17,6 +17,8 @@
 #define MAX_EVENT_SOURCES 5
 #endif
 
+class EventManager;
+
 using EventFamily = uint8_t;
 
 class EventSignal
@@ -40,32 +42,45 @@ public:
     T getData() { return this->data; }
 };
 
-class EventObserver
+class EventSignalObserver
 {
-private:
+    friend EventManager;
+
+protected:
     EventFamily family;
 
+    virtual void onEventSignal(EventSignal *event) = 0;
+
 public:
-    EventObserver(EventFamily family) : family(family) {}
+    EventSignalObserver(EventFamily family) : family(family) {}
+};
 
-    virtual void onEvent(EventSignal *event) = 0;
-
-    EventFamily getObservedEventFamily()
+template <typename T>
+class EventObserver : public EventSignalObserver
+{
+protected:
+    void onEventSignal(EventSignal *event) override
     {
-        return this->family;
+        T eventData = static_cast<Event<T> *>(event)->getData();
+        this->onEvent(eventData);
     }
+
+    virtual void onEvent(T eventData) = 0;
+
+public:
+    EventObserver(EventFamily family) : EventSignalObserver(family) {}
 };
 
 class EventManager
 {
 private:
     Array<EventSignal *, EVENT_QUEUE_SIZE> eventQueue;
-    Array<EventObserver *, MAX_EVENT_OBSERVERS> observers;
+    Array<EventSignalObserver *, MAX_EVENT_OBSERVERS> observers;
 
 public:
     EventManager() : eventQueue(), observers() {};
 
-    bool registerObserver(EventObserver *observer)
+    bool registerObserver(EventSignalObserver *observer)
     {
         return this->observers.pushLast(observer);
     }
@@ -101,10 +116,10 @@ public:
 
         for (size_t i = 0; i < this->observers.size(); i++)
         {
-            EventObserver *observer = *this->observers.get(i);
-            if (observer->getObservedEventFamily() == event->getFamily())
+            EventSignalObserver *observer = *this->observers.get(i);
+            if (observer->family == event->getFamily())
             {
-                observer->onEvent(event);
+                observer->onEventSignal(event);
             }
         }
 
@@ -132,6 +147,6 @@ protected:
     }
 
 public:
-    EventSource(EventFamily family, EventManager *eventManager) 
+    EventSource(EventFamily family, EventManager *eventManager)
         : family(family), eventManager(eventManager) {}
 };
