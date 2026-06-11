@@ -64,13 +64,16 @@ public:
 
     bool generateEvent(EventSignal<Type> *event)
     {
+        noInterrupts();
         if (this->eventQueue.isFull())
         {
             EventSignal<Type> *event = *this->eventQueue.get(0);
             delete event;
             this->eventQueue.deleteAt(0);
         }
-        return this->eventQueue.pushLast(event);
+        bool ok = this->eventQueue.pushLast(event);
+        interrupts();
+        return ok;
     }
 
     void handleEvents()
