@@ -37,6 +37,9 @@ export async function startSerialPort(
   }
 
   const serialPort = openSerialPort(path, baudRate)
+  serialPort.on("close", (_) => {
+    serialSynced = false
+  })
   serialPort.pipe(parser)
   console.debug("Attached serial port messages parser")
   return serialPort
