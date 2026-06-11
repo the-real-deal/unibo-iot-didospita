@@ -6,6 +6,7 @@
 #include "devices/button.hpp"
 #include "devices/servo.hpp"
 #include "devices/potentiometer.hpp"
+#include "devices/led.hpp"
 
 #ifndef BTN_EVENT_FAMILY
 #define BTN_EVENT_FAMILY 0
@@ -64,6 +65,7 @@ EventsManager eventManager;
 PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
 Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
 ServoMotor servo(SERVO_PIN, 10);
+Led builtinLed(LED_BUILTIN);
 
 BtnLogObserver btnObserver;
 PotLogObserver potObserver(&servo);
@@ -76,6 +78,7 @@ void setup()
   eventManager.registerObserver(&btnObserver);
   eventManager.registerObserver(&potObserver);
   
+  builtinLed.setup();
   button.setup();
   potentiomenter.setup();
   servo.setup();
@@ -85,7 +88,7 @@ void setup()
 
 void loop()
 {
-  serialManager.log("loop() is running");
+  builtinLed.toggle();
   potentiomenter.checkEvents();
   eventManager.handleEvents();
   delay(50);
