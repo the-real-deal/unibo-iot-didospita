@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task.hpp"
-#include "mode.hpp"
+#include "core/mode.hpp"
 #include "devices/lcd.hpp"
 
 class LCDTask : public AsyncTask

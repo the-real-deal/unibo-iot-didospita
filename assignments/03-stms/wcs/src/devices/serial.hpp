@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "kernel/events.hpp"
-#include "tasks/mode.hpp"
+#include "core/mode.hpp"
 
 #ifndef SERIAL_BAUD
 #define SERIAL_BAUD 9600

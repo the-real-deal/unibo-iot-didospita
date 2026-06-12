@@ -2,24 +2,9 @@
 
 #include "task.hpp"
 #include "kernel/events.hpp"
+#include "core/mode.hpp"
 #include "devices/button.hpp"
 #include "devices/serial.hpp"
-
-enum class OperationMode
-{
-    Manual,
-    Automatic,
-};
-const char *const OPERATION_MODE_STRINGS[] = {
-    "MANUAL",
-    "AUTOMATIC",
-};
-
-struct OperationModeEvent
-{
-    OperationMode mode;
-    OperationMode prev;
-};
 
 class OperationModeTask : public AsyncTask, public EventSource<OperationModeEvent>
 {
