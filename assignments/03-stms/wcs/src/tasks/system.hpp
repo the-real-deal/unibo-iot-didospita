@@ -2,39 +2,38 @@
 
 #include "task.hpp"
 #include "kernel/events.hpp"
-#include "core/mode.hpp"
+#include "core/system.hpp"
 #include "devices/button.hpp"
 #include "devices/serial.hpp"
 
-class OperationModeTask : public AsyncTask, public EventSource<OperationModeEvent>
+class SystemStatusTask : public AsyncTask, public EventSource<SystemStatusChangeEvent>
 {
 private:
-    OperationMode mode;
+    SystemStatus status;
 
-    bool generateModeEvent(OperationMode mode);
-    void toggleMode();
-    void switchMode(OperationMode mode);
+    bool generateStatusEvent(SystemStatus status);
+    void switchStatus(SystemStatus status);
 
-    class ButtonObserver : public TaskEventObserver<OperationModeTask, ButtonEvent>
+    class ButtonObserver : public TaskEventObserver<SystemStatusTask, ButtonEvent>
     {
     public:
-        ButtonObserver(OperationModeTask *task, EventFamily family)
+        ButtonObserver(SystemStatusTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(ButtonEvent event) override;
     };
     ButtonObserver buttonObserver;
 
-    class SerialObserver : public TaskEventObserver<OperationModeTask, SerialMessage>
+    class SerialObserver : public TaskEventObserver<SystemStatusTask, SerialMessage>
     {
     public:
-        SerialObserver(OperationModeTask *task, EventFamily family)
+        SerialObserver(SystemStatusTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(SerialMessage event) override;
     };
     SerialObserver serialObserver;
 
 public:
-    OperationModeTask(OperationMode initialMode,
+    SystemStatusTask(SystemStatus initialState,
                       EventFamily operationsModeEventFamily,
                       EventFamily buttonEventFamily,
                       EventFamily serialEventFamily);

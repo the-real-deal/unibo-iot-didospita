@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #include "kernel/events.hpp"
-#include "core/mode.hpp"
+#include "core/system.hpp"
 
 #ifndef SERIAL_BAUD
 #define SERIAL_BAUD 9600
@@ -25,12 +25,12 @@ enum class SerialMessageType
 {
   SerialSync,
   Log,
-  Mode,
+  Status,
 };
 const char *const SERIAL_MESSAGE_TYPE_STRINGS[] = {
     "SERIAL_SYNC",
     "LOG",
-    "MODE",
+    "STATUS",
 };
 
 struct SerialMessage
@@ -50,5 +50,4 @@ public:
   void checkEvents() override;
   void serialSync();
   void log(const char *message);
-  void sendMode(OperationMode);
 };

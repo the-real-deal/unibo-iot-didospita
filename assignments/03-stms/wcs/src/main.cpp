@@ -9,7 +9,7 @@
 #include "devices/led.hpp"
 #include "devices/lcd.hpp"
 #include "devices/i2c.hpp"
-#include "tasks/mode.hpp"
+#include "tasks/system.hpp"
 #include "tasks/lcd.hpp"
 
 enum class Events : EventFamily
@@ -33,7 +33,7 @@ ServoMotor servo(SERVO_PIN, 0);
 Led builtinLed(LED_BUILTIN);
 LCD lcd;
 
-OperationModeTask operationModeTask(OperationMode::Automatic,
+SystemStatusTask operationModeTask(SystemStatus::Automatic,
                                     family(Events::OperationMode),
                                     button.getFamily(),
                                     serialManager.getFamily());

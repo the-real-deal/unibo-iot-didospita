@@ -8,15 +8,15 @@ void LCDTask::prepareRow(uint8_t row)
     this->lcd->setCursor(0, row);
 }
 
-void LCDTask::displayMode(OperationMode mode)
+void LCDTask::displayStatus(SystemStatus status)
 {
     this->prepareRow(0);
-    this->lcd->print(enumToString(mode, OPERATION_MODE_STRINGS));
+    this->lcd->print(enumToString(status, SYSTEM_STATUS_STRINGS));
 }
 
-void LCDTask::OperationModeObserver::onEvent(OperationModeEvent event)
+void LCDTask::OperationModeObserver::onEvent(SystemStatusChangeEvent event)
 {
-    this->task->displayMode(event.mode);
+    this->task->displayStatus(event.status);
 }
 
 LCDTask::LCDTask(LCD *lcd, EventFamily operationModeEventFamily)

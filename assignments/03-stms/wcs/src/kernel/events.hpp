@@ -44,12 +44,16 @@ class EventSignalObserver
 
 protected:
     EventFamily family;
+    bool enabled;
 
     virtual void onEventSignal(EventSignal *event) = 0;
 
 public:
     EventSignalObserver(EventFamily family) : family(family) {}
     EventFamily getObservedFamily() { return this->family; }
+    void enable() { this->enabled = true; }
+    void disable() { this->enabled = false; }
+    bool isEnabled() { return this->enabled; }
 };
 
 template <typename T>
@@ -112,7 +116,7 @@ public:
         for (size_t i = 0; i < this->observers.size(); i++)
         {
             EventSignalObserver *observer = *this->observers.get(i);
-            if (observer->family == event->getFamily())
+            if (observer->isEnabled() && observer->family == event->getFamily())
             {
                 observer->onEventSignal(event);
             }
