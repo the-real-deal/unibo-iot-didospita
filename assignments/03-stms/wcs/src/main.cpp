@@ -22,60 +22,13 @@
 #define SERIAL_EVENT_FAMILY 2
 #endif
 
-class BtnLogObserver : public EventObserver<ButtonEvent>
-{
-protected:
-  void onEvent(ButtonEvent eventData) override
-  {
-    Serial.print(F("BTN "));
-    switch (eventData)
-    {
-    case ButtonEvent::Press:
-      Serial.println(F("PRESS"));
-      break;
-
-    case ButtonEvent::Release:
-      Serial.println(F("RELEASE"));
-      break;
-    }
-    Serial.flush();
-  }
-
-public:
-  BtnLogObserver() : EventObserver(BTN_EVENT_FAMILY) {}
-};
-
-class PotLogObserver : public EventObserver<PotentiometerEvent>
-{
-private:
-  ServoMotor *servo;
-
-protected:
-  void onEvent(PotentiometerEvent eventData) override
-  {
-    int angle = (160 * eventData.value) + 10;
-    Serial.print(F("POT :"));
-    Serial.print(eventData.value);
-    Serial.print(F("/"));
-    Serial.println(angle);
-    Serial.flush();
-    this->servo->setAngle(angle);
-  }
-
-public:
-  PotLogObserver(ServoMotor *servo) : EventObserver(POT_EVENT_FAMILY), servo(servo) {}
-};
-
 EventsManager eventManager;
 SerialManager serialManager(SERIAL_EVENT_FAMILY, &eventManager);
 PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
 Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
-ServoMotor servo(SERVO_PIN, 10);
+ServoMotor servo(SERVO_PIN, 0);
 Led builtinLed(LED_BUILTIN);
 LCD lcd;
-
-BtnLogObserver btnObserver;
-PotLogObserver potObserver(&servo);
 
 void setup()
 {
@@ -87,9 +40,6 @@ void setup()
 
   uint8_t lcdAddress = i2c.scan();
   lcd.begin(lcdAddress);
-
-  eventManager.registerObserver(&btnObserver);
-  eventManager.registerObserver(&potObserver);
   
   builtinLed.setup();
   button.setup();
