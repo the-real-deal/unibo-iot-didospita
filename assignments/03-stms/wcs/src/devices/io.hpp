@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/setup.hpp"
+#include "kernel/setup.hpp"
 
 class ExternalInput : public Setup
 {

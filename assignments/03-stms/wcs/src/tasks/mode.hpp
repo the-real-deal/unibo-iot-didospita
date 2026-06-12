@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task.hpp"
-#include "core/events.hpp"
+#include "kernel/events.hpp"
 #include "devices/button.hpp"
 #include "devices/serial.hpp"
 

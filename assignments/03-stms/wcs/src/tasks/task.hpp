@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/setup.hpp"
-#include "core/events.hpp"
+#include "kernel/setup.hpp"
+#include "kernel/events.hpp"
 
 class AsyncTask
 {

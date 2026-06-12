@@ -2,7 +2,8 @@
 
 #include <Arduino.h>
 
-#include "core/events.hpp"
+#include "kernel/events.hpp"
+#include "tasks/mode.hpp"
 
 #ifndef SERIAL_BAUD
 #define SERIAL_BAUD 9600
@@ -49,4 +50,5 @@ public:
   void checkEvents() override;
   void serialSync();
   void log(const char *message);
+  void sendMode(OperationMode);
 };

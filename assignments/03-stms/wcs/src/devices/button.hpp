@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "core/events.hpp"
-#include "core/interrupts.hpp"
+#include "kernel/events.hpp"
+#include "kernel/interrupts.hpp"
 
 #ifndef BTN_DEBOUNCE_MILLIS
 #define BTN_DEBOUNCE_MILLIS 50

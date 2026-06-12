@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #include "io.hpp"
-#include "core/pins.hpp"
-#include "core/events.hpp"
+#include "kernel/pins.hpp"
+#include "kernel/events.hpp"
 
 #ifndef SERVO_MIN_FREQ
 #define SERVO_MIN_FREQ 500

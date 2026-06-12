@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "core/pins.hpp"
-#include "core/events.hpp"
+#include "kernel/pins.hpp"
+#include "kernel/events.hpp"
 
 #ifndef POT_EVENT_THRESHOLD
 #define POT_EVENT_THRESHOLD 0.03

@@ -2,7 +2,7 @@
 
 #include <LiquidCrystal_I2C.h>
 
-#include "core/setup.hpp"
+#include "kernel/setup.hpp"
 
 #ifndef LCD_COLS
 #define LCD_COLS 16

@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "core/setup.hpp"
+#include "kernel/setup.hpp"
 
 #ifndef I2C_MIN_ADDRESS
 #define I2C_MIN_ADDRESS 0

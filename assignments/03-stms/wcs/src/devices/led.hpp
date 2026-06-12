@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/pins.hpp"
-#include "core/setup.hpp"
+#include "kernel/pins.hpp"
+#include "kernel/setup.hpp"
 
 class Led : public Setup
 {
