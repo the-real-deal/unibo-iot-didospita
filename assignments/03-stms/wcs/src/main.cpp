@@ -9,6 +9,7 @@
 #include "devices/led.hpp"
 #include "devices/lcd.hpp"
 #include "devices/i2c.hpp"
+#include "tasks/mode.hpp"
 
 #ifndef BTN_EVENT_FAMILY
 #define BTN_EVENT_FAMILY 0
@@ -22,13 +23,15 @@
 #define SERIAL_EVENT_FAMILY 2
 #endif
 
-EventsManager eventManager;
-SerialManager serialManager(SERIAL_EVENT_FAMILY, &eventManager);
-PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
-Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
+EventsManager eventsManager;
+SerialManager serialManager(SERIAL_EVENT_FAMILY, &eventsManager);
+PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventsManager);
+Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventsManager);
 ServoMotor servo(SERVO_PIN, 0);
 Led builtinLed(LED_BUILTIN);
 LCD lcd;
+
+OperationModeTask operationModeTask(&button);
 
 void setup()
 {
@@ -40,11 +43,13 @@ void setup()
 
   uint8_t lcdAddress = i2c.scan();
   lcd.begin(lcdAddress);
-  
+
   builtinLed.setup();
   button.setup();
   potentiomenter.setup();
   servo.setup();
+
+  operationModeTask.begin(&eventsManager);
 
   serialManager.log("setup() finished");
 }
@@ -54,6 +59,6 @@ void loop()
   builtinLed.toggle();
   serialManager.checkEvents();
   potentiomenter.checkEvents();
-  eventManager.handleEvents();
+  eventsManager.handleEvents();
   delay(100);
 }

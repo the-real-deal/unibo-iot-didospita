@@ -49,6 +49,7 @@ protected:
 
 public:
     EventSignalObserver(EventFamily family) : family(family) {}
+    EventFamily getObservedFamily() { return this->family; }
 };
 
 template <typename T>
@@ -145,6 +146,8 @@ protected:
 public:
     EventSource(EventFamily family, EventsManager *eventManager)
         : family(family), eventManager(eventManager) {}
+    
+    EventFamily getFamily() { return this->family; }
 };
 
 template <typename T>
