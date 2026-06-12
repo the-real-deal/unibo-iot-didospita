@@ -5,31 +5,31 @@
 #include "devices/potentiometer.hpp"
 #include "devices/servo.hpp"
 
-class ManualControlTask : public AsyncTask
+class ControlTask : public AsyncTask
 {
 private:
     ServoMotor *servo;
 
-    class SystemStateObserver : public TaskEventObserver<ManualControlTask, SystemStatusChangeEvent>
+    class SystemStateObserver : public TaskEventObserver<ControlTask, SystemStatusChangeEvent>
     {
     public:
-        SystemStateObserver(ManualControlTask *task, EventFamily family)
+        SystemStateObserver(ControlTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(SystemStatusChangeEvent event) override;
     };
     SystemStateObserver systemStateObserver;
 
-    class PotentiometerObserver : public TaskEventObserver<ManualControlTask, PotentiometerEvent>
+    class PotentiometerObserver : public TaskEventObserver<ControlTask, PotentiometerEvent>
     {
     public:
-        PotentiometerObserver(ManualControlTask *task, EventFamily family)
+        PotentiometerObserver(ControlTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(PotentiometerEvent event) override;
     };
     PotentiometerObserver potentiometerObserver;
 
 public:
-    ManualControlTask(ServoMotor *servo,
+    ControlTask(ServoMotor *servo,
                       EventFamily statusChangeEventFamily,
                       EventFamily potEventFamily);
     void begin(EventsManager *eventsManager) override;

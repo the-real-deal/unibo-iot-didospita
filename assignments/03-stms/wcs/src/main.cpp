@@ -11,7 +11,7 @@
 #include "devices/i2c.hpp"
 #include "tasks/system.hpp"
 #include "tasks/lcd.hpp"
-#include "tasks/manual.hpp"
+#include "tasks/control.hpp"
 
 enum class Events : EventFamily
 {
@@ -40,9 +40,9 @@ SystemStatusTask systemStatusTask(SystemStatus::Automatic,
                                   button.getFamily(),
                                   serialManager.getFamily());
 LCDTask lcdTask(&lcd, systemStatusTask.getFamily(), servo.getFamily());
-ManualControlTask manualControlTask(&servo,
-                                    systemStatusTask.getFamily(),
-                                    potentiomenter.getFamily());
+ControlTask controlTask(&servo,
+                        systemStatusTask.getFamily(),
+                        potentiomenter.getFamily());
 
 void setup()
 {
@@ -62,7 +62,7 @@ void setup()
   servo.begin(&eventsManager);
   systemStatusTask.begin(&eventsManager);
   lcdTask.begin(&eventsManager);
-  manualControlTask.begin(&eventsManager);
+  controlTask.begin(&eventsManager);
 
   serialManager.log("setup() finished");
 }

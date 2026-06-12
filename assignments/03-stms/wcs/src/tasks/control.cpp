@@ -1,8 +1,8 @@
-#include "manual.hpp"
+#include "control.hpp"
 
 #include "config.h"
 
-void ManualControlTask::SystemStateObserver::onEvent(SystemStatusChangeEvent event)
+void ControlTask::SystemStateObserver::onEvent(SystemStatusChangeEvent event)
 {
     switch (event.status)
     {
@@ -16,20 +16,20 @@ void ManualControlTask::SystemStateObserver::onEvent(SystemStatusChangeEvent eve
     }
 }
 
-void ManualControlTask::PotentiometerObserver::onEvent(PotentiometerEvent event)
+void ControlTask::PotentiometerObserver::onEvent(PotentiometerEvent event)
 {
     int angle = event.value * POT_SERVO_MAX_ANGLE;
     this->task->servo->setAngle(angle);
 }
 
-ManualControlTask::ManualControlTask(ServoMotor *servo,
+ControlTask::ControlTask(ServoMotor *servo,
                                      EventFamily statusChangeEventFamily,
                                      EventFamily potEventFamily)
     : servo(servo),
       systemStateObserver(this, statusChangeEventFamily),
       potentiometerObserver(this, potEventFamily) {}
 
-void ManualControlTask::begin(EventsManager *eventsManager)
+void ControlTask::begin(EventsManager *eventsManager)
 {
     eventsManager->registerObserver(&this->systemStateObserver);
     eventsManager->registerObserver(&this->potentiometerObserver);
