@@ -16,7 +16,6 @@ void LCDTask::displayMode(OperationMode mode)
 
 void LCDTask::OperationModeObserver::onEvent(OperationModeEvent event)
 {
-    Serial.println(F("LCD ON MODE EVENT"));
     this->task->displayMode(event.mode);
 }
 
