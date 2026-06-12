@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "setup.hpp"
+#include "core/setup.hpp"
 
 #ifndef SERIAL_BAUD
 #define SERIAL_BAUD 9600

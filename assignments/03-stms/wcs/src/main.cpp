@@ -2,7 +2,7 @@
 
 #include "config.h"
 
-#include "core/serial.hpp"
+#include "devices/serial.hpp"
 #include "devices/button.hpp"
 #include "devices/servo.hpp"
 #include "devices/potentiometer.hpp"
