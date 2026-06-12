@@ -16,6 +16,10 @@
 #define POT_EVENT_FAMILY 1
 #endif
 
+#ifndef SERIAL_EVENT_FAMILY
+#define SERIAL_EVENT_FAMILY 2
+#endif
+
 class BtnLogObserver : public EventObserver<ButtonEvent>
 {
 protected:
@@ -60,8 +64,8 @@ public:
   PotLogObserver(ServoMotor *servo) : EventObserver(POT_EVENT_FAMILY), servo(servo) {}
 };
 
-SerialManager serialManager;
 EventsManager eventManager;
+SerialManager serialManager(SERIAL_EVENT_FAMILY, &eventManager);
 PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
 Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
 ServoMotor servo(SERVO_PIN, 10);
@@ -89,6 +93,7 @@ void setup()
 void loop()
 {
   builtinLed.toggle();
+  serialManager.checkEvents();
   potentiomenter.checkEvents();
   eventManager.handleEvents();
   delay(50);

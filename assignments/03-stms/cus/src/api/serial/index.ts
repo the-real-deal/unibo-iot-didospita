@@ -3,6 +3,7 @@ import { findSerialDevice, openSerialPort } from "../../serial/index.js"
 import { serialMessageParser } from "../../serial/message.js"
 
 let serialSynced = false
+let serialPort: SerialPort
 
 const parser = serialMessageParser({
   SERIAL_SYNC: (_) => {
@@ -12,6 +13,7 @@ const parser = serialMessageParser({
   LOG: (message) => {
     if (serialSynced) {
       console.info("Serial log:", message.payload)
+      serialPort.write("LOG:01234567\n")
     }
   },
 })
@@ -36,7 +38,7 @@ export async function startSerialPort(
     path = options.path
   }
 
-  const serialPort = openSerialPort(path, baudRate)
+  serialPort = openSerialPort(path, baudRate)
   serialPort.on("close", (_) => {
     serialSynced = false
   })
