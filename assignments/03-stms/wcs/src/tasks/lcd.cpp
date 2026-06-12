@@ -14,15 +14,15 @@ void LCDTask::displayStatus(SystemStatus status)
     this->lcd->print(enumToString(status, SYSTEM_STATUS_STRINGS));
 }
 
-void LCDTask::OperationModeObserver::onEvent(SystemStatusChangeEvent event)
+void LCDTask::SystemModeObserver::onEvent(SystemStatusChangeEvent event)
 {
     this->task->displayStatus(event.status);
 }
 
-LCDTask::LCDTask(LCD *lcd, EventFamily operationModeEventFamily)
-    : lcd(lcd), operationModeObserver(this, operationModeEventFamily) {}
+LCDTask::LCDTask(LCD *lcd, EventFamily statusChangeEventFamily)
+    : lcd(lcd), systemModeObserver(this, statusChangeEventFamily) {}
 
 void LCDTask::begin(EventsManager *eventsManager)
 {
-    eventsManager->registerObserver(&this->operationModeObserver);
+    eventsManager->registerObserver(&this->systemModeObserver);
 }

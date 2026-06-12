@@ -13,16 +13,16 @@ private:
     void displayStatus(SystemStatus status);
     void displayOpeningLevel(uint8_t openingPercentage);
 
-    class OperationModeObserver : public TaskEventObserver<LCDTask, SystemStatusChangeEvent>
+    class SystemModeObserver : public TaskEventObserver<LCDTask, SystemStatusChangeEvent>
     {
     public:
-        OperationModeObserver(LCDTask *task, EventFamily family)
+        SystemModeObserver(LCDTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(SystemStatusChangeEvent event) override;
     };
-    OperationModeObserver operationModeObserver;
+    SystemModeObserver systemModeObserver;
 
 public:
-    LCDTask(LCD *lcd, EventFamily operationModeEventFamily);
+    LCDTask(LCD *lcd, EventFamily statusChangeEventFamily);
     void begin(EventsManager *eventsManager) override;
 };

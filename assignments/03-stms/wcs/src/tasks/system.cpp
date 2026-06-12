@@ -53,10 +53,10 @@ void SystemStatusTask::SerialObserver::onEvent(SerialMessage message)
 }
 
 SystemStatusTask::SystemStatusTask(SystemStatus initialStatus,
-                                     EventFamily operationsModeEventFamily,
+                                     EventFamily statusChangeEventFamily,
                                      EventFamily buttonEventFamily,
                                      EventFamily serialEventFamily)
-    : EventSource(operationsModeEventFamily),
+    : EventSource(statusChangeEventFamily),
       status(initialStatus),
       buttonObserver(this, buttonEventFamily),
       serialObserver(this, serialEventFamily) {}

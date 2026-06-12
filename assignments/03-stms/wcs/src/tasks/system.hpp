@@ -34,7 +34,7 @@ private:
 
 public:
     SystemStatusTask(SystemStatus initialState,
-                      EventFamily operationsModeEventFamily,
+                      EventFamily statusChangeEventFamily,
                       EventFamily buttonEventFamily,
                       EventFamily serialEventFamily);
     void begin(EventsManager *eventsManager) override;
