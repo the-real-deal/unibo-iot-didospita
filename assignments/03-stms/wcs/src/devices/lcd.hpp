@@ -22,5 +22,6 @@ private:
   void begin(uint8_t address);
   void setCursor(uint8_t col, uint8_t row);
   void clear();
+  void clearRow(uint8_t row);
   void print(const char *message);
 };

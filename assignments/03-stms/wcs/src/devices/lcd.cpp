@@ -22,6 +22,15 @@ void LCD::clear()
   this->lcd.clear();
 }
 
+void LCD::clearRow(uint8_t row) {
+  this->lcd.setCursor(0, row);
+  for (uint8_t i = 0; i < LCD_COLS; i++)
+  {
+    this->lcd.print(' ');
+  }
+  
+}
+
 void LCD::print(const char *message)
 {
   this->lcd.print(message);

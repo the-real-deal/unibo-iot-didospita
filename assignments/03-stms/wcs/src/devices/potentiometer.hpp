@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-#include "core/setup.hpp"
 #include "core/pins.hpp"
 #include "core/events.hpp"
 
@@ -15,7 +14,7 @@ struct PotentiometerEvent
     double value;
 };
 
-class Potentiometer : public Setup, public SyncEventSource<PotentiometerEvent>
+class Potentiometer : public SyncEventSource<PotentiometerEvent>
 {
 private:
     AnalogInputPin pin;
@@ -24,8 +23,8 @@ private:
     double readPin();
 
 public:
-    Potentiometer(uint8_t pin, EventFamily family, EventsManager *eventManager);
-    void setup() override;
+    Potentiometer(uint8_t pin, EventFamily family);
+    void begin(EventsManager *eventsManager) override;
     void checkEvents() override;
     double getValue();
 };

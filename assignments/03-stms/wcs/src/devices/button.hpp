@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-#include "core/setup.hpp"
 #include "core/events.hpp"
 #include "core/interrupts.hpp"
 
@@ -18,8 +17,7 @@ enum class ButtonEvent
 
 class PushButton;
 
-class PushButton : public Setup,
-                   public EventSource<ButtonEvent>
+class PushButton : public EventSource<ButtonEvent>
 {
 private:
     InterruptPin pin;
@@ -27,6 +25,6 @@ private:
     static void interruptHandler(void *ctx, InterruptPinState state);
 
 public:
-    PushButton(uint8_t pin, EventFamily family, EventsManager* eventManager);
-    virtual void setup() override;
+    PushButton(uint8_t pin, EventFamily family);
+    void begin(EventsManager *eventsManager) override;
 };

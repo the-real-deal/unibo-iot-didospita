@@ -24,8 +24,8 @@ uint8_t I2CManager::scan()
     }
     else if (error == 4)
     {
-      exit(error);
+      abort();
     }
   }
-  exit(-1);
+  abort();
 }

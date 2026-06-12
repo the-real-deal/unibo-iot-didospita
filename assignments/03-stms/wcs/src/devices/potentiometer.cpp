@@ -4,11 +4,12 @@
 
 #include <Arduino.h>
 
-Potentiometer::Potentiometer(uint8_t pin, EventFamily family, EventsManager *eventManager)
-    : SyncEventSource(family, eventManager), pin(pin), value(NAN) {}
+Potentiometer::Potentiometer(uint8_t pin, EventFamily family)
+    : SyncEventSource(family), pin(pin), value(NAN) {}
 
-void Potentiometer::setup()
+void Potentiometer::begin(EventsManager *eventsManager)
 {
+    EventSource<PotentiometerEvent>::begin(eventsManager);
     this->pin.setup();
 }
 

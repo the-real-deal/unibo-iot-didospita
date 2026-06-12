@@ -4,11 +4,12 @@
 
 #include "std/enum.hpp"
 
-SerialManager::SerialManager(EventFamily family, EventsManager *eventsManager)
-    : SyncEventSource(family, eventsManager) {}
+SerialManager::SerialManager(EventFamily family)
+    : SyncEventSource(family) {}
 
-void SerialManager::setup()
+void SerialManager::begin(EventsManager *eventsManager)
 {
+  EventSource<SerialMessage>::begin(eventsManager);
   Serial.begin(SERIAL_BAUD);
   delay(SERIAL_DELAY_MS);
   this->serialSync();

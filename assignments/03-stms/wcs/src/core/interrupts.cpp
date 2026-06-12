@@ -98,7 +98,7 @@ void InterruptPin::setup()
     Pair<InterruptHandle *, size_t> existingInterrupt = InterruptPin::findPinInterrupt(this->handle.pin);
     if (existingInterrupt.left != nullptr)
     {
-        exit(-1);
+        abort();
     }
     InterruptPin::interrupts.pushLast(this->handle);
     enableInterrupt(this->handle.pin, InterruptPin::interruptHandler, rawInterruptMode(this->mode));

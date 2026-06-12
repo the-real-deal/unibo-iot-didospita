@@ -82,17 +82,15 @@ public:
         return this->observers.pushLast(observer);
     }
 
-    bool generateEvent(EventSignal *event)
+    bool generateEvent(EventSignal *event, bool deleteOnFail = true)
     {
         noInterrupts();
-        if (this->eventQueue.isFull())
-        {
-            EventSignal *event = *this->eventQueue.get(0);
-            delete event;
-            this->eventQueue.deleteAt(0);
-        }
         bool ok = this->eventQueue.pushLast(event);
         interrupts();
+        if (!ok && deleteOnFail)
+        {
+            delete event;
+        }
         return ok;
     }
 
@@ -132,21 +130,23 @@ class EventSource
 {
 protected:
     EventFamily family;
-    EventsManager *eventManager;
+    EventsManager *eventsManager;
 
     bool generateEvent(T eventData)
     {
-        if (this->eventManager != nullptr)
+        if (this->eventsManager != nullptr)
         {
-            return this->eventManager->generateEvent(new Event<T>(this->family, eventData));
+            bool ok = this->eventsManager->generateEvent(new Event<T>(this->family, eventData));
+            return ok;
         }
         return false;
     }
 
 public:
-    EventSource(EventFamily family, EventsManager *eventManager)
-        : family(family), eventManager(eventManager) {}
-    
+    EventSource(EventFamily family)
+        : family(family), eventsManager(nullptr) {}
+
+    virtual void begin(EventsManager *eventsManager) { this->eventsManager = eventsManager; }
     EventFamily getFamily() { return this->family; }
 };
 
@@ -154,8 +154,8 @@ template <typename T>
 class SyncEventSource : public EventSource<T>
 {
 public:
-    SyncEventSource(EventFamily family, EventsManager *eventManager)
-        : EventSource<T>(family, eventManager) {}
+    SyncEventSource(EventFamily family)
+        : EventSource<T>(family) {}
 
     virtual void checkEvents() = 0;
 };

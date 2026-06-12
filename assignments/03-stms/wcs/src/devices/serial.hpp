@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 
-#include "core/setup.hpp"
 #include "core/events.hpp"
 
 #ifndef SERIAL_BAUD
@@ -25,10 +24,12 @@ enum class SerialMessageType
 {
   SerialSync,
   Log,
+  Mode,
 };
 const char *const SERIAL_MESSAGE_TYPE_STRINGS[] = {
     "SERIAL_SYNC",
     "LOG",
+    "MODE",
 };
 
 struct SerialMessage
@@ -37,14 +38,14 @@ struct SerialMessage
   char data[SERIAL_MESSAGE_DATA_BUF_LEN];
 };
 
-class SerialManager : public Setup, public SyncEventSource<SerialMessage>
+class SerialManager : public SyncEventSource<SerialMessage>
 {
 private:
   void sendMessage(SerialMessageType type, const char *message);
 
 public:
-  SerialManager(EventFamily family, EventsManager *eventsManager);
-  void setup() override;
+  SerialManager(EventFamily family);
+  void begin(EventsManager *eventsManager) override;
   void checkEvents() override;
   void serialSync();
   void log(const char *message);

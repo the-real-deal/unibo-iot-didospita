@@ -13,7 +13,6 @@ const parser = serialMessageParser({
   LOG: (message) => {
     if (serialSynced) {
       console.info("Serial log:", message.payload)
-      serialPort.write("LOG:01234567\n")
     }
   },
 })

@@ -2,8 +2,8 @@
 
 #include "Arduino.h"
 
-PushButton::PushButton(uint8_t pin, EventFamily family, EventsManager *eventManager)
-    : EventSource(family, eventManager),
+PushButton::PushButton(uint8_t pin, EventFamily family)
+    : EventSource(family),
       pin(pin,
           InterruptMode::Change,
           BTN_DEBOUNCE_MILLIS,
@@ -25,7 +25,8 @@ void PushButton::interruptHandler(void *ctx, InterruptPinState pinState)
     button->generateEvent(event);
 }
 
-void PushButton::setup()
+void PushButton::begin(EventsManager *eventsManager)
 {
+    EventSource<ButtonEvent>::begin(eventsManager);
     this->pin.setup();
 }

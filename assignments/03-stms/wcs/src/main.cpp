@@ -10,32 +10,38 @@
 #include "devices/lcd.hpp"
 #include "devices/i2c.hpp"
 #include "tasks/mode.hpp"
+#include "tasks/lcd.hpp"
 
-#ifndef BTN_EVENT_FAMILY
-#define BTN_EVENT_FAMILY 0
-#endif
+enum class Events : EventFamily
+{
+  Button,
+  Potentiometer,
+  Serial,
+  OperationMode,
+};
 
-#ifndef POT_EVENT_FAMILY
-#define POT_EVENT_FAMILY 1
-#endif
-
-#ifndef SERIAL_EVENT_FAMILY
-#define SERIAL_EVENT_FAMILY 2
-#endif
+EventFamily family(Events event)
+{
+  return static_cast<EventFamily>(event);
+}
 
 EventsManager eventsManager;
-SerialManager serialManager(SERIAL_EVENT_FAMILY, &eventsManager);
-PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventsManager);
-Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventsManager);
+SerialManager serialManager(family(Events::Serial));
+PushButton button(BTN_PIN, family(Events::Button));
+Potentiometer potentiomenter(POT_PIN, family(Events::Potentiometer));
 ServoMotor servo(SERVO_PIN, 0);
 Led builtinLed(LED_BUILTIN);
 LCD lcd;
 
-OperationModeTask operationModeTask(&button);
+OperationModeTask operationModeTask(OperationMode::Automatic,
+                                    family(Events::OperationMode),
+                                    button.getFamily(),
+                                    serialManager.getFamily());
+LCDTask lcdTask(&lcd, operationModeTask.getFamily());
 
 void setup()
 {
-  serialManager.setup();
+  serialManager.begin(&eventsManager);
   serialManager.log("setup() started");
 
   I2CManager i2c;
@@ -45,11 +51,13 @@ void setup()
   lcd.begin(lcdAddress);
 
   builtinLed.setup();
-  button.setup();
-  potentiomenter.setup();
   servo.setup();
 
+  button.begin(&eventsManager);
+  potentiomenter.begin(&eventsManager);
+
   operationModeTask.begin(&eventsManager);
+  lcdTask.begin(&eventsManager);
 
   serialManager.log("setup() finished");
 }
@@ -57,8 +65,10 @@ void setup()
 void loop()
 {
   builtinLed.toggle();
+
   serialManager.checkEvents();
   potentiomenter.checkEvents();
+
   eventsManager.handleEvents();
-  delay(100);
+  delay(LOOP_DELAY_MS);
 }
