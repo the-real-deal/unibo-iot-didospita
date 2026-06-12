@@ -2,26 +2,33 @@
 
 #include <Arduino.h>
 
-ServoMotor::ServoMotor(uint8_t pin, int initialAngle)
-    : servo(),
+ServoMotor::ServoMotor(uint8_t pin, int initialAngle, EventFamily family)
+    : EventSource(family),
+      servo(),
       pin(pin),
       angle(initialAngle) {}
 
-void ServoMotor::setup()
+bool ServoMotor::writeAngle(int angle)
 {
+  this->servo.write(angle);
+  return this->generateEvent({.angle = angle});
+}
+
+void ServoMotor::begin(EventsManager *eventsManager)
+{
+  EventSource<ServoMotorEvent>::begin(eventsManager);
   this->servo.attach(this->pin, SERVO_MIN_FREQ, SERVO_MAX_FREQ);
   while (!this->servo.attached())
     ;
-  this->setAngle(this->angle);
+  this->writeAngle(this->angle);
 }
 
-void ServoMotor::read()
+bool ServoMotor::setAngle(int angle)
 {
-  noInterrupts();
-  this->angle = this->servo.read();
-  interrupts();
+  if (this->angle == angle)
+  {
+    return false;
+  }
+  this->angle = angle;
+  return this->writeAngle(this->angle);
 }
-
-int ServoMotor::getAngle() { return this->angle; }
-
-void ServoMotor::setAngle(int angle) { this->servo.write(angle); }

@@ -2,7 +2,6 @@
 
 #include "std/enum.hpp"
 
-
 bool SystemStatusTask::generateStatusEvent(SystemStatus status)
 {
     SystemStatusChangeEvent event = {.status = status, .prev = this->status};
@@ -49,13 +48,22 @@ void SystemStatusTask::SerialObserver::onEvent(SerialMessage message)
     }
 
     SystemStatus status = enumFromString<SystemStatus>(message.data, SYSTEM_STATUS_STRINGS);
-    this->task->switchStatus(status);
+    switch (status)
+    {
+    case SystemStatus::Unconnected:
+        this->task->buttonObserver.disable();
+        break;
+    default:
+        this->task->buttonObserver.enable();
+        this->task->switchStatus(status);
+        break;
+    }
 }
 
 SystemStatusTask::SystemStatusTask(SystemStatus initialStatus,
-                                     EventFamily statusChangeEventFamily,
-                                     EventFamily buttonEventFamily,
-                                     EventFamily serialEventFamily)
+                                   EventFamily statusChangeEventFamily,
+                                   EventFamily buttonEventFamily,
+                                   EventFamily serialEventFamily)
     : EventSource(statusChangeEventFamily),
       status(initialStatus),
       buttonObserver(this, buttonEventFamily),

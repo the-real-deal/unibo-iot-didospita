@@ -3,7 +3,6 @@
 #include <Servo.h>
 #include <stdint.h>
 
-#include "io.hpp"
 #include "kernel/pins.hpp"
 #include "kernel/events.hpp"
 
@@ -15,17 +14,22 @@
 #define SERVO_MAX_FREQ 2500
 #endif
 
-class ServoMotor : public ExternalInput
+struct ServoMotorEvent
+{
+  int angle;
+};
+
+class ServoMotor : public EventSource<ServoMotorEvent>
 {
 private:
   Servo servo;
   uint8_t pin;
   int angle;
 
+  bool writeAngle(int angle);
+
 public:
-  ServoMotor(uint8_t pin, int initialAngle);
-  void setup() override;
-  void read() override;
-  int getAngle();
-  void setAngle(int angle);
+  ServoMotor(uint8_t pin, int initialAngle, EventFamily family);
+  bool setAngle(int angle);
+  void begin(EventsManager *eventsManager) override;
 };

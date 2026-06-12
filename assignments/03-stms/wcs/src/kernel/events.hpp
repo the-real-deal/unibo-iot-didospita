@@ -6,11 +6,11 @@
 #include "std/collections.hpp"
 
 #ifndef EVENT_QUEUE_SIZE
-#define EVENT_QUEUE_SIZE 10
+#define EVENT_QUEUE_SIZE 20
 #endif
 
 #ifndef MAX_EVENT_OBSERVERS
-#define MAX_EVENT_OBSERVERS 5
+#define MAX_EVENT_OBSERVERS 10
 #endif
 
 class EventsManager;
@@ -49,10 +49,15 @@ protected:
     virtual void onEventSignal(EventSignal *event) = 0;
 
 public:
-    EventSignalObserver(EventFamily family) : family(family) {}
+    EventSignalObserver(EventFamily family)
+        : family(family), enabled(true) {}
+
     EventFamily getObservedFamily() { return this->family; }
+
     void enable() { this->enabled = true; }
+
     void disable() { this->enabled = false; }
+
     bool isEnabled() { return this->enabled; }
 };
 

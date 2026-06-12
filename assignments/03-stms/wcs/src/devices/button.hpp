@@ -6,7 +6,7 @@
 #include "kernel/interrupts.hpp"
 
 #ifndef BTN_DEBOUNCE_MILLIS
-#define BTN_DEBOUNCE_MILLIS 50
+#define BTN_DEBOUNCE_MILLIS 150
 #endif
 
 enum class ButtonEvent

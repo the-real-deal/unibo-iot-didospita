@@ -11,12 +11,14 @@
 #include "devices/i2c.hpp"
 #include "tasks/system.hpp"
 #include "tasks/lcd.hpp"
+#include "tasks/manual.hpp"
 
 enum class Events : EventFamily
 {
   Button,
   Potentiometer,
   Serial,
+  Servo,
   StatusChange,
 };
 
@@ -29,15 +31,18 @@ EventsManager eventsManager;
 SerialManager serialManager(family(Events::Serial));
 PushButton button(BTN_PIN, family(Events::Button));
 Potentiometer potentiomenter(POT_PIN, family(Events::Potentiometer));
-ServoMotor servo(SERVO_PIN, 0);
+ServoMotor servo(SERVO_PIN, 0, family(Events::Servo));
 Led builtinLed(LED_BUILTIN);
 LCD lcd;
 
 SystemStatusTask systemStatusTask(SystemStatus::Automatic,
-                                    family(Events::StatusChange),
-                                    button.getFamily(),
-                                    serialManager.getFamily());
-LCDTask lcdTask(&lcd, systemStatusTask.getFamily());
+                                  family(Events::StatusChange),
+                                  button.getFamily(),
+                                  serialManager.getFamily());
+LCDTask lcdTask(&lcd, systemStatusTask.getFamily(), servo.getFamily());
+ManualControlTask manualControlTask(&servo,
+                                    systemStatusTask.getFamily(),
+                                    potentiomenter.getFamily());
 
 void setup()
 {
@@ -51,13 +56,13 @@ void setup()
   lcd.begin(lcdAddress);
 
   builtinLed.setup();
-  servo.setup();
 
   button.begin(&eventsManager);
   potentiomenter.begin(&eventsManager);
-
+  servo.begin(&eventsManager);
   systemStatusTask.begin(&eventsManager);
   lcdTask.begin(&eventsManager);
+  manualControlTask.begin(&eventsManager);
 
   serialManager.log("setup() finished");
 }
