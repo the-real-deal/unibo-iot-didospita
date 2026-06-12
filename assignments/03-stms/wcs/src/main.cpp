@@ -105,5 +105,5 @@ void loop()
   serialManager.checkEvents();
   potentiomenter.checkEvents();
   eventManager.handleEvents();
-  delay(50);
+  delay(100);
 }
