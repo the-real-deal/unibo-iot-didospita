@@ -3,36 +3,38 @@
 #include "task.hpp"
 #include "core/system.hpp"
 #include "devices/lcd.hpp"
+#include "devices/serial.hpp"
 #include "devices/servo.hpp"
 
-class LCDTask : public AsyncTask
+class DisplayTask : public AsyncTask
 {
 private:
     LCD *lcd;
+    SerialManager *serialManager;
 
-    void prepareRow(uint8_t row);
     void displayStatus(SystemStatus status);
-    void displayOpeningLevel(uint8_t openingPercentage);
+    void displayAngle(int angle);
 
-    class SystemStateObserver : public TaskEventObserver<LCDTask, SystemStatusChangeEvent>
+    class SystemStateObserver : public TaskEventObserver<DisplayTask, SystemStatusChangeEvent>
     {
     public:
-        SystemStateObserver(LCDTask *task, EventFamily family)
+        SystemStateObserver(DisplayTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(SystemStatusChangeEvent event) override;
     };
     SystemStateObserver systemStateObserver;
 
-    class ServoMotorObserver : public TaskEventObserver<LCDTask, ServoMotorEvent>
+    class ServoMotorObserver : public TaskEventObserver<DisplayTask, ServoMotorEvent>
     {
     public:
-        ServoMotorObserver(LCDTask *task, EventFamily family)
+        ServoMotorObserver(DisplayTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(ServoMotorEvent event) override;
     };
     ServoMotorObserver servoObserver;
 
 public:
-    LCDTask(LCD *lcd, EventFamily statusChangeEventFamily, EventFamily servoEventFamily);
+    DisplayTask(LCD *lcd, SerialManager *serialManager,
+                EventFamily statusChangeEventFamily, EventFamily servoEventFamily);
     void begin(EventsManager *eventsManager) override;
 };

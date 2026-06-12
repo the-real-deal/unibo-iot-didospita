@@ -28,7 +28,7 @@ void LCD::clearRow(uint8_t row) {
   {
     this->lcd.print(' ');
   }
-  
+  this->lcd.setCursor(0, row);
 }
 
 void LCD::print(const char *message)

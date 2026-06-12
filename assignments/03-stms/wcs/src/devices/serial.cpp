@@ -23,7 +23,8 @@ void SerialManager::checkEvents()
   }
 
   String buffer = Serial.readStringUntil('\n');
-  if (buffer.endsWith("\r")) {
+  if (buffer.endsWith("\r"))
+  {
     buffer.remove(buffer.length() - 1);
   }
 
@@ -68,4 +69,16 @@ void SerialManager::serialSync()
 void SerialManager::log(const char *message)
 {
   this->sendMessage(SerialMessageType::Log, message);
+}
+
+void SerialManager::sendStatus(SystemStatus status)
+{
+  const char *message = enumToString<SystemStatus>(status, SYSTEM_STATUS_STRINGS);
+  this->sendMessage(SerialMessageType::Status, message);
+}
+
+void SerialManager::sendAngle(int angle)
+{
+  String message = String(angle);
+  this->sendMessage(SerialMessageType::Angle, message.c_str());
 }

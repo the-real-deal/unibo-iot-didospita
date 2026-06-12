@@ -26,11 +26,13 @@ enum class SerialMessageType
   SerialSync,
   Log,
   Status,
+  Angle,
 };
 const char *const SERIAL_MESSAGE_TYPE_STRINGS[] = {
     "SERIAL_SYNC",
     "LOG",
     "STATUS",
+    "ANGLE",
 };
 
 struct SerialMessage
@@ -50,4 +52,6 @@ public:
   void checkEvents() override;
   void serialSync();
   void log(const char *message);
+  void sendStatus(SystemStatus status);
+  void sendAngle(int angle);
 };

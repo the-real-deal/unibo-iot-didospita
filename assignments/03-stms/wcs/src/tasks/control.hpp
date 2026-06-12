@@ -4,6 +4,7 @@
 #include "core/system.hpp"
 #include "devices/potentiometer.hpp"
 #include "devices/servo.hpp"
+#include "devices/serial.hpp"
 
 class ControlTask : public AsyncTask
 {
@@ -28,9 +29,19 @@ private:
     };
     PotentiometerObserver potentiometerObserver;
 
+    class SerialObserver : public TaskEventObserver<ControlTask, SerialMessage>
+    {
+    public:
+        SerialObserver(ControlTask *task, EventFamily family)
+            : TaskEventObserver(task, family) {}
+        void onEvent(SerialMessage event) override;
+    };
+    SerialObserver serialObserver;
+
 public:
     ControlTask(ServoMotor *servo,
-                      EventFamily statusChangeEventFamily,
-                      EventFamily potEventFamily);
+                EventFamily statusChangeEventFamily,
+                EventFamily potEventFamily,
+                EventFamily serialEventFamily);
     void begin(EventsManager *eventsManager) override;
 };
