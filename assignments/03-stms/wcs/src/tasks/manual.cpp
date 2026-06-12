@@ -1,5 +1,7 @@
 #include "manual.hpp"
 
+#include "config.h"
+
 void ManualControlTask::SystemStateObserver::onEvent(SystemStatusChangeEvent event)
 {
     switch (event.status)
@@ -16,7 +18,7 @@ void ManualControlTask::SystemStateObserver::onEvent(SystemStatusChangeEvent eve
 
 void ManualControlTask::PotentiometerObserver::onEvent(PotentiometerEvent event)
 {
-    int angle = event.value * 90;
+    int angle = event.value * POT_SERVO_MAX_ANGLE;
     this->task->servo->setAngle(angle);
 }
 

@@ -1,5 +1,6 @@
 #include "lcd.hpp"
 
+#include "config.h"
 #include "std/enum.hpp"
 
 void LCDTask::prepareRow(uint8_t row)

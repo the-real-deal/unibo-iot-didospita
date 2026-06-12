@@ -5,10 +5,6 @@
 #include "devices/lcd.hpp"
 #include "devices/servo.hpp"
 
-#ifndef POT_SERVO_MAX_ANGLE
-#define POT_SERVO_MAX_ANGLE 90
-#endif
-
 class LCDTask : public AsyncTask
 {
 private:
