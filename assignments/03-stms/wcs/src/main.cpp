@@ -7,6 +7,8 @@
 #include "devices/servo.hpp"
 #include "devices/potentiometer.hpp"
 #include "devices/led.hpp"
+#include "devices/lcd.hpp"
+#include "devices/i2c.hpp"
 
 #ifndef BTN_EVENT_FAMILY
 #define BTN_EVENT_FAMILY 0
@@ -70,6 +72,7 @@ PushButton button(BTN_PIN, BTN_EVENT_FAMILY, &eventManager);
 Potentiometer potentiomenter(POT_PIN, POT_EVENT_FAMILY, &eventManager);
 ServoMotor servo(SERVO_PIN, 10);
 Led builtinLed(LED_BUILTIN);
+LCD lcd;
 
 BtnLogObserver btnObserver;
 PotLogObserver potObserver(&servo);
@@ -78,6 +81,12 @@ void setup()
 {
   serialManager.setup();
   serialManager.log("setup() started");
+
+  I2CManager i2c;
+  i2c.setup();
+
+  uint8_t lcdAddress = i2c.scan();
+  lcd.begin(lcdAddress);
 
   eventManager.registerObserver(&btnObserver);
   eventManager.registerObserver(&potObserver);
