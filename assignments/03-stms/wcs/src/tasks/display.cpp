@@ -38,6 +38,6 @@ DisplayTask::DisplayTask(LCD *lcd, SerialManager *serialManager,
 
 void DisplayTask::begin(EventsManager *eventsManager)
 {
-    eventsManager->registerObserver(&this->systemStateObserver);
-    eventsManager->registerObserver(&this->servoObserver);
+    this->systemStateObserver.begin(eventsManager);
+    this->servoObserver.begin(eventsManager);
 }

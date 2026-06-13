@@ -6,7 +6,7 @@
 #include "devices/button.hpp"
 #include "devices/serial.hpp"
 
-class SystemStateTask : public AsyncTask, public EventSource<SystemState>
+class SystemStateTask : public EventSource<SystemState>
 {
 private:
     SystemState state;

@@ -3,13 +3,6 @@
 #include "kernel/setup.hpp"
 #include "kernel/events.hpp"
 
-class AsyncTask
-{
-public:
-    AsyncTask() {}
-    virtual void begin(EventsManager *eventsManager);
-};
-
 template <typename Task, typename T>
 class TaskEventObserver : public EventObserver<T>
 {

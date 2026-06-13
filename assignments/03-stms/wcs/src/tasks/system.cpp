@@ -71,7 +71,7 @@ SystemStateTask::SystemStateTask(SystemState initialState,
 void SystemStateTask::SystemStateTask::begin(EventsManager *eventsManager)
 {
     EventSource<SystemState>::begin(eventsManager);
-    eventsManager->registerObserver(&this->buttonObserver);
-    eventsManager->registerObserver(&this->serialObserver);
+    this->buttonObserver.begin(eventsManager);
+    this->serialObserver.begin(eventsManager);
     this->generateStateEvent(this->state);
 }

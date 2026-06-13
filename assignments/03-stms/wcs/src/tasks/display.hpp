@@ -1,12 +1,13 @@
 #pragma once
 
 #include "task.hpp"
+#include "kernel/events.hpp"
 #include "core/system.hpp"
 #include "devices/lcd.hpp"
 #include "devices/serial.hpp"
 #include "devices/servo.hpp"
 
-class DisplayTask : public AsyncTask
+class DisplayTask : public EventActor
 {
 private:
     LCD *lcd;

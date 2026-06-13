@@ -1,12 +1,13 @@
 #pragma once
 
 #include "task.hpp"
+#include "kernel/events.hpp"
 #include "core/system.hpp"
 #include "devices/potentiometer.hpp"
 #include "devices/servo.hpp"
 #include "devices/serial.hpp"
 
-class ControlTask : public AsyncTask
+class ControlTask : public EventActor
 {
 private:
     ServoMotor *servo;

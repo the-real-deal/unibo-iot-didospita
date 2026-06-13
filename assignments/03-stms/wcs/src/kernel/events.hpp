@@ -38,7 +38,14 @@ public:
     T getData() { return this->data; }
 };
 
-class EventSignalObserver
+class EventActor
+{
+public:
+    virtual void begin(EventsManager *eventsManager) = 0;
+    ~EventActor() = default;
+};
+
+class EventSignalObserver : public EventActor
 {
     friend EventsManager;
 
@@ -51,6 +58,8 @@ protected:
 public:
     EventSignalObserver(EventFamily family)
         : family(family), enabled(true) {}
+
+    virtual void begin(EventsManager *eventsManager) override;
 
     EventFamily getObservedFamily() { return this->family; }
 
@@ -135,7 +144,7 @@ public:
 };
 
 template <typename T>
-class EventSource
+class EventSource : public EventActor
 {
 protected:
     EventFamily family;
@@ -155,7 +164,10 @@ public:
     EventSource(EventFamily family)
         : family(family), eventsManager(nullptr) {}
 
-    virtual void begin(EventsManager *eventsManager) { this->eventsManager = eventsManager; }
+    virtual void begin(EventsManager *eventsManager) override
+    {
+        this->eventsManager = eventsManager;
+    }
     EventFamily getFamily() { return this->family; }
 };
 

@@ -4,7 +4,6 @@
 #include <Arduino.h>
 
 #include "std/collections.hpp"
-#include "core/esp.hpp"
 
 #ifndef EVENT_QUEUE_SIZE
 #define EVENT_QUEUE_SIZE 20
@@ -39,7 +38,14 @@ public:
     T getData() { return this->data; }
 };
 
-class EventSignalObserver
+class EventActor
+{
+public:
+    virtual void begin(EventsManager *eventsManager) = 0;
+    ~EventActor() = default;
+};
+
+class EventSignalObserver : public EventActor
 {
     friend EventsManager;
 
@@ -52,6 +58,8 @@ protected:
 public:
     EventSignalObserver(EventFamily family)
         : family(family), enabled(true) {}
+
+    virtual void begin(EventsManager *eventsManager) override;
 
     EventFamily getObservedFamily() { return this->family; }
 
@@ -136,7 +144,7 @@ public:
 };
 
 template <typename T>
-class EventSource
+class EventSource : public EventActor
 {
 protected:
     EventFamily family;
@@ -156,48 +164,19 @@ public:
     EventSource(EventFamily family)
         : family(family), eventsManager(nullptr) {}
 
-    virtual void begin(EventsManager *eventsManager) { this->eventsManager = eventsManager; }
+    virtual void begin(EventsManager *eventsManager) override
+    {
+        this->eventsManager = eventsManager;
+    }
     EventFamily getFamily() { return this->family; }
 };
 
 template <typename T>
 class SyncEventSource : public EventSource<T>
 {
-private:
-    TaskHandle_t backgroundTask;
-    uint32_t backgroundTaskPeriodMillis;
-
-    static void backgroundTaskFn(void *ctx)
-    {
-        SyncEventSource<T> *eventSource = static_cast<SyncEventSource<T> *>(ctx);
-        while (true)
-        {
-            eventSource->checkEvents();
-            delay(eventSource->backgroundTaskPeriodMillis);
-        }
-    }
-
 public:
     SyncEventSource(EventFamily family)
-        : EventSource<T>(family),
-          backgroundTask(nullptr),
-          backgroundTaskPeriodMillis(0) {}
-
-    ~SyncEventSource()
-    {
-        deleteEspTask(&this->backgroundTask);
-    }
+        : EventSource<T>(family) {}
 
     virtual void checkEvents() = 0;
-
-    void spawnBackgroundTask(uint32_t periodMillis, ESPTaskConfig config)
-    {
-        if (this->backgroundTask != nullptr)
-        {
-            return;
-        }
-
-        this->backgroundTaskPeriodMillis = periodMillis;
-        createEspTask(config, this, backgroundTaskFn);
-    }
 };

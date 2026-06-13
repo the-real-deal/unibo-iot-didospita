@@ -46,7 +46,7 @@ ControlTask::ControlTask(ServoMotor *servo,
 
 void ControlTask::begin(EventsManager *eventsManager)
 {
-    eventsManager->registerObserver(&this->systemStateObserver);
-    eventsManager->registerObserver(&this->potentiometerObserver);
-    eventsManager->registerObserver(&this->serialObserver);
+    this->systemStateObserver.begin(eventsManager);
+    this->potentiometerObserver.begin(eventsManager);
+    this->serialObserver.begin(eventsManager);
 }
