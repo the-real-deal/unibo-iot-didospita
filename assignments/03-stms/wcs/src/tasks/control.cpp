@@ -2,16 +2,16 @@
 
 #include "config.h"
 
-void ControlTask::SystemStateObserver::onEvent(SystemStatusChangeEvent event)
+void ControlTask::SystemStateObserver::onEvent(SystemState state)
 {
-    switch (event.status)
+    switch (state)
     {
-    case SystemStatus::Automatic:
-    case SystemStatus::Unconnected:
+    case SystemState::Automatic:
+    case SystemState::Unconnected:
         this->task->potentiometerObserver.disable();
         this->task->serialObserver.enable();
         break;
-    case SystemStatus::Manual:
+    case SystemState::Manual:
         this->task->potentiometerObserver.enable();
         this->task->serialObserver.disable();
         break;
@@ -36,11 +36,11 @@ void ControlTask::SerialObserver::onEvent(SerialMessage message)
 }
 
 ControlTask::ControlTask(ServoMotor *servo,
-                         EventFamily statusChangeEventFamily,
+                         EventFamily systemStateEventFamily,
                          EventFamily potEventFamily,
                          EventFamily serialEventFamily)
     : servo(servo),
-      systemStateObserver(this, statusChangeEventFamily),
+      systemStateObserver(this, systemStateEventFamily),
       potentiometerObserver(this, potEventFamily),
       serialObserver(this, serialEventFamily) {}
 

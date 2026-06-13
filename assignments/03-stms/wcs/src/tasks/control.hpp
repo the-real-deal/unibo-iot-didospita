@@ -11,12 +11,12 @@ class ControlTask : public AsyncTask
 private:
     ServoMotor *servo;
 
-    class SystemStateObserver : public TaskEventObserver<ControlTask, SystemStatusChangeEvent>
+    class SystemStateObserver : public TaskEventObserver<ControlTask, SystemState>
     {
     public:
         SystemStateObserver(ControlTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
-        void onEvent(SystemStatusChangeEvent event) override;
+        void onEvent(SystemState state) override;
     };
     SystemStateObserver systemStateObserver;
 
@@ -40,7 +40,7 @@ private:
 
 public:
     ControlTask(ServoMotor *servo,
-                EventFamily statusChangeEventFamily,
+                EventFamily systemStateEventFamily,
                 EventFamily potEventFamily,
                 EventFamily serialEventFamily);
     void begin(EventsManager *eventsManager) override;

@@ -3,11 +3,11 @@
 #include "config.h"
 #include "std/enum.hpp"
 
-void DisplayTask::displayStatus(SystemStatus status)
+void DisplayTask::displayState(SystemState state)
 {
-    this->serialManager->sendStatus(status);
+    this->serialManager->sendState(state);
     this->lcd->clearRow(0);
-    this->lcd->print(enumToString(status, SYSTEM_STATUS_STRINGS));
+    this->lcd->print(enumToString(state, SYSTEM_STATE_STRINGS));
 }
 
 void DisplayTask::displayAngle(int angle)
@@ -20,9 +20,9 @@ void DisplayTask::displayAngle(int angle)
     this->lcd->print(displayString.c_str());
 }
 
-void DisplayTask::SystemStateObserver::onEvent(SystemStatusChangeEvent event)
+void DisplayTask::SystemStateObserver::onEvent(SystemState state)
 {
-    this->task->displayStatus(event.status);
+    this->task->displayState(state);
 }
 
 void DisplayTask::ServoMotorObserver::onEvent(ServoMotorEvent event)
@@ -31,9 +31,9 @@ void DisplayTask::ServoMotorObserver::onEvent(ServoMotorEvent event)
 }
 
 DisplayTask::DisplayTask(LCD *lcd, SerialManager *serialManager,
-                         EventFamily statusChangeEventFamily, EventFamily servoEventFamily)
+                         EventFamily systemStateEventFamily, EventFamily servoEventFamily)
     : lcd(lcd), serialManager(serialManager),
-      systemStateObserver(this, statusChangeEventFamily),
+      systemStateObserver(this, systemStateEventFamily),
       servoObserver(this, servoEventFamily) {}
 
 void DisplayTask::begin(EventsManager *eventsManager)

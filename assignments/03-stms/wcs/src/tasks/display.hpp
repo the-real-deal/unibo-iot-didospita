@@ -12,15 +12,15 @@ private:
     LCD *lcd;
     SerialManager *serialManager;
 
-    void displayStatus(SystemStatus status);
+    void displayState(SystemState state);
     void displayAngle(int angle);
 
-    class SystemStateObserver : public TaskEventObserver<DisplayTask, SystemStatusChangeEvent>
+    class SystemStateObserver : public TaskEventObserver<DisplayTask, SystemState>
     {
     public:
         SystemStateObserver(DisplayTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
-        void onEvent(SystemStatusChangeEvent event) override;
+        void onEvent(SystemState state) override;
     };
     SystemStateObserver systemStateObserver;
 
@@ -35,6 +35,6 @@ private:
 
 public:
     DisplayTask(LCD *lcd, SerialManager *serialManager,
-                EventFamily statusChangeEventFamily, EventFamily servoEventFamily);
+                EventFamily systemStateEventFamily, EventFamily servoEventFamily);
     void begin(EventsManager *eventsManager) override;
 };

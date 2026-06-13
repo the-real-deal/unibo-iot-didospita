@@ -34,7 +34,7 @@ class DigitalOutputPin : public IOPin
 {
 public:
   DigitalOutputPin(uint8_t pin);
-  void write(DigitalValue status);
+  void write(DigitalValue value);
 };
 
 class DigitalInputPin : public IOPin

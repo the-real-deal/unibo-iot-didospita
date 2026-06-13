@@ -1,4 +1,10 @@
 #include <Arduino.h>
+#include <PubSubClient.h>
+
+#include "secrets.h" // ignored, should define WIFI_SSID and WIFI_PASSWD
+#include "devices/wifi.hpp"
+
+WifiManager wifiManager(WIFI_SSID, WIFI_PASSWD);
 
 void setup() {
   Serial.begin(115200);

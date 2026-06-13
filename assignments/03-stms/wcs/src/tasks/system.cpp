@@ -2,77 +2,76 @@
 
 #include "std/enum.hpp"
 
-bool SystemStatusTask::generateStatusEvent(SystemStatus status)
+bool SystemStateTask::generateStateEvent(SystemState state)
 {
-    SystemStatusChangeEvent event = {.status = status, .prev = this->status};
-    this->status = status;
-    return this->generateEvent(event);
+    this->state = state;
+    return this->generateEvent(state);
 }
 
-void SystemStatusTask::switchStatus(SystemStatus status)
+void SystemStateTask::switchState(SystemState state)
 {
-    if (this->status == status)
+    if (this->state == state)
     {
         return;
     }
-    this->generateStatusEvent(status);
+    this->generateStateEvent(state);
 }
 
-void SystemStatusTask::ButtonObserver::onEvent(ButtonEvent event)
+void SystemStateTask::ButtonObserver::onEvent(ButtonEvent event)
 {
     if (event != ButtonEvent::Press)
     {
         return;
     }
 
-    SystemStatus status;
-    switch (this->task->status)
+    SystemState state;
+    switch (this->task->state)
     {
-    case SystemStatus::Manual:
-        status = SystemStatus::Automatic;
+    case SystemState::Manual:
+        state = SystemState::Automatic;
         break;
-    case SystemStatus::Automatic:
-        status = SystemStatus::Manual;
+    case SystemState::Automatic:
+        state = SystemState::Manual;
         break;
     default:
         break;
     }
-    this->task->switchStatus(status);
+    this->task->switchState(state);
 }
 
-void SystemStatusTask::SerialObserver::onEvent(SerialMessage message)
+void SystemStateTask::SerialObserver::onEvent(SerialMessage message)
 {
-    if (message.type != SerialMessageType::Status)
+    if (message.type != SerialMessageType::State)
     {
         return;
     }
 
-    SystemStatus status = enumFromString<SystemStatus>(message.data, SYSTEM_STATUS_STRINGS);
-    switch (status)
+    SystemState state = enumFromString<SystemState>(message.data, SYSTEM_STATE_STRINGS);
+    switch (state)
     {
-    case SystemStatus::Unconnected:
+    case SystemState::Unconnected:
         this->task->buttonObserver.disable();
         break;
     default:
         this->task->buttonObserver.enable();
-        this->task->switchStatus(status);
+        this->task->switchState(state);
         break;
     }
 }
 
-SystemStatusTask::SystemStatusTask(SystemStatus initialStatus,
-                                   EventFamily statusChangeEventFamily,
+SystemStateTask::SystemStateTask(SystemState initialState,
+                                   EventFamily systemStateEventFamily,
                                    EventFamily buttonEventFamily,
                                    EventFamily serialEventFamily)
-    : EventSource(statusChangeEventFamily),
-      status(initialStatus),
+    : EventSource(systemStateEventFamily),
+      state(initialState),
       buttonObserver(this, buttonEventFamily),
       serialObserver(this, serialEventFamily) {}
 
-void SystemStatusTask::SystemStatusTask::begin(EventsManager *eventsManager)
+void SystemStateTask::SystemStateTask::begin(EventsManager *eventsManager)
 {
-    EventSource<SystemStatusChangeEvent>::begin(eventsManager);
+    EventSource<SystemState>::begin(eventsManager);
     eventsManager->registerObserver(&this->buttonObserver);
     eventsManager->registerObserver(&this->serialObserver);
-    this->generateStatusEvent(this->status);
+    this->generateStateEvent(this->state);
 }

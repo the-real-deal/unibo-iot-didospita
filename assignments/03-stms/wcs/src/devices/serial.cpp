@@ -71,10 +71,10 @@ void SerialManager::log(const char *message)
   this->sendMessage(SerialMessageType::Log, message);
 }
 
-void SerialManager::sendStatus(SystemStatus status)
+void SerialManager::sendState(SystemState state)
 {
-  const char *message = enumToString<SystemStatus>(status, SYSTEM_STATUS_STRINGS);
-  this->sendMessage(SerialMessageType::Status, message);
+  const char *message = enumToString<SystemState>(state, SYSTEM_STATE_STRINGS);
+  this->sendMessage(SerialMessageType::State, message);
 }
 
 void SerialManager::sendAngle(int angle)

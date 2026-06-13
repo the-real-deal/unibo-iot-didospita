@@ -1,19 +1,13 @@
 #pragma once
 
-enum class SystemStatus
+enum class SystemState
 {
     Manual,
     Automatic,
     Unconnected,
 };
-const char *const SYSTEM_STATUS_STRINGS[] = {
+const char *const SYSTEM_STATE_STRINGS[] = {
     "MANUAL",
     "AUTOMATIC",
     "UNCONNECTED",
-};
-
-struct SystemStatusChangeEvent
-{
-    SystemStatus status;
-    SystemStatus prev;
 };

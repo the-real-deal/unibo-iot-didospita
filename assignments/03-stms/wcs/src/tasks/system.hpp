@@ -6,35 +6,35 @@
 #include "devices/button.hpp"
 #include "devices/serial.hpp"
 
-class SystemStatusTask : public AsyncTask, public EventSource<SystemStatusChangeEvent>
+class SystemStateTask : public AsyncTask, public EventSource<SystemState>
 {
 private:
-    SystemStatus status;
+    SystemState state;
 
-    bool generateStatusEvent(SystemStatus status);
-    void switchStatus(SystemStatus status);
+    bool generateStateEvent(SystemState state);
+    void switchState(SystemState state);
 
-    class ButtonObserver : public TaskEventObserver<SystemStatusTask, ButtonEvent>
+    class ButtonObserver : public TaskEventObserver<SystemStateTask, ButtonEvent>
     {
     public:
-        ButtonObserver(SystemStatusTask *task, EventFamily family)
+        ButtonObserver(SystemStateTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(ButtonEvent event) override;
     };
     ButtonObserver buttonObserver;
 
-    class SerialObserver : public TaskEventObserver<SystemStatusTask, SerialMessage>
+    class SerialObserver : public TaskEventObserver<SystemStateTask, SerialMessage>
     {
     public:
-        SerialObserver(SystemStatusTask *task, EventFamily family)
+        SerialObserver(SystemStateTask *task, EventFamily family)
             : TaskEventObserver(task, family) {}
         void onEvent(SerialMessage event) override;
     };
     SerialObserver serialObserver;
 
 public:
-    SystemStatusTask(SystemStatus initialState,
-                      EventFamily statusChangeEventFamily,
+    SystemStateTask(SystemState initialState,
+                      EventFamily systemStateEventFamily,
                       EventFamily buttonEventFamily,
                       EventFamily serialEventFamily);
     void begin(EventsManager *eventsManager) override;

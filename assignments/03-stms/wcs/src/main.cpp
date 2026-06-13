@@ -19,7 +19,7 @@ enum class Events : EventFamily
   Potentiometer,
   Serial,
   Servo,
-  StatusChange,
+  SystemState,
 };
 
 EventFamily family(Events event)
@@ -35,14 +35,14 @@ ServoMotor servo(SERVO_PIN, 0, family(Events::Servo));
 Led builtinLed(LED_BUILTIN);
 LCD lcd;
 
-SystemStatusTask systemStatusTask(SystemStatus::Automatic,
-                                  family(Events::StatusChange),
+SystemStateTask systemStateTask(SystemState::Automatic,
+                                  family(Events::SystemState),
                                   button.getFamily(),
                                   serialManager.getFamily());
 DisplayTask displayTask(&lcd, &serialManager,
-                        systemStatusTask.getFamily(), servo.getFamily());
+                        systemStateTask.getFamily(), servo.getFamily());
 ControlTask controlTask(&servo,
-                        systemStatusTask.getFamily(),
+                        systemStateTask.getFamily(),
                         potentiomenter.getFamily(),
                         serialManager.getFamily());
 
@@ -62,7 +62,7 @@ void setup()
   button.begin(&eventsManager);
   potentiomenter.begin(&eventsManager);
   servo.begin(&eventsManager);
-  systemStatusTask.begin(&eventsManager);
+  systemStateTask.begin(&eventsManager);
   displayTask.begin(&eventsManager);
   controlTask.begin(&eventsManager);
 
