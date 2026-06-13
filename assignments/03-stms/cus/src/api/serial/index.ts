@@ -37,7 +37,9 @@ export async function startSerialPort(
     path = options.path
   }
 
-  serialPort = openSerialPort(path, baudRate)
+  console.debug("Opening serial port at:", path)
+  serialPort = await openSerialPort(path, baudRate)
+  console.debug("Successfully opened serial port")
   serialPort.on("close", (_) => {
     serialSynced = false
   })

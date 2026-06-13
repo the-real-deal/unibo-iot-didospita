@@ -41,22 +41,22 @@ try {
   console.error("Failed to start http server")
 }
 
-// try {
-//   await startMQTTClient(
-//     MQTT_BROKER_URL,
-//     {
-//       qos: MQTT_QOS,
-//     },
-//     {
-//       topicSubscription: {
-//         baseTopic: MQTT_BASE_TOPIC,
-//       },
-//     },
-//   )
-//   console.info("MQTT client started")
-// } catch (err) {
-//   console.error("Failed to start MQTT client")
-// }
+try {
+  await startMQTTClient(
+    MQTT_BROKER_URL,
+    {
+      qos: MQTT_QOS,
+    },
+    {
+      topicSubscription: {
+        baseTopic: MQTT_BASE_TOPIC,
+      },
+    },
+  )
+  console.info("MQTT client started")
+} catch (err) {
+  console.error("Failed to start MQTT client")
+}
 
 try {
   const serialPort = await startSerialPort(SERIAL_BAUD_RATE, {
