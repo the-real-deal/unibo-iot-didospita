@@ -52,7 +52,7 @@ void MQTTClient::connect()
     }
 
     String id = this->generateClientId();
-    while (true)
+    while (!this->client.connected())
     {
         bool connected = this->client.connect(id.c_str());
         if (connected)
