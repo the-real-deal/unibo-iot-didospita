@@ -1,15 +1,16 @@
 #include <Arduino.h>
-#include <PubSubClient.h>
 
 #include "config.h"
 
 #include "kernel/events.hpp"
 #include "devices/wifi.hpp"
+#include "core/mqtt.hpp"
 #include "std/enum.hpp"
 
 enum class Events : EventFamily
 {
-  Wifi,
+  NetworkState,
+  MQTT,
 };
 
 EventFamily family(Events event)
@@ -18,7 +19,11 @@ EventFamily family(Events event)
 }
 
 EventsManager eventsManager;
-WifiManager wifiManager(WIFI_SSID, WIFI_PASSWD, family(Events::Wifi));
+WifiManager wifiManager(WIFI_SSID, WIFI_PASSWD, family(Events::NetworkState));
+MQTTClient mqtt(wifiManager.getClient(),
+                MQTTBrokerEndpoint(MQTT_BROKER_HOST, MQTT_BROKER_PORT),
+                MQTT_BASE_TOPIC,
+                family(Events::MQTT));
 
 void setup()
 {
@@ -26,6 +31,7 @@ void setup()
   delay(2000);
   Serial.println(F("setup() started"));
 
+  randomSeed(micros());
   wifiManager.begin(&eventsManager);
 
   Serial.println(F("setup() finished"));

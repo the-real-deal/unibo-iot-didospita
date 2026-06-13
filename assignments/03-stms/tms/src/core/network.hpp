@@ -1,6 +1,6 @@
 #pragma once
 
-enum class WifiState
+enum class NetworkState
 {
     Connected,
     Disconnected,
