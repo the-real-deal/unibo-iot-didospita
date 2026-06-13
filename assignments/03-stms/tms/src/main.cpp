@@ -1,21 +1,38 @@
 #include <Arduino.h>
 #include <PubSubClient.h>
 
-#include "secrets.h" // ignored, should define WIFI_SSID and WIFI_PASSWD
+#include "config.h"
+
+#include "kernel/events.hpp"
 #include "devices/wifi.hpp"
+#include "std/enum.hpp"
 
-WifiManager wifiManager(WIFI_SSID, WIFI_PASSWD);
+enum class Events : EventFamily
+{
+  Wifi,
+};
 
-void setup() {
-  Serial.begin(115200);
-  delay(2000); 
-
-  Serial.print("setup() is running on core ");
-  Serial.println(xPortGetCoreID());
+EventFamily family(Events event)
+{
+  return static_cast<EventFamily>(event);
 }
 
-void loop() {
-  Serial.print("loop() is running on core ");
-  Serial.println(xPortGetCoreID());
-  delay(1000);
+EventsManager eventsManager;
+WifiManager wifiManager(WIFI_SSID, WIFI_PASSWD, family(Events::Wifi));
+
+void setup()
+{
+  Serial.begin(115200);
+  delay(2000);
+  Serial.println(F("setup() started"));
+
+  wifiManager.begin(&eventsManager);
+
+  Serial.println(F("setup() finished"));
+}
+
+void loop()
+{
+  eventsManager.handleEvents();
+  delay(LOOP_DELAY_MS);
 }

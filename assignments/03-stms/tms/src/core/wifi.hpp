@@ -1,17 +1,11 @@
 #pragma once
 
-enum class WifiStatus
+enum class WifiState
 {
     Connected,
-    Unconnected,
+    Disconnected,
 };
-const char *const WIFI_STATUS_STRINGS[] = {
+const char *const WIFI_STATE_STRINGS[] = {
     "CONNECTED",
-    "UNCONNECTED",
-};
-
-struct WifiStatusChangeEvent
-{
-    WifiStatus status;
-    WifiStatus prev;
+    "DISCONNECTED",
 };
