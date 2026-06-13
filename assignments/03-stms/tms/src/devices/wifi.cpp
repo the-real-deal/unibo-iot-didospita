@@ -5,7 +5,20 @@ WifiManager::WifiManager(const char *ssid,
                          EventFamily wifiEventFamily)
     : EventSource(wifiEventFamily),
       ssid(ssid), passwd(passwd),
-      state(WifiState::Disconnected) {}
+      state(WifiState::Disconnected),
+      client(),
+      eventsAttached(false),
+      onConnectEvent(),
+      onDisconnectEvent() {}
+
+WifiManager::~WifiManager()
+{
+  if (this->eventsAttached)
+  {
+    WiFi.removeEvent(this->onConnectEvent);
+    WiFi.removeEvent(this->onDisconnectEvent);
+  }
+}
 
 bool WifiManager::generateStateEvent()
 {
@@ -37,10 +50,16 @@ void WifiManager::begin(EventsManager *eventsManager)
   EventSource<WifiState>::begin(eventsManager);
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
-  WiFi.onEvent([this](arduino_event_id_t id, arduino_event_info_t info)
-               { this->onConnect(id, info); }, ARDUINO_EVENT_WIFI_STA_CONNECTED);
-  WiFi.onEvent([this](arduino_event_id_t id, arduino_event_info_t info)
-               { this->onDisconnect(id, info); }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+  this->onConnectEvent = WiFi.onEvent([this](arduino_event_id_t id, arduino_event_info_t info)
+                                      { this->onConnect(id, info); }, ARDUINO_EVENT_WIFI_STA_CONNECTED);
+  this->onDisconnectEvent = WiFi.onEvent([this](arduino_event_id_t id, arduino_event_info_t info)
+                                         { this->onDisconnect(id, info); }, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+  this->eventsAttached = true;
   WiFi.begin(this->ssid, this->passwd);
   this->generateStateEvent();
+}
+
+WiFiClient *WifiManager::getClient()
+{
+  return &this->client;
 }
