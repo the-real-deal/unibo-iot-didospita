@@ -4,6 +4,7 @@
 
 #include "kernel/events.hpp"
 #include "devices/wifi.hpp"
+#include "devices/sonar.hpp"
 #include "core/mqtt.hpp"
 #include "std/enum.hpp"
 
@@ -11,6 +12,7 @@ enum class Events : EventFamily
 {
   NetworkState,
   MQTT,
+  Sonar,
 };
 
 EventFamily family(Events event)
@@ -24,6 +26,7 @@ MQTTClient mqtt(wifiManager.getClient(),
                 MQTTBrokerEndpoint(MQTT_BROKER_HOST, MQTT_BROKER_PORT),
                 MQTT_BASE_TOPIC,
                 family(Events::MQTT));
+Sonar sonar(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN, family(Events::Sonar));
 
 void setup()
 {
@@ -33,12 +36,16 @@ void setup()
 
   randomSeed(micros());
   wifiManager.begin(&eventsManager);
+  mqtt.begin(&eventsManager);
+  sonar.begin(&eventsManager);
 
+  sonar.spawnBackgroundTask("SONAR_EVENTS_TASK", SONAR_EVENTS_PERIOD_MS);
+  mqtt.spawnBackgroundTask("MQTT_EVENTS_TASK", MQTT_EVENTS_PERIOD_MS);
   Serial.println(F("setup() finished"));
 }
 
 void loop()
 {
   eventsManager.handleEvents();
-  delay(LOOP_DELAY_MS);
+  delay(LOOP_PERIOD_MS);
 }

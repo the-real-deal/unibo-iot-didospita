@@ -13,10 +13,10 @@
 
 struct ESPTaskConfig
 {
-    const char *name;
     uint32_t stackDepth = ESP_DEFAULT_TASK_STACK_DEPTH;
     UBaseType_t priority = ESP_DEFAULT_TASK_PRIORITY;
 };
 
-TaskHandle_t createEspTask(ESPTaskConfig config, void *context, TaskFunction_t fn);
+TaskHandle_t createEspTask(const char *name, ESPTaskConfig config,
+                           void *context, TaskFunction_t fn);
 void deleteEspTask(TaskHandle_t *taskHandle);

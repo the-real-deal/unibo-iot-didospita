@@ -1,10 +1,11 @@
 #include "esp.hpp"
 
-TaskHandle_t createEspTask(ESPTaskConfig config, void *context, TaskFunction_t fn)
+TaskHandle_t createEspTask(const char *name, ESPTaskConfig config,
+                           void *context, TaskFunction_t fn)
 {
     TaskHandle_t taskHandle = nullptr;
-    xTaskCreate(fn,
-                config.name, config.stackDepth,
+    xTaskCreate(fn, name,
+                config.stackDepth,
                 context, config.priority,
                 &taskHandle);
     return taskHandle;

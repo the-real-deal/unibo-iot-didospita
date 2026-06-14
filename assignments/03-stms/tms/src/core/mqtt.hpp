@@ -27,16 +27,18 @@ private:
     const char *baseTopic;
 
     String generateClientId();
-    String generateTopic(const char* topic);
+    String generateTopic(const char *topic);
     void callback(char *topic, byte *payload, unsigned int length);
+
+protected:
+    void generateEvents() override;
 
 public:
     MQTTClient(WiFiClient &wifiClient, MQTTBrokerEndpoint broker,
                const char *baseTopic,
                EventFamily mqttEventFamily);
     void begin(EventsManager *eventsManager) override;
-    void checkEvents() override;
     void connect();
-    bool subscribe(const char* topic);
-    bool publish(const char* topic, const char* message);
+    bool subscribe(const char *topic);
+    bool publish(const char *topic, const char *message);
 };

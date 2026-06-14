@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <Arduino.h>
 
+#include "core/esp.hpp"
 #include "std/collections.hpp"
 
 #ifndef EVENT_QUEUE_SIZE
@@ -40,9 +41,16 @@ public:
 
 class EventActor
 {
+private:
+    bool enabled;
+
 public:
+    EventActor() : enabled(true) {}
     virtual void begin(EventsManager *eventsManager) = 0;
-    ~EventActor() = default;
+
+    void enable() { this->enabled = true; }
+    void disable() { this->enabled = false; }
+    bool isEnabled() { return this->enabled; }
 };
 
 class EventSignalObserver : public EventActor
@@ -51,23 +59,16 @@ class EventSignalObserver : public EventActor
 
 protected:
     EventFamily family;
-    bool enabled;
 
     virtual void onEventSignal(EventSignal *event) = 0;
 
 public:
     EventSignalObserver(EventFamily family)
-        : family(family), enabled(true) {}
+        : family(family) {}
 
     virtual void begin(EventsManager *eventsManager) override;
 
     EventFamily getObservedFamily() { return this->family; }
-
-    void enable() { this->enabled = true; }
-
-    void disable() { this->enabled = false; }
-
-    bool isEnabled() { return this->enabled; }
 };
 
 template <typename T>
@@ -152,7 +153,7 @@ protected:
 
     bool generateEvent(T eventData)
     {
-        if (this->eventsManager != nullptr)
+        if (this->isEnabled() && this->eventsManager != nullptr)
         {
             bool ok = this->eventsManager->generateEvent(new Event<T>(this->family, eventData));
             return ok;
@@ -174,9 +175,48 @@ public:
 template <typename T>
 class SyncEventSource : public EventSource<T>
 {
+private:
+    TaskHandle_t backgroundTask;
+    uint32_t backgroundTaskPeriodMs;
+
+    static void backgroundTaskFn(void *ctx)
+    {
+        SyncEventSource<T> *source = static_cast<SyncEventSource<T> *>(ctx);
+        while (true)
+        {
+            source->checkEvents();
+            delay(source->backgroundTaskPeriodMs);
+        }
+    }
+
+protected:
+    virtual void generateEvents() = 0;
+
 public:
     SyncEventSource(EventFamily family)
-        : EventSource<T>(family) {}
+        : EventSource<T>(family),
+          backgroundTask(nullptr),
+          backgroundTaskPeriodMs(0) {}
+    ~SyncEventSource()
+    {
+        deleteEspTask(&this->backgroundTask);
+    }
 
-    virtual void checkEvents() = 0;
+    void checkEvents()
+    {
+        if (this->isEnabled())
+        {
+            this->generateEvents();
+        }
+    }
+
+    void spawnBackgroundTask(const char *name, uint32_t periodMs, ESPTaskConfig config = {})
+    {
+        if (this->backgroundTask != nullptr)
+        {
+            return;
+        }
+        this->backgroundTaskPeriodMs = periodMs;
+        this->backgroundTask = createEspTask(name, config, this, backgroundTaskFn);
+    }
 };

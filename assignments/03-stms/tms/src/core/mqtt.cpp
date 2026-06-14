@@ -38,7 +38,7 @@ void MQTTClient::begin(EventsManager *eventsManager)
                              { this->callback(topic, payload, length); });
 }
 
-void MQTTClient::checkEvents()
+void MQTTClient::generateEvents()
 {
     this->client.loop();
 }
