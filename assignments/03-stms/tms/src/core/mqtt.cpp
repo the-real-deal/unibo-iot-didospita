@@ -46,13 +46,14 @@ void MQTTClient::generateEvents()
 void MQTTClient::connect()
 {
     // client id generation is expensive, stop if already connected
-    if (this->client.connected())
+    bool connected = this->client.connected();
+    if (connected)
     {
         return;
     }
 
     String id = this->generateClientId();
-    while (!this->client.connected())
+    while (!connected)
     {
         bool connected = this->client.connect(id.c_str());
         if (connected)

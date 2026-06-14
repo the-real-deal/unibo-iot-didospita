@@ -1,5 +1,6 @@
 #pragma once
 
+#include "kernel/setup.hpp"
 #include "kernel/events.hpp"
 
 template <typename Task, typename T>

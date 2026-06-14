@@ -8,6 +8,7 @@
 #include "devices/led.hpp"
 #include "core/mqtt.hpp"
 #include "std/enum.hpp"
+#include "tasks/network.hpp"
 
 enum class Events : EventFamily
 {
@@ -30,6 +31,10 @@ MQTTClient mqtt(wifiManager.getClient(),
 Sonar sonar(SONAR_ECHO_PIN, SONAR_TRIGGER_PIN, family(Events::Sonar));
 
 Led builtinLed(BUILTIN_LED);
+Led offlineLed(OFFLINE_LED_PIN);
+Led onlineLed(ONLINE_LED_PIN);
+
+NetworkTask networkTask(&mqtt, &onlineLed, &offlineLed, family(Events::NetworkState));
 
 void setup()
 {
@@ -39,13 +44,17 @@ void setup()
 
   randomSeed(micros());
   builtinLed.setup();
+  offlineLed.setup();
+  onlineLed.setup();
 
   wifiManager.begin(&eventsManager);
   mqtt.begin(&eventsManager);
   sonar.begin(&eventsManager);
 
+  networkTask.begin(&eventsManager);
   sonar.spawnBackgroundTask("SONAR_EVENTS_TASK", SONAR_EVENTS_PERIOD_MS);
   mqtt.spawnBackgroundTask("MQTT_EVENTS_TASK", MQTT_EVENTS_PERIOD_MS);
+
   Serial.println(F("setup() finished"));
 }
 
