@@ -9,6 +9,7 @@
 #include "core/mqtt.hpp"
 #include "std/enum.hpp"
 #include "tasks/network.hpp"
+#include "tasks/water.hpp"
 
 enum class Events : EventFamily
 {
@@ -35,12 +36,17 @@ Led offlineLed(OFFLINE_LED_PIN);
 Led onlineLed(ONLINE_LED_PIN);
 
 NetworkTask networkTask(&mqtt, &onlineLed, &offlineLed, family(Events::NetworkState));
+WaterMonitoringTask waterMonitoringTask(&mqtt, &sonar,
+                                        WATER_LEVEL_TOPIC,
+                                        family(Events::Sonar),
+                                        family(Events::NetworkState));
 
 void setup()
 {
   Serial.begin(115200);
   delay(2000);
   Serial.println(F("setup() started"));
+  Serial.flush();
 
   randomSeed(micros());
   builtinLed.setup();
@@ -52,10 +58,12 @@ void setup()
   sonar.begin(&eventsManager);
 
   networkTask.begin(&eventsManager);
+  waterMonitoringTask.begin(&eventsManager);
   sonar.spawnBackgroundTask("SONAR_EVENTS_TASK", SONAR_EVENTS_PERIOD_MS);
   mqtt.spawnBackgroundTask("MQTT_EVENTS_TASK", MQTT_EVENTS_PERIOD_MS);
 
   Serial.println(F("setup() finished"));
+  Serial.flush();
 }
 
 void loop()

@@ -39,6 +39,7 @@ public:
                EventFamily mqttEventFamily);
     void begin(EventsManager *eventsManager) override;
     void connect();
+    void disconnect();
     bool subscribe(const char *topic);
     bool publish(const char *topic, const char *message);
 };

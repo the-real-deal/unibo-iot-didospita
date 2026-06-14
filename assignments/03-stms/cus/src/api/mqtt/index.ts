@@ -6,8 +6,8 @@ import {
 } from "../../mqtt/sub.js"
 
 const callbacks: TopicCallbacksMap = {
-  hello: (topic, payload, packet) => {
-    console.log("MQTT hello:", payload.toString())
+  "water/level": (topic, payload, packet) => {
+    console.log("Water level:", payload.toString())
   },
 }
 

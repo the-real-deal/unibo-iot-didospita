@@ -7,7 +7,10 @@ MQTTClient::MQTTClient(WiFiClient &wifiClient,
     : SyncEventSource(mqttEventFamily),
       client(wifiClient),
       broker(broker),
-      baseTopic(baseTopic) {}
+      baseTopic(baseTopic)
+{
+    this->disableEvents(); // enabled only when connected to prevent network errors
+}
 
 String MQTTClient::generateClientId()
 {
@@ -40,31 +43,47 @@ void MQTTClient::begin(EventsManager *eventsManager)
 
 void MQTTClient::generateEvents()
 {
+    Serial.println(F("MQTT GENEVENTS"));
+    Serial.flush();
     this->client.loop();
 }
 
 void MQTTClient::connect()
 {
-    // client id generation is expensive, stop if already connected
+    Serial.println(F("MQTT CONNECT"));
+    Serial.flush();
+    // client id generation is expensive, don't do it if already connected
     bool connected = this->client.connected();
-    if (connected)
+    if (!connected)
     {
-        return;
+        String id = this->generateClientId();
+        while (!connected)
+        {
+            Serial.println(F("MQTT TRY CONNECT"));
+            Serial.flush();
+            bool connected = this->client.connect(id.c_str());
+            Serial.print(F("MQTT CONNECTED: "));
+            Serial.println(connected);
+            Serial.flush();
+            if (connected)
+            {
+                break;
+            }
+            else
+            {
+                delay(MQTT_CONNECT_RETRY_PERIOD_MS);
+            }
+        }
     }
+    this->enableEvents();
+}
 
-    String id = this->generateClientId();
-    while (!connected)
-    {
-        bool connected = this->client.connect(id.c_str());
-        if (connected)
-        {
-            return;
-        }
-        else
-        {
-            delay(MQTT_CONNECT_RETRY_PERIOD_MS);
-        }
-    }
+void MQTTClient::disconnect()
+{
+    Serial.println(F("MQTT DISCONNECT"));
+    Serial.flush();
+    this->disableEvents();
+    this->client.disconnect();
 }
 
 bool MQTTClient::subscribe(const char *topic)

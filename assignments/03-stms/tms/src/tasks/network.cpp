@@ -6,12 +6,11 @@ void NetworkTask::NetworkObserver::onEvent(NetworkState state)
     {
     case NetworkState::Connected:
         this->task->mqtt->connect();
-        this->task->mqtt->enable();
         this->task->onlineLed->turnOn();
         this->task->offlineLed->turnOff();
         break;
     case NetworkState::Disconnected:
-        this->task->mqtt->disable();
+        this->task->mqtt->disableEvents();
         this->task->onlineLed->turnOff();
         this->task->offlineLed->turnOn();
         break;

@@ -8,12 +8,12 @@ void ControlTask::SystemStateObserver::onEvent(SystemState state)
     {
     case SystemState::Automatic:
     case SystemState::Unconnected:
-        this->task->potentiometerObserver.disable();
-        this->task->serialObserver.enable();
+        this->task->potentiometerObserver.disableEvents();
+        this->task->serialObserver.enableEvents();
         break;
     case SystemState::Manual:
-        this->task->potentiometerObserver.enable();
-        this->task->serialObserver.disable();
+        this->task->potentiometerObserver.enableEvents();
+        this->task->serialObserver.disableEvents();
         break;
     }
 }

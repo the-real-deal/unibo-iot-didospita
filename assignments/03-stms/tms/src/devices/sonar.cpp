@@ -8,8 +8,7 @@
 Sonar::Sonar(uint8_t echoPin, uint8_t triggerPin, EventFamily sonarEventFamily)
     : SyncEventSource(sonarEventFamily),
       echoPin(echoPin),
-      triggerPin(triggerPin),
-      distanceMm(NAN) {}
+      triggerPin(triggerPin) {}
 
 void Sonar::begin(EventsManager *eventsManager)
 {
@@ -57,11 +56,8 @@ float Sonar::read()
 
 void Sonar::generateEvents()
 {
+  Serial.println(F("SONAR GENEVENTS"));
+  Serial.flush();
   float distanceMm = this->read();
-  if (isnan(this->distanceMm) || abs(this->distanceMm - distanceMm) < SONAR_EVENT_THRESHOLD_MM)
-  {
-    return;
-  }
-  this->distanceMm = distanceMm;
   this->generateEvent({.distanceMm = distanceMm});
 }

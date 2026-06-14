@@ -7,10 +7,6 @@
 #define SONAR_TEMP_CELSIUS 20
 #endif
 
-#ifndef SONAR_EVENT_THRESHOLD_MM
-#define SONAR_EVENT_THRESHOLD_MM 100
-#endif
-
 #ifndef SONAR_READ_START_US
 #define SONAR_READ_START_US 3
 #endif
@@ -45,7 +41,6 @@ class Sonar : public SyncEventSource<SonarEvent>
 private:
   DigitalInputPin echoPin;
   DigitalOutputPin triggerPin;
-  float distanceMm;
 
   float getSoundSpeed();
   float pulseToDistance(uint32_t pulse);

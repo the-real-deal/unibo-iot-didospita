@@ -11,6 +11,8 @@
 #define MQTT_BROKER_PORT 1883
 #define MQTT_BASE_TOPIC "unibo-iot-didospita/assignment03"
 
+#define WATER_LEVEL_TOPIC "water/level"
+
 #define LOOP_PERIOD_MS 100
 #define SONAR_EVENTS_PERIOD_MS 150 // F
 #define MQTT_EVENTS_PERIOD_MS LOOP_PERIOD_MS

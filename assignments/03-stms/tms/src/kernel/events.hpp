@@ -48,9 +48,9 @@ public:
     EventActor() : enabled(true) {}
     virtual void begin(EventsManager *eventsManager) = 0;
 
-    void enable() { this->enabled = true; }
-    void disable() { this->enabled = false; }
-    bool isEnabled() { return this->enabled; }
+    void enableEvents() { this->enabled = true; }
+    void disableEvents() { this->enabled = false; }
+    bool eventsEnabled() { return this->enabled; }
 };
 
 class EventSignalObserver : public EventActor
@@ -131,7 +131,7 @@ public:
         for (size_t i = 0; i < this->observers.size(); i++)
         {
             EventSignalObserver *observer = *this->observers.get(i);
-            if (observer->isEnabled() && observer->family == event->getFamily())
+            if (observer->eventsEnabled() && observer->family == event->getFamily())
             {
                 observer->onEventSignal(event);
             }
@@ -153,7 +153,7 @@ protected:
 
     bool generateEvent(T eventData)
     {
-        if (this->isEnabled() && this->eventsManager != nullptr)
+        if (this->eventsEnabled() && this->eventsManager != nullptr)
         {
             bool ok = this->eventsManager->generateEvent(new Event<T>(this->family, eventData));
             return ok;
@@ -204,7 +204,7 @@ public:
 
     void checkEvents()
     {
-        if (this->isEnabled())
+        if (this->eventsEnabled())
         {
             this->generateEvents();
         }

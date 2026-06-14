@@ -37,11 +37,15 @@ void WifiManager::switchState(NetworkState state)
 
 void WifiManager::onConnect(arduino_event_id_t id, arduino_event_info_t info)
 {
+  Serial.println(F("WIFI CONNECTED"));
+  Serial.flush();
   this->switchState(NetworkState::Connected);
 }
 
 void WifiManager::onDisconnect(arduino_event_id_t id, arduino_event_info_t info)
 {
+  Serial.println(F("WIFI DISCONNECTED"));
+  Serial.flush();
   this->switchState(NetworkState::Disconnected);
 }
 

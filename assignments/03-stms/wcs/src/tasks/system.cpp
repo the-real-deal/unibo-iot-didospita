@@ -50,10 +50,10 @@ void SystemStateTask::SerialObserver::onEvent(SerialMessage message)
     switch (state)
     {
     case SystemState::Unconnected:
-        this->task->buttonObserver.disable();
+        this->task->buttonObserver.disableEvents();
         break;
     default:
-        this->task->buttonObserver.enable();
+        this->task->buttonObserver.enableEvents();
         this->task->switchState(state);
         break;
     }
