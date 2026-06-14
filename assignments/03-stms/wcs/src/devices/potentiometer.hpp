@@ -22,9 +22,10 @@ private:
 
     double readPin();
 
+protected:
+    void generateEvents() override;
+
 public:
     Potentiometer(uint8_t pin, EventFamily family);
     void begin(EventsManager *eventsManager) override;
-    void checkEvents() override;
-    double getValue();
 };

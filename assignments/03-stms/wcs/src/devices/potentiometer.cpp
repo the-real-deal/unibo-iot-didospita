@@ -21,7 +21,7 @@ double Potentiometer::readPin()
     return value;
 }
 
-void Potentiometer::checkEvents()
+void Potentiometer::generateEvents()
 {
     double value = this->readPin();
     if (abs(this->value - value) < POT_EVENT_THRESHOLD)
@@ -31,5 +31,3 @@ void Potentiometer::checkEvents()
     this->value = value;
     this->generateEvent({.value = value});
 }
-
-double Potentiometer::getValue() { return this->value; }

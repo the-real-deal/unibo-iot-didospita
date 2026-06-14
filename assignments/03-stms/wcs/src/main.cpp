@@ -77,5 +77,5 @@ void loop()
   potentiomenter.checkEvents();
 
   eventsManager.handleEvents();
-  delay(LOOP_DELAY_MS);
+  delay(LOOP_PERIOD_MS);
 }

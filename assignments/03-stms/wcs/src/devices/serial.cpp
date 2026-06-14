@@ -15,7 +15,7 @@ void SerialManager::begin(EventsManager *eventsManager)
   this->serialSync();
 }
 
-void SerialManager::checkEvents()
+void SerialManager::generateEvents()
 {
   if (!Serial.available())
   {

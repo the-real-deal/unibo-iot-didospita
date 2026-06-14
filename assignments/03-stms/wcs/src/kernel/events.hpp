@@ -40,9 +40,16 @@ public:
 
 class EventActor
 {
+private:
+    bool enabled;
+
 public:
+    EventActor() : enabled(true) {}
     virtual void begin(EventsManager *eventsManager) = 0;
-    ~EventActor() = default;
+
+    void enable() { this->enabled = true; }
+    void disable() { this->enabled = false; }
+    bool isEnabled() { return this->enabled; }
 };
 
 class EventSignalObserver : public EventActor
@@ -51,23 +58,16 @@ class EventSignalObserver : public EventActor
 
 protected:
     EventFamily family;
-    bool enabled;
 
     virtual void onEventSignal(EventSignal *event) = 0;
 
 public:
     EventSignalObserver(EventFamily family)
-        : family(family), enabled(true) {}
+        : family(family) {}
 
     virtual void begin(EventsManager *eventsManager) override;
 
     EventFamily getObservedFamily() { return this->family; }
-
-    void enable() { this->enabled = true; }
-
-    void disable() { this->enabled = false; }
-
-    bool isEnabled() { return this->enabled; }
 };
 
 template <typename T>
@@ -152,7 +152,7 @@ protected:
 
     bool generateEvent(T eventData)
     {
-        if (this->eventsManager != nullptr)
+        if (this->isEnabled() && this->eventsManager != nullptr)
         {
             bool ok = this->eventsManager->generateEvent(new Event<T>(this->family, eventData));
             return ok;
@@ -174,9 +174,17 @@ public:
 template <typename T>
 class SyncEventSource : public EventSource<T>
 {
+protected:
+    virtual void generateEvents() = 0;
+
 public:
     SyncEventSource(EventFamily family)
         : EventSource<T>(family) {}
 
-    virtual void checkEvents() = 0;
+    void checkEvents() {
+        if (this->isEnabled())
+        {
+            this->generateEvents();
+        }   
+    }
 };

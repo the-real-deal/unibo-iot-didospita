@@ -46,10 +46,12 @@ class SerialManager : public SyncEventSource<SerialMessage>
 private:
   void sendMessage(SerialMessageType type, const char *message);
 
+protected:
+  void generateEvents() override;
+
 public:
   SerialManager(EventFamily family);
   void begin(EventsManager *eventsManager) override;
-  void checkEvents() override;
   void serialSync();
   void log(const char *message);
   void sendState(SystemState state);
