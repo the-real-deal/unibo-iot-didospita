@@ -40,6 +40,8 @@
               typescript-language-server
               # serialport
               libcpp
+              # docs
+              plantuml
             ];
             env = {
               LD_LIBRARY_PATH = lib.makeLibraryPath [
