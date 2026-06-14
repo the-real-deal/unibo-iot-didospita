@@ -1,6 +1,6 @@
 import { startHTTPServer } from "./api/http/index.js"
 import { startMQTTClient } from "./api/mqtt/index.js"
-import { startSerialPort } from "./api/serial/index.js"
+import { startSerialServer } from "./api/serial/index.js"
 import { sanitizeQoS } from "./mqtt/qos.js"
 import { getEnvNumber, getEnvString, setEnvPrefix } from "./utils/env.js"
 import { serverAddressString } from "./utils/http.js"
@@ -27,7 +27,7 @@ const MQTT_QOS = (() => {
 })()
 
 const SERIAL_PORT = getEnvString("SERIAL_PORT")
-const SERIAL_BAUD_RATE = getEnvNumber("SERIAL_BAUD_RATE") ?? 9600
+const SERIAL_BAUD_RATE = getEnvNumber("SERIAL_BAUD_RATE") ?? 115200
 
 try {
   const httpServer = await startHTTPServer(HTTP_HOSTNAME, HTTP_PORT)
@@ -59,10 +59,10 @@ try {
 }
 
 try {
-  const serialPort = await startSerialPort(SERIAL_BAUD_RATE, {
+  const [serialServer, path] = await startSerialServer(SERIAL_BAUD_RATE, {
     path: SERIAL_PORT,
   })
-  console.info("Serial port attached at:", serialPort.path)
+  console.info("Serial server started at:", path)
 } catch (err) {
-  console.error("Failed to attach serial port")
+  console.error("Failed to start serial server")
 }

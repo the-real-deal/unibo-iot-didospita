@@ -15,16 +15,3 @@ export async function findSerialDevice(): Promise<PortInfo | undefined> {
   const portInfo = availablePorts.find(portHasDevice)
   return portInfo
 }
-
-export async function openSerialPort(path: string, baudRate: number): Promise<SerialPort> {
-  const serialPort = new SerialPort({ path, baudRate, autoOpen: false })
-  return new Promise((resolve, reject) => {
-    serialPort.open((err) => {
-      if (err === null) {
-        resolve(serialPort)
-      } else {
-        reject(err)
-      }
-    })
-  })
-}

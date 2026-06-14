@@ -1,32 +1,34 @@
-import { type SerialPort } from "serialport"
-import { findSerialDevice, openSerialPort } from "../../serial/index.js"
-import { serialMessageParser } from "../../serial/message.js"
+import { findSerialDevice } from "../../serial/index.js"
+import { SerialMessagesServer, SerialMessageType } from "../../serial/message.js"
 
+const serialServer = new SerialMessagesServer()
 let serialSynced = false
-let serialPort: SerialPort
 
-const parser = serialMessageParser({
-  SERIAL_SYNC: (_) => {
-    console.warn("Serial sync")
-    serialSynced = true
-  },
-  LOG: (message) => {
-    if (serialSynced) {
-      console.info("Serial log:", message.payload)
-    }
-  },
+serialServer.onClose(() => {
+  serialSynced = false
+})
+
+serialServer.onMessage(SerialMessageType.SerialSync, (_) => {
+  console.warn("Serial sync")
+  serialSynced = true
+})
+
+serialServer.onMessage(SerialMessageType.Log, (message) => {
+  if (serialSynced) {
+    console.info("Serial log:", message.payload)
+  }
 })
 
 export interface SerialPortStartOptions {
   path?: string
 }
 
-export async function startSerialPort(
+export async function startSerialServer(
   baudRate: number,
   options: SerialPortStartOptions = {},
-): Promise<SerialPort> {
+): Promise<[SerialMessagesServer, string]> {
   let path: string
-  if (options.path === undefined) {
+  if (options.path === undefined || options.path.length === 0) {
     const portInfo = await findSerialDevice()
     if (portInfo === undefined) {
       throw new Error("No serial device found")
@@ -37,13 +39,6 @@ export async function startSerialPort(
     path = options.path
   }
 
-  console.debug("Opening serial port at:", path)
-  serialPort = await openSerialPort(path, baudRate)
-  console.debug("Successfully opened serial port")
-  serialPort.on("close", (_) => {
-    serialSynced = false
-  })
-  serialPort.pipe(parser)
-  console.debug("Attached serial port messages parser")
-  return serialPort
+  await serialServer.start(path, baudRate)
+  return [serialServer, path]
 }
