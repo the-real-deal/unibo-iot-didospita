@@ -1,0 +1,35 @@
+#include "led.hpp"
+
+Led::Led(uint8_t pin) : pin(pin), value(DigitalValue::Low) {}
+
+void Led::setup()
+{
+  this->pin.setup();
+  this->turnOff();
+}
+
+void Led::setValue(DigitalValue value)
+{
+  this->pin.write(value);
+  this->value = value;
+}
+
+void Led::turnOn() { this->setValue(DigitalValue::High); }
+
+void Led::turnOff() { this->setValue(DigitalValue::Low); }
+
+void Led::toggle()
+{
+  if (this->isOff())
+  {
+    this->turnOn();
+  }
+  else
+  {
+    this->turnOff();
+  }
+}
+
+bool Led::isOn() { return this->value == DigitalValue::High; }
+
+bool Led::isOff() { return this->value == DigitalValue::Low; }
