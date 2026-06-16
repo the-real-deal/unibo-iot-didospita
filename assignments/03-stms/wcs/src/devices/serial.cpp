@@ -12,7 +12,6 @@ void SerialManager::begin(EventsManager *eventsManager)
   EventSource<SerialMessage>::begin(eventsManager);
   Serial.begin(SERIAL_BAUD);
   delay(SERIAL_DELAY_MS);
-  this->serialSync();
 }
 
 void SerialManager::generateEvents()
@@ -61,11 +60,6 @@ void SerialManager::sendMessage(SerialMessageType type, const char *message)
   Serial.flush();
 }
 
-void SerialManager::serialSync()
-{
-  this->sendMessage(SerialMessageType::SerialSync, nullptr);
-}
-
 void SerialManager::log(const char *message)
 {
   this->sendMessage(SerialMessageType::Log, message);
@@ -80,5 +74,5 @@ void SerialManager::sendState(SystemState state)
 void SerialManager::sendAngle(int angle)
 {
   String message = String(angle);
-  this->sendMessage(SerialMessageType::Angle, message.c_str());
+  this->sendMessage(SerialMessageType::Door, message.c_str());
 }

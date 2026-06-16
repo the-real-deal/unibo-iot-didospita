@@ -7,7 +7,7 @@
 #include "std/pair.hpp"
 
 #ifndef MQTT_CONNECT_RETRY_PERIOD_MS
-#define MQTT_CONNECT_RETRY_PERIOD_MS 5000
+#define MQTT_CONNECT_RETRY_PERIOD_MS 1000
 #endif
 
 struct MQTTMessage

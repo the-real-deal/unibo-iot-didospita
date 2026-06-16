@@ -7,6 +7,10 @@
 #include "devices/led.hpp"
 #include "devices/sonar.hpp"
 
+#ifndef WATER_MONITORING_MAX_CAPACITY
+#define WATER_MONITORING_MAX_CAPACITY 300
+#endif
+
 class WaterMonitoringTask : public EventActor
 {
 private:

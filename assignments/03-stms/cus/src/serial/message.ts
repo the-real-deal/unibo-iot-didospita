@@ -2,7 +2,8 @@ import { DelimiterParser, SerialPort } from "serialport"
 
 export enum SerialMessageType {
   Log = "LOG",
-  SerialSync = "SERIAL_SYNC",
+  State = "STATE",
+  Door = "DOOR",
 }
 
 export interface SerialMessage {
@@ -23,15 +24,17 @@ export type SerialMessagesServerOnCloseCallback = () => void
 const SERIAL_MESSAGE_DELIMITER = ":"
 
 export class SerialMessagesServer {
+  serialPort: SerialPort
   callbacks: SerialMessagesCallbacksMap
   onCloseFn: SerialMessagesServerOnCloseCallback
 
-  constructor() {
+  constructor(path: string, baudRate: number) {
+    this.serialPort = new SerialPort({ path, baudRate, autoOpen: false })
     this.callbacks = {}
     this.onCloseFn = () => {}
   }
 
-  parseSerialMessage(
+  private parseSerialMessage(
     buffer: Buffer,
     separator: string = SERIAL_MESSAGE_DELIMITER,
   ): SerialMessage {
@@ -39,6 +42,8 @@ export class SerialMessagesServer {
     if (message.endsWith("\r")) {
       message = message.substring(0, message.length - 1)
     }
+    console.debug("Received serial:", message)
+
     const delimiterSplit = message.split(separator, 2)
     const [type, payload] = delimiterSplit
 
@@ -48,29 +53,31 @@ export class SerialMessagesServer {
     return { type, payload: payload ?? "" }
   }
 
-  isSerialMessageType(value: string): value is SerialMessageType {
+  private isSerialMessageType(value: string): value is SerialMessageType {
     return (Object.values(SerialMessageType) as string[]).includes(value)
   }
 
-  public onClose(fn: SerialMessagesServerOnCloseCallback) {
+  path(): string {
+    return this.serialPort.path
+  }
+
+  onClose(fn: SerialMessagesServerOnCloseCallback) {
     this.onCloseFn = fn
   }
 
-  public onMessage(type: SerialMessageType, fn: SerialMessageCallback) {
+  onMessage(type: SerialMessageType, fn: SerialMessageCallback) {
     this.callbacks[type] = fn
   }
 
   sendMessage(
-    serialPort: SerialPort,
     message: SerialMessage,
     separator: string = SERIAL_MESSAGE_DELIMITER,
   ) {
-    serialPort.write(`${message.type}${separator}${message.payload}\n`)
-    serialPort.flush()
+    this.serialPort.write(`${message.type}${separator}${message.payload}\n`)
+    this.serialPort.flush()
   }
 
-  async start(path: string, baudRate: number): Promise<void> {
-    const serialPort = new SerialPort({ path, baudRate, autoOpen: false })
+  async start(): Promise<void> {
     const parser = new DelimiterParser({
       delimiter: "\n",
       includeDelimiter: false,
@@ -81,19 +88,21 @@ export class SerialMessagesServer {
       if (callback !== undefined) {
         const response = callback(message)
         if (response !== undefined) {
-          this.sendMessage(serialPort, response)
+          this.sendMessage(response)
         }
       }
     })
-    serialPort.on("close", (_) => this.onCloseFn())
-    serialPort.pipe(parser)
+    this.serialPort.on("close", (_) => this.onCloseFn())
 
     return new Promise((resolve, reject) => {
-      console.debug("Opening serial port at:", serialPort.path)
-      serialPort.open((err) => {
+      console.debug("Opening serial port at:", this.serialPort.path)
+      this.serialPort.open((err) => {
         if (err === null) {
-          console.debug("Successfully opened serial port")
-          resolve()
+          this.serialPort.flush(() => {
+            this.serialPort.pipe(parser)
+            console.debug("Successfully opened serial port")
+            resolve()
+          })
         } else {
           reject(err)
         }

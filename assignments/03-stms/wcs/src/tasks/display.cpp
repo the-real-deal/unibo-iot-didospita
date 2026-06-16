@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "std/enum.hpp"
+#include "std/percentage.hpp"
 
 void DisplayTask::displayState(SystemState state)
 {
@@ -14,7 +15,7 @@ void DisplayTask::displayAngle(int angle)
 {
     this->serialManager->sendAngle(angle);
 
-    uint8_t openingPercentage = min(((double)angle / (double)POT_SERVO_MAX_ANGLE), 1.0) * 100;
+    uint8_t openingPercentage = round(toPercentage(angle, POT_SERVO_MAX_ANGLE) * 100.0);
     String displayString = String((uint16_t)openingPercentage) + "%";
     this->lcd->clearRow(1);
     this->lcd->print(displayString.c_str());

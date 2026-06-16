@@ -23,16 +23,14 @@
 
 enum class SerialMessageType
 {
-  SerialSync,
   Log,
   State,
-  Angle,
+  Door,
 };
 const char *const SERIAL_MESSAGE_TYPE_STRINGS[] = {
-    "SERIAL_SYNC",
     "LOG",
     "STATE",
-    "ANGLE",
+    "DOOR",
 };
 
 struct SerialMessage
@@ -52,7 +50,6 @@ protected:
 public:
   SerialManager(EventFamily family);
   void begin(EventsManager *eventsManager) override;
-  void serialSync();
   void log(const char *message);
   void sendState(SystemState state);
   void sendAngle(int angle);

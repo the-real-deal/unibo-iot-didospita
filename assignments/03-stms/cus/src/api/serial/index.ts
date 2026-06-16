@@ -1,23 +1,43 @@
+import { WaterMonitor } from "../../core/water.js"
 import { findSerialDevice } from "../../serial/index.js"
-import { SerialMessagesServer, SerialMessageType } from "../../serial/message.js"
+import {
+  SerialMessagesServer,
+  SerialMessageType,
+} from "../../serial/message.js"
 
-const serialServer = new SerialMessagesServer()
-let serialSynced = false
+const SAFE_LEVEL_DOOR_OPEN_PERC = 0
+const DANGEROUS_LEVEL_DOOR_OPEN_PERC = 0.5
+const CRITICAL_LEVEL_DOOR_OPEN_PERC = 1.0
 
-serialServer.onClose(() => {
-  serialSynced = false
-})
-
-serialServer.onMessage(SerialMessageType.SerialSync, (_) => {
-  console.warn("Serial sync")
-  serialSynced = true
-})
-
-serialServer.onMessage(SerialMessageType.Log, (message) => {
-  if (serialSynced) {
+function setup(serialServer: SerialMessagesServer, waterMonitor: WaterMonitor) {
+  serialServer.onMessage(SerialMessageType.Log, (message) => {
     console.info("Serial log:", message.payload)
-  }
-})
+  })
+
+  waterMonitor.on("safe", (_) => {
+    console.debug("SERIAL SAFE EVENT")
+    serialServer.sendMessage({
+      type: SerialMessageType.Door,
+      payload: SAFE_LEVEL_DOOR_OPEN_PERC.toString(),
+    })
+  })
+
+  waterMonitor.on("danger", (_) => {
+    console.debug("SERIAL DANGER EVENT")
+    serialServer.sendMessage({
+      type: SerialMessageType.Door,
+      payload: DANGEROUS_LEVEL_DOOR_OPEN_PERC.toString(),
+    })
+  })
+
+  waterMonitor.on("critical", (_) => {
+    console.debug("SERIAL CRITICAL EVENT")
+    serialServer.sendMessage({
+      type: SerialMessageType.Door,
+      payload: CRITICAL_LEVEL_DOOR_OPEN_PERC.toString(),
+    })
+  })
+}
 
 export interface SerialPortStartOptions {
   path?: string
@@ -25,8 +45,9 @@ export interface SerialPortStartOptions {
 
 export async function startSerialServer(
   baudRate: number,
+  waterMonitor: WaterMonitor,
   options: SerialPortStartOptions = {},
-): Promise<[SerialMessagesServer, string]> {
+): Promise<SerialMessagesServer> {
   let path: string
   if (options.path === undefined || options.path.length === 0) {
     const portInfo = await findSerialDevice()
@@ -39,6 +60,8 @@ export async function startSerialServer(
     path = options.path
   }
 
-  await serialServer.start(path, baudRate)
-  return [serialServer, path]
+  const serialServer = new SerialMessagesServer(path, baudRate)
+  setup(serialServer, waterMonitor)
+  await serialServer.start()
+  return serialServer
 }

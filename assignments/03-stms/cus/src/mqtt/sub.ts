@@ -64,11 +64,6 @@ async function subscribeClient(
 
 function attachCallbacks(client: MqttClient, callbacks: TopicCallbacksMap) {
   client.on("message", (topic, payload, packet) => {
-    console.info(`Received mqtt message at ${topic}:`, {
-      cmd: packet.cmd,
-      qos: packet.qos,
-      payloadSize: payload.length,
-    })
     const callback = callbacks[topic]
     if (callback !== undefined) {
       callback(topic, payload, packet)

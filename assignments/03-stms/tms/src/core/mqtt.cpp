@@ -43,7 +43,6 @@ void MQTTClient::begin(EventsManager *eventsManager)
 
 void MQTTClient::generateEvents()
 {
-    Serial.println(F("MQTT GENEVENTS"));
     Serial.flush();
     this->client.loop();
 }

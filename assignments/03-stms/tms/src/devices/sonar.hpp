@@ -28,7 +28,7 @@
 #endif
 
 #ifndef SONAR_MAX_DISTANCE_MM
-#define SONAR_MAX_DISTANCE_MM 3000
+#define SONAR_MAX_DISTANCE_MM 1000
 #endif
 
 struct SonarEvent

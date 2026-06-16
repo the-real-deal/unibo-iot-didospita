@@ -15,8 +15,9 @@ void WaterMonitoringTask::NetworkObserver::onEvent(NetworkState state)
 
 void WaterMonitoringTask::SonarObserver::onEvent(SonarEvent event)
 {
-    String distanceString = String(event.distanceMm);
-    this->task->mqtt->publish(this->task->waterLevelTopic, distanceString.c_str());
+    float level = 1.0 - (min(event.distanceMm, (float)WATER_MONITORING_MAX_CAPACITY) / (float)WATER_MONITORING_MAX_CAPACITY);
+    String levelString = String(level);
+    this->task->mqtt->publish(this->task->waterLevelTopic, levelString.c_str());
 }
 
 WaterMonitoringTask::WaterMonitoringTask(MQTTClient *mqtt,

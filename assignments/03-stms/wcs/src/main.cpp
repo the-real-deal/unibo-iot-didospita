@@ -49,7 +49,6 @@ ControlTask controlTask(&servo,
 void setup()
 {
   serialManager.begin(&eventsManager);
-  serialManager.log("setup() started");
 
   I2CManager i2c;
   i2c.setup();

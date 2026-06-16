@@ -2,36 +2,44 @@
 
 #include "config.h"
 
+#include "std/percentage.hpp"
+
 void ControlTask::SystemStateObserver::onEvent(SystemState state)
 {
     switch (state)
     {
-    case SystemState::Automatic:
     case SystemState::Unconnected:
+        this->task->potentiometerObserver.disableEvents();
+        this->task->serialObserver.disableEvents();
+        break;
+    case SystemState::Automatic:
         this->task->potentiometerObserver.disableEvents();
         this->task->serialObserver.enableEvents();
         break;
     case SystemState::Manual:
         this->task->potentiometerObserver.enableEvents();
-        this->task->serialObserver.disableEvents();
+        this->task->serialObserver.enableEvents();
         break;
     }
 }
 
 void ControlTask::PotentiometerObserver::onEvent(PotentiometerEvent event)
 {
-    int angle = event.value * POT_SERVO_MAX_ANGLE;
+    int angle = fromPercentage(event.value, POT_SERVO_MAX_ANGLE);
     this->task->servo->setAngle(angle);
 }
 
 void ControlTask::SerialObserver::onEvent(SerialMessage message)
 {
-    if (message.type != SerialMessageType::Angle)
+    if (message.type != SerialMessageType::Door)
     {
         return;
     }
 
-    int angle = (int)String(message.data).toInt();
+    double percentage = String(message.data).toDouble();
+    Serial.print(F("PERCENTAGE: "));
+    Serial.println(percentage);
+    int angle = fromPercentage(percentage, POT_SERVO_MAX_ANGLE);
     this->task->servo->setAngle(angle);
 }
 
