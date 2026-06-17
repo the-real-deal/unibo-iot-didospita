@@ -36,22 +36,22 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
     this.dangerEvent = null
   }
 
-  registerWaterLevel(level: number) {
+  registerWaterLevel(eventsSource: string, level: number) {
     console.debug("WATER LEVEL:", level)
     if (level < this.dangerLevel) {
       if (this.levelState !== "safe") {
-        this.emit("safe", { level })
+        this.emit("safe", eventsSource, { level })
       }
       this.levelState = "safe"
       this.destroyDangerEvent()
     } else if (level < this.criticalLevel) {
       if (this.levelState === "critical") {
-        this.emit("danger", { level })
+        this.emit("danger", eventsSource, { level })
         this.levelState = "danger"
       } else if (this.levelState === "safe") {
         if (this.dangerEvent === null) {
           const timeout = setTimeout(() => {
-            this.emit("danger", { level: this.dangerEvent!.level })
+            this.emit("danger", eventsSource, { level: this.dangerEvent!.level })
             this.levelState = "danger"
           }, this.dangerTimeoutMs)
           this.dangerEvent = { timeout, level }
@@ -62,7 +62,7 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
     } else {
       if (this.levelState !== "critical") {
         this.destroyDangerEvent()
-        this.emit("critical", { level })
+        this.emit("critical", eventsSource, { level })
       }
       this.levelState = "critical"
     }

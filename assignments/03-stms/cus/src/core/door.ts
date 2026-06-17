@@ -20,11 +20,11 @@ export class DoorManager extends EventsManager<DoorEventsMap> {
     return this.percentage
   }
 
-  registerDoorPercentage(percentage: number) {
+  registerDoorPercentage(eventsSource: string, percentage: number) {
     if (this.percentage === percentage) {
       return
     }
     this.percentage = percentage
-    this.emit("changed", { percentage })
+    this.emit("changed", eventsSource, { percentage })
   }
 }

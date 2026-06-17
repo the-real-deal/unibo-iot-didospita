@@ -6,6 +6,7 @@ import { DoorManager } from "../../core/door.js"
 
 function setup(
   app: Express,
+  eventsSource: string,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
 ) {
@@ -17,7 +18,7 @@ function setup(
       return res.status(400).send("Invalid state")
     }
 
-    systemStateManager.registerSystemState(state)
+    systemStateManager.registerSystemState(eventsSource, state)
     return res.status(200).send("ok")
   })
 
@@ -27,7 +28,7 @@ function setup(
       return res.status(400).send("Invalid perc")
     }
 
-    doorManager.registerDoorPercentage(percentage)
+    doorManager.registerDoorPercentage(eventsSource, percentage)
     return res.status(200).send("ok")
   })
 }
@@ -35,13 +36,14 @@ function setup(
 export async function startHTTPServer(
   hostname: string,
   port: number,
+  eventsSource: string,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
 ): Promise<Server> {
   return new Promise((resolve, reject) => {
     try {
       const app = express()
-      setup(app, systemStateManager, doorManager)
+      setup(app, eventsSource, systemStateManager, doorManager)
       const server = http.createServer(app)
       server.listen(port, hostname)
       resolve(server)

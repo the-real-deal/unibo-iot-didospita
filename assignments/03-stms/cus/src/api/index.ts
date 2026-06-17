@@ -10,16 +10,19 @@ export interface ServersOptions {
   http: {
     hostname: string
     port: number
+    eventsSource: string
   }
   mqtt: {
     brokerURL: string
     qos: QoS
     baseTopic: string
     unconnectedTimeoutMs: number
+    eventsSource: string
   }
   serial: {
     path?: string
     baudRate: number
+    eventsSource: string
   }
 }
 
@@ -34,6 +37,7 @@ export async function startAllServers(
     const httpServer = await startHTTPServer(
       hostname,
       port,
+      options.http.eventsSource,
       systemStateManager,
       doorManager,
     )
@@ -46,6 +50,7 @@ export async function startAllServers(
     await startMQTTClient(
       options.mqtt.brokerURL,
       options.mqtt.unconnectedTimeoutMs,
+      options.mqtt.eventsSource,
       waterMonitor,
       systemStateManager,
       {
@@ -65,6 +70,7 @@ export async function startAllServers(
   try {
     const serialServer = await startSerialServer(
       options.serial.baudRate,
+      options.serial.eventsSource,
       waterMonitor,
       systemStateManager,
       doorManager,

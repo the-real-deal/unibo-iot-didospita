@@ -1,6 +1,7 @@
 // The NodeJS events api doesn't expose all types
 
 import { EventEmitterOptions, EventEmitter as NodeEventEmitter } from "events"
+import { EventEmitter } from "stream"
 
 export type EventsMap<T> = Record<keyof T, any[]>
 export type EventNames<T extends EventsMap<T>> = keyof T
@@ -8,8 +9,19 @@ export type EventListener<T extends EventsMap<T>, K extends EventNames<T>> = (
   ...args: T[K]
 ) => void
 
+type EventSourceData<T extends EventsMap<T>, K extends EventNames<T>> = {
+  source: string
+  eventArgs: T[K]
+}
+
+type EventsSourceMap<T extends EventsMap<T>> = {
+  [K in keyof T]: [e: EventSourceData<T, K>]
+}
+
+type Emitter<T extends EventsMap<T>> = NodeEventEmitter<EventsSourceMap<T>>
+
 export class EventsManager<T extends EventsMap<T>> {
-  private eventEmitter: NodeEventEmitter<T>
+  private eventEmitter: Emitter<T>
   private enabled: boolean
 
   constructor(options?: EventEmitterOptions) {
@@ -29,18 +41,24 @@ export class EventsManager<T extends EventsMap<T>> {
     return this.enabled
   }
 
-  protected emit<K extends EventNames<T>>(event: K, ...args: T[K]) {
+  protected emit<K extends EventNames<T>>(event: K, source: string, ...args: T[K]) {
     if (!this.enabled) {
       return
     }
-    this.eventEmitter.emit(event as any, ...(args as any))
+    const e = {
+      source: source,
+      eventArgs: args,
+    }
+    const emitter = this.eventEmitter as EventEmitter<any>
+    emitter.emit(event as any, e)
   }
 
-  on<K extends EventNames<T>>(event: K, listener: EventListener<T, K>) {
-    this.eventEmitter.on(event as any, listener as any)
-  }
-
-  off<K extends EventNames<T>>(event: K, listener: EventListener<T, K>) {
-    this.eventEmitter.off(event as any, listener as any)
+  on<K extends EventNames<T>>(event: K, source: string, listener: EventListener<T, K>) {
+    this.eventEmitter.on(event as any, (e: EventSourceData<T, K>) => {
+      if (!this.isEnabled() || e.source === source) {
+        return
+      }
+      listener(...e.eventArgs)
+    })
   }
 }
