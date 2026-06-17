@@ -19,7 +19,7 @@ function setup(
   doorManager: DoorManager,
 ) {
   serialServer.onMessage(SerialMessageType.Log, (message) => {
-    console.info("Serial log:", message.payload)
+    console.info("SERIAL LOG:", message.payload)
   })
 
   serialServer.onMessage(SerialMessageType.State, (message) => {
@@ -42,7 +42,6 @@ function setup(
   })
 
   waterMonitor.on("safe", (_) => {
-    console.debug("SERIAL SAFE EVENT")
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: SAFE_LEVEL_DOOR_OPEN_PERC.toString(),
@@ -50,7 +49,6 @@ function setup(
   })
 
   waterMonitor.on("danger", (_) => {
-    console.debug("SERIAL DANGER EVENT")
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: DANGEROUS_LEVEL_DOOR_OPEN_PERC.toString(),
@@ -58,7 +56,6 @@ function setup(
   })
 
   waterMonitor.on("critical", (_) => {
-    console.debug("SERIAL CRITICAL EVENT")
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: CRITICAL_LEVEL_DOOR_OPEN_PERC.toString(),

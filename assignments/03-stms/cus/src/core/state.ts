@@ -22,7 +22,6 @@ export class SystemStateManager extends EventsManager<SystemStateEventsMap> {
     if (this.state === state) {
       return
     }
-    console.debug("STATE EVENT:", state)
     this.state = state
     this.emit(state)
     this.emit("changed", state)

@@ -20,7 +20,6 @@ export class DoorManager extends EventsManager<DoorEventsMap> {
     if (this.percentage === percentage) {
       return
     }
-    console.debug("DOOR EVENT:", percentage)
     this.percentage = percentage
     this.emit("changed", { percentage })
   }

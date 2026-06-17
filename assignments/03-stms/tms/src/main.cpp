@@ -43,11 +43,6 @@ WaterMonitoringTask waterMonitoringTask(&mqtt, &sonar,
 
 void setup()
 {
-  Serial.begin(115200);
-  delay(2000);
-  Serial.println(F("setup() started"));
-  Serial.flush();
-
   randomSeed(micros());
   builtinLed.setup();
   offlineLed.setup();
@@ -61,9 +56,6 @@ void setup()
   waterMonitoringTask.begin(&eventsManager);
   sonar.spawnBackgroundTask("SONAR_EVENTS_TASK", SONAR_EVENTS_PERIOD_MS);
   mqtt.spawnBackgroundTask("MQTT_EVENTS_TASK", MQTT_EVENTS_PERIOD_MS);
-
-  Serial.println(F("setup() finished"));
-  Serial.flush();
 }
 
 void loop()

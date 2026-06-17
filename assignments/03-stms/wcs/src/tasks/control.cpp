@@ -37,8 +37,6 @@ void ControlTask::SerialObserver::onEvent(SerialMessage message)
     }
 
     double percentage = String(message.data).toDouble();
-    Serial.print(F("PERCENTAGE: "));
-    Serial.println(percentage);
     int angle = fromPercentage(percentage, POT_SERVO_MAX_ANGLE);
     this->task->servo->setAngle(angle);
 }

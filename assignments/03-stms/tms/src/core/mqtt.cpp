@@ -49,7 +49,6 @@ void MQTTClient::generateEvents()
 
 void MQTTClient::connect()
 {
-    Serial.println(F("MQTT CONNECT"));
     Serial.flush();
     // client id generation is expensive, don't do it if already connected
     bool connected = this->client.connected();
@@ -58,12 +57,7 @@ void MQTTClient::connect()
         String id = this->generateClientId();
         while (!connected)
         {
-            Serial.println(F("MQTT TRY CONNECT"));
-            Serial.flush();
             bool connected = this->client.connect(id.c_str());
-            Serial.print(F("MQTT CONNECTED: "));
-            Serial.println(connected);
-            Serial.flush();
             if (connected)
             {
                 break;
@@ -79,7 +73,6 @@ void MQTTClient::connect()
 
 void MQTTClient::disconnect()
 {
-    Serial.println(F("MQTT DISCONNECT"));
     Serial.flush();
     this->disableEvents();
     this->client.disconnect();

@@ -17,7 +17,6 @@ function setup(
       return res.status(400).send("Invalid state")
     }
 
-    console.log("HTTP State:", state)
     systemStateManager.registerSystemState(state)
     return res.status(200).send("ok")
   })
@@ -28,7 +27,6 @@ function setup(
       return res.status(400).send("Invalid perc")
     }
 
-    console.log("HTTP Door:", percentage)
     doorManager.registerDoorPercentage(percentage)
     return res.status(200).send("ok")
   })

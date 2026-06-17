@@ -30,7 +30,7 @@ export async function startMQTTClient(
   options: MQTTClientStartOptions = {},
 ): Promise<MqttClient> {
   const endpoint = `mqtt://${brokerURL}`
-  console.debug(`Connecting to ${endpoint}`)
+  console.debug("Connecting to:", endpoint)
   const client = await mqtt.connectAsync(endpoint)
   console.debug(`MQTT client connected`)
   const callbacks = defineCallbacks(waterMonitor)

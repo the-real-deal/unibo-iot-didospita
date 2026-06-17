@@ -37,7 +37,6 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
   }
 
   registerWaterLevel(level: number) {
-    console.debug("Water level:", level)
     if (level < this.dangerLevel) {
       if (this.levelState !== "safe") {
         this.emit("safe", { level })

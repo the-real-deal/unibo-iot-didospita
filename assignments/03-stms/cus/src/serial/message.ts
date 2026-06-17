@@ -13,7 +13,7 @@ export interface SerialMessage {
 
 export type SerialMessageCallback = (
   message: SerialMessage,
-) => SerialMessage | undefined
+) => SerialMessage | void
 
 type SerialMessagesCallbacksMap = {
   [messageType in SerialMessageType]?: SerialMessageCallback
@@ -42,7 +42,6 @@ export class SerialMessagesServer {
     if (message.endsWith("\r")) {
       message = message.substring(0, message.length - 1)
     }
-    console.debug("Received serial:", message)
 
     const delimiterSplit = message.split(separator, 2)
     const [type, payload] = delimiterSplit
