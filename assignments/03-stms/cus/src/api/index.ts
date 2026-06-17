@@ -1,6 +1,7 @@
+import { DoorManager } from "../core/door.js"
+import { SystemStateManager } from "../core/state.js"
 import { WaterMonitor } from "../core/water.js"
 import { QoS } from "../mqtt/qos.js"
-import { serverAddressString } from "../utils/http.js"
 import { startHTTPServer } from "./http/index.js"
 import { startMQTTClient } from "./mqtt/index.js"
 import { startSerialServer } from "./serial/index.js"
@@ -23,19 +24,19 @@ export interface ServersOptions {
 
 export async function startAllServers(
   waterMonitor: WaterMonitor,
+  systemStateManager: SystemStateManager,
+  doorManager: DoorManager,
   options: ServersOptions,
 ) {
   try {
+    const { hostname, port } = options.http
     const httpServer = await startHTTPServer(
-      options.http.hostname,
-      options.http.port,
+      hostname,
+      port,
+      systemStateManager,
+      doorManager,
     )
-    const httpAddress = serverAddressString(httpServer.address())
-    if (httpAddress === null) {
-      console.warn("Failed to get http server address")
-    } else {
-      console.info("HTTP server started at:", httpAddress)
-    }
+    console.info(`HTTP server started at: http://${hostname}:${port}`)
   } catch (err) {
     console.error("Failed to start http server")
   }
@@ -43,10 +44,10 @@ export async function startAllServers(
   try {
     await startMQTTClient(
       options.mqtt.brokerURL,
+      waterMonitor,
       {
         qos: options.mqtt.qos,
       },
-      waterMonitor,
       {
         topicSubscription: {
           baseTopic: options.mqtt.baseTopic,
@@ -62,6 +63,9 @@ export async function startAllServers(
     const serialServer = await startSerialServer(
       options.serial.baudRate,
       waterMonitor,
+      systemStateManager,
+      doorManager,
+
       {
         path: options.serial.path,
       },

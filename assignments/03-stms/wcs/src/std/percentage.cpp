@@ -2,10 +2,10 @@
 
 #include <Arduino.h>
 
-double toPercentage(int value, int max) {
-    return min(((double)value / (double)max), 1.0);
+double toPercentage(int value, int maxValue) {
+    return (double)min(max(0, value), maxValue) / (double)maxValue;
 }
 
-int fromPercentage(double value, int max) {
-    return max * value;
+int fromPercentage(double value, int maxValue) {
+    return maxValue * max(0, min(value, 1.0));
 }

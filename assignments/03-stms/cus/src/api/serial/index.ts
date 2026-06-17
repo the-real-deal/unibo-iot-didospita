@@ -1,17 +1,44 @@
+import { DoorManager } from "../../core/door.js"
+import { SystemState, SystemStateManager } from "../../core/state.js"
 import { WaterMonitor } from "../../core/water.js"
 import { findSerialDevice } from "../../serial/index.js"
 import {
   SerialMessagesServer,
   SerialMessageType,
 } from "../../serial/message.js"
+import { parseEnum } from "../../utils/enum.js"
 
 const SAFE_LEVEL_DOOR_OPEN_PERC = 0
 const DANGEROUS_LEVEL_DOOR_OPEN_PERC = 0.5
 const CRITICAL_LEVEL_DOOR_OPEN_PERC = 1.0
 
-function setup(serialServer: SerialMessagesServer, waterMonitor: WaterMonitor) {
+function setup(
+  serialServer: SerialMessagesServer,
+  waterMonitor: WaterMonitor,
+  systemStateManager: SystemStateManager,
+  doorManager: DoorManager,
+) {
   serialServer.onMessage(SerialMessageType.Log, (message) => {
     console.info("Serial log:", message.payload)
+  })
+
+  serialServer.onMessage(SerialMessageType.State, (message) => {
+    const state = parseEnum(SystemState, message.payload.toString())
+    if (state === null) {
+      return
+    }
+    systemStateManager.registerSystemState(state)
+  })
+
+  systemStateManager.on("changed", (state) => {
+    serialServer.sendMessage({ type: SerialMessageType.State, payload: state })
+  })
+
+  doorManager.on("changed", (e) => {
+    serialServer.sendMessage({
+      type: SerialMessageType.Door,
+      payload: e.percentage.toPrecision(2),
+    })
   })
 
   waterMonitor.on("safe", (_) => {
@@ -46,6 +73,8 @@ export interface SerialPortStartOptions {
 export async function startSerialServer(
   baudRate: number,
   waterMonitor: WaterMonitor,
+  systemStateManager: SystemStateManager,
+  doorManager: DoorManager,
   options: SerialPortStartOptions = {},
 ): Promise<SerialMessagesServer> {
   let path: string
@@ -61,7 +90,7 @@ export async function startSerialServer(
   }
 
   const serialServer = new SerialMessagesServer(path, baudRate)
-  setup(serialServer, waterMonitor)
+  setup(serialServer, waterMonitor, systemStateManager, doorManager)
   await serialServer.start()
   return serialServer
 }

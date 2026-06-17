@@ -18,12 +18,13 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
   } | null
 
   constructor(
+    initialState: EventNames<WaterEventsMap>,
     private dangerLevel: number,
     private criticalLevel: number,
     private dangerTimeoutMs: number,
   ) {
     super()
-    this.levelState = "safe"
+    this.levelState = initialState
     this.dangerEvent = null
   }
 

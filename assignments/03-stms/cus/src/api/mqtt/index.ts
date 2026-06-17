@@ -25,8 +25,8 @@ export interface MQTTClientStartOptions {
 
 export async function startMQTTClient(
   brokerURL: string,
-  subscribeOptions: IClientSubscribeOptions,
   waterMonitor: WaterMonitor,
+  subscribeOptions: IClientSubscribeOptions,
   options: MQTTClientStartOptions = {},
 ): Promise<MqttClient> {
   const endpoint = `mqtt://${brokerURL}`
