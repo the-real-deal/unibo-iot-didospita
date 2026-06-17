@@ -13,10 +13,11 @@ void DisplayTask::displayState(SystemState state)
 
 void DisplayTask::displayAngle(int angle)
 {
-    this->serialManager->sendAngle(angle);
+    float percentage = toPercentage(angle, POT_SERVO_MAX_ANGLE);
+    this->serialManager->sendDoorOpening(percentage);
 
-    uint8_t openingPercentage = round(toPercentage(angle, POT_SERVO_MAX_ANGLE) * 100.0);
-    String displayString = String((uint16_t)openingPercentage) + "%";
+    uint8_t displayPercentage = round(percentage * 100.0);
+    String displayString = String((uint16_t)displayPercentage) + "%";
     this->lcd->clearRow(1);
     this->lcd->print(displayString.c_str());
 }

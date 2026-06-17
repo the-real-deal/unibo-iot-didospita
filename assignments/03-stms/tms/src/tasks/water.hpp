@@ -8,7 +8,7 @@
 #include "devices/sonar.hpp"
 
 #ifndef WATER_MONITORING_MAX_CAPACITY
-#define WATER_MONITORING_MAX_CAPACITY 300
+#define WATER_MONITORING_MAX_CAPACITY 400
 #endif
 
 class WaterMonitoringTask : public EventActor

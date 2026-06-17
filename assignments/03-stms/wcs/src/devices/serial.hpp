@@ -52,5 +52,5 @@ public:
   void begin(EventsManager *eventsManager) override;
   void log(const char *message);
   void sendState(SystemState state);
-  void sendAngle(int angle);
+  void sendDoorOpening(float percentage);
 };

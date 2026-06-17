@@ -71,8 +71,8 @@ void SerialManager::sendState(SystemState state)
   this->sendMessage(SerialMessageType::State, message);
 }
 
-void SerialManager::sendAngle(int angle)
+void SerialManager::sendDoorOpening(float percentage)
 {
-  String message = String(angle);
+  String message = String(percentage);
   this->sendMessage(SerialMessageType::Door, message.c_str());
 }

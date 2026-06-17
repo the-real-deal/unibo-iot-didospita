@@ -10,13 +10,30 @@ export type EventListener<T extends EventsMap<T>, K extends EventNames<T>> = (
 
 export class EventsManager<T extends EventsMap<T>> {
   private eventEmitter: NodeEventEmitter<T>
+  private enabled: boolean
 
   constructor(options?: EventEmitterOptions) {
     this.eventEmitter = new NodeEventEmitter(options)
+    this.enabled = true
+  }
+
+  enable() {
+    this.enabled = true
+  }
+
+  disable() {
+    this.enabled = false
+  }
+
+  isEnabled() {
+    return this.enabled
   }
 
   protected emit<K extends EventNames<T>>(event: K, ...args: T[K]) {
-    this.eventEmitter.emit(event as any, ...args as any)
+    if (!this.enabled) {
+      return
+    }
+    this.eventEmitter.emit(event as any, ...(args as any))
   }
 
   on<K extends EventNames<T>>(event: K, listener: EventListener<T, K>) {
