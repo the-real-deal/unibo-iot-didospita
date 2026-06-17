@@ -43,6 +43,9 @@ WaterMonitoringTask waterMonitoringTask(&mqtt, &sonar,
 
 void setup()
 {
+  Serial.begin(115200);
+  delay(2000);
+
   randomSeed(micros());
   builtinLed.setup();
   offlineLed.setup();

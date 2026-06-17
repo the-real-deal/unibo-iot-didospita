@@ -56,7 +56,6 @@ float Sonar::read()
 
 void Sonar::generateEvents()
 {
-  Serial.flush();
   float distanceMm = this->read();
   this->generateEvent({.distanceMm = distanceMm});
 }

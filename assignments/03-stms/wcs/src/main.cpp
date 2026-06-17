@@ -64,8 +64,6 @@ void setup()
   systemStateTask.begin(&eventsManager);
   displayTask.begin(&eventsManager);
   controlTask.begin(&eventsManager);
-
-  serialManager.log("setup() finished");
 }
 
 void loop()

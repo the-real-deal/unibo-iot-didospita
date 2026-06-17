@@ -10,6 +10,7 @@ setEnvPrefix("IOT_ASSIGNMENT_O3")
 const DANGER_WATER_LEVEL = getEnvNumber("DANGER_WATER_LEVEL") ?? 0.4 // L1
 const CRITICAL_WATER_LEVEL = getEnvNumber("CRITICAL_WATER_LEVEL") ?? 0.7 // L2
 const DANGER_TIMEOUT_MS = getEnvNumber("DANGER_TIMEOUT_MS") ?? 3000 // T1
+const UNCONNECTED_TIMEOUT_MS = getEnvNumber("UNCONNECTED_TIMEOUT_MS") ?? 2000 // T2
 
 const HTTP_HOSTNAME = getEnvString("HTTP_HOSTNAME") ?? "0.0.0.0"
 const HTTP_PORT = getEnvNumber("HTTP_PORT") ?? 3000
@@ -51,6 +52,7 @@ await startAllServers(waterMonitor, systemStateManager, doorManager, {
     brokerURL: MQTT_BROKER_URL,
     qos: MQTT_QOS,
     baseTopic: MQTT_BASE_TOPIC,
+    unconnectedTimeoutMs: UNCONNECTED_TIMEOUT_MS,
   },
   serial: {
     path: SERIAL_PORT,

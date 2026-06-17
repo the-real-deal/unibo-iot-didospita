@@ -6,8 +6,8 @@ export enum SystemState {
   Unconnected = "UNCONNECTED",
 }
 
-export type SystemStateEventsMap = Record<SystemState, []> & {
-  changed: [state: SystemState]
+export type SystemStateEventsMap = Record<SystemState, [prev: SystemState]> & {
+  changed: [state: SystemState, prev: SystemState]
 }
 
 export class SystemStateManager extends EventsManager<SystemStateEventsMap> {
@@ -18,12 +18,17 @@ export class SystemStateManager extends EventsManager<SystemStateEventsMap> {
     this.state = initialState
   }
 
+  getState(): SystemState {
+    return this.state
+  }
+
   registerSystemState(state: SystemState) {
     if (this.state === state) {
       return
     }
+    const prev = this.state
     this.state = state
-    this.emit(state)
-    this.emit("changed", state)
+    this.emit(state, prev)
+    this.emit("changed", state, prev)
   }
 }

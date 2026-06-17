@@ -15,6 +15,7 @@ export interface ServersOptions {
     brokerURL: string
     qos: QoS
     baseTopic: string
+    unconnectedTimeoutMs: number
   }
   serial: {
     path?: string
@@ -44,7 +45,9 @@ export async function startAllServers(
   try {
     await startMQTTClient(
       options.mqtt.brokerURL,
+      options.mqtt.unconnectedTimeoutMs,
       waterMonitor,
+      systemStateManager,
       {
         qos: options.mqtt.qos,
       },

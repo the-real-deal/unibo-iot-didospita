@@ -10,6 +10,10 @@ bool SystemStateTask::generateStateEvent(SystemState state)
 
 void SystemStateTask::switchState(SystemState state)
 {
+    Serial.print(F("STATE: "));
+    Serial.print(enumToString(state, SYSTEM_STATE_STRINGS));
+    Serial.print(F("/"));
+    Serial.println(enumToString(this->state, SYSTEM_STATE_STRINGS));
     if (this->state == state)
     {
         return;
@@ -41,6 +45,8 @@ void SystemStateTask::ButtonObserver::onEvent(ButtonEvent event)
 
 void SystemStateTask::SerialObserver::onEvent(SerialMessage message)
 {
+    Serial.print(F("SERIAL STATE: "));
+    Serial.println(message.data);
     if (message.type != SerialMessageType::State)
     {
         return;
@@ -54,15 +60,15 @@ void SystemStateTask::SerialObserver::onEvent(SerialMessage message)
         break;
     default:
         this->task->buttonObserver.enableEvents();
-        this->task->switchState(state);
         break;
     }
+    this->task->switchState(state);
 }
 
 SystemStateTask::SystemStateTask(SystemState initialState,
-                                   EventFamily systemStateEventFamily,
-                                   EventFamily buttonEventFamily,
-                                   EventFamily serialEventFamily)
+                                 EventFamily systemStateEventFamily,
+                                 EventFamily buttonEventFamily,
+                                 EventFamily serialEventFamily)
     : EventSource(systemStateEventFamily),
       state(initialState),
       buttonObserver(this, buttonEventFamily),

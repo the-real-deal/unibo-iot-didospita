@@ -18,7 +18,7 @@
 #endif
 
 #ifndef SERIAL_MESSAGE_DATA_BUF_LEN
-#define SERIAL_MESSAGE_DATA_BUF_LEN 10
+#define SERIAL_MESSAGE_DATA_BUF_LEN 20
 #endif
 
 enum class SerialMessageType
