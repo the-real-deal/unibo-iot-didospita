@@ -33,6 +33,7 @@ const waterChart = new Chart(waterChartCanvas, {
     ],
   },
   options: {
+    animation: false,
     responsive: true,
     scales: {
       y: { min: 0, max: 100 },
@@ -86,6 +87,7 @@ btnStateSwitch.addEventListener("click", () => {
 
 valveSlider.addEventListener("change", () => {
   const percentage = valveSlider.valueAsNumber / Number(valveSlider.max)
+  valveDisplay.textContent = percentageString(percentage)
   cusApi.setDoorOpening(percentage)
 })
 

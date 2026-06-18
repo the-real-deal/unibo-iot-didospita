@@ -41,7 +41,6 @@ void ControlTask::SerialObserver::onEvent(SerialMessage message)
     double percentage = String(message.data).toDouble();
     int angle = fromPercentage(percentage, POT_SERVO_MAX_ANGLE);
     this->task->servo->setAngle(angle);
-    this->task->serialManager->sendDoorOpening(percentage);
 }
 
 ControlTask::ControlTask(ServoMotor *servo,
