@@ -16,7 +16,6 @@ function errorRes(error: string) {
 
 function setup(
   app: Express,
-  eventsSource: string,
   waterMonitor: WaterMonitor,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
@@ -37,7 +36,7 @@ function setup(
       return res.status(400).send(errorRes("Invalid state"))
     }
 
-    systemStateManager.registerSystemState(eventsSource, state)
+    systemStateManager.registerSystemState(state)
     return res.status(200).send(successRes(state))
   })
 
@@ -51,7 +50,7 @@ function setup(
       return res.status(400).send(errorRes("Invalid value"))
     }
 
-    doorManager.registerDoorPercentage(eventsSource, percentage)
+    doorManager.registerDoorPercentage(percentage)
     return res.status(200).send(successRes(percentage))
   })
 
@@ -61,7 +60,7 @@ function setup(
     waterLevelEventStream.registerClient(req, res)
   })
 
-  waterMonitor.on("new", eventsSource, (e) => {
+  waterMonitor.on("new", (e) => {
     waterLevelEventStream.sendEvent({ data: e })
   })
 
@@ -71,7 +70,7 @@ function setup(
     systemStateEventStream.registerClient(req, res)
   })
 
-  systemStateManager.on("changed", eventsSource, (e) => {
+  systemStateManager.on("changed", (e) => {
     systemStateEventStream.sendEvent({ data: e })
   })
 
@@ -81,7 +80,7 @@ function setup(
     doorEventStream.registerClient(req, res)
   })
 
-  doorManager.on("changed", eventsSource, (e) => {
+  doorManager.on("changed", (e) => {
     doorEventStream.sendEvent({ data: e })
   })
 }
@@ -89,7 +88,6 @@ function setup(
 export async function startHTTPServer(
   hostname: string,
   port: number,
-  eventsSource: string,
   waterMonitor: WaterMonitor,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
@@ -97,7 +95,7 @@ export async function startHTTPServer(
   return new Promise((resolve, reject) => {
     try {
       const app = express()
-      setup(app, eventsSource, waterMonitor, systemStateManager, doorManager)
+      setup(app, waterMonitor, systemStateManager, doorManager)
       const server = http.createServer(app)
       server.listen(port, hostname)
       resolve(server)

@@ -11,6 +11,7 @@ class ControlTask : public EventActor
 {
 private:
     ServoMotor *servo;
+    SerialManager *serialManager;
 
     class SystemStateObserver : public TaskEventObserver<ControlTask, SystemState>
     {
@@ -41,6 +42,7 @@ private:
 
 public:
     ControlTask(ServoMotor *servo,
+                SerialManager *serialManager,
                 EventFamily systemStateEventFamily,
                 EventFamily potEventFamily,
                 EventFamily serialEventFamily);

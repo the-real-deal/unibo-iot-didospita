@@ -9,14 +9,13 @@ import { SystemState, SystemStateManager } from "../../core/state.js"
 
 function defineCallbacks(
   unconnectedTimeoutMs: number,
-  eventsSource: string,
   waterMonitor: WaterMonitor,
   systemStateManager: SystemStateManager,
 ): [() => void, TopicCallbacksMap] {
   let unconnectedTimeout: NodeJS.Timeout | null = null
   let beforeUnconnectedState: SystemState | null = null
 
-  systemStateManager.on(SystemState.Unconnected, eventsSource, (prev) => {
+  systemStateManager.on(SystemState.Unconnected, (prev) => {
     beforeUnconnectedState = prev
   })
 
@@ -24,12 +23,12 @@ function defineCallbacks(
     if (unconnectedTimeout !== null) {
       clearTimeout(unconnectedTimeout)
       if (beforeUnconnectedState !== null) {
-        systemStateManager.registerSystemState(eventsSource, beforeUnconnectedState)
+        systemStateManager.registerSystemState(beforeUnconnectedState)
         beforeUnconnectedState = null
       }
     }
     unconnectedTimeout = setTimeout(() => {
-      systemStateManager.registerSystemState(eventsSource, SystemState.Unconnected)
+      systemStateManager.registerSystemState(SystemState.Unconnected)
       unconnectedTimeout = null
     }, unconnectedTimeoutMs)
   }
@@ -41,7 +40,7 @@ function defineCallbacks(
         resetTimeout()
         try {
           const waterLevel = parseFloat(payload.toString())
-          waterMonitor.registerWaterLevel(eventsSource, waterLevel)
+          waterMonitor.registerWaterLevel(waterLevel)
         } catch (e) {
           console.error("Error parsing MQTT water level payload:", e)
         }
@@ -57,7 +56,6 @@ export interface MQTTClientStartOptions {
 export async function startMQTTClient(
   brokerURL: string,
   unconnectedTimeoutMs: number,
-  eventsSource: string,
   waterMonitor: WaterMonitor,
   systemStateManager: SystemStateManager,
   subscribeOptions: IClientSubscribeOptions,
@@ -69,7 +67,6 @@ export async function startMQTTClient(
   console.debug(`MQTT client connected`)
   const [resetTimeout, callbacks] = defineCallbacks(
     unconnectedTimeoutMs,
-    eventsSource,
     waterMonitor,
     systemStateManager,
   )

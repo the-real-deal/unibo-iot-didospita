@@ -14,7 +14,6 @@ const CRITICAL_LEVEL_DOOR_OPEN_PERC = 1.0
 
 function setup(
   serialServer: SerialMessagesServer,
-  eventsSource: string,
   waterMonitor: WaterMonitor,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
@@ -28,35 +27,35 @@ function setup(
     if (state === null) {
       return
     }
-    systemStateManager.registerSystemState(eventsSource, state)
+    systemStateManager.registerSystemState(state)
   })
 
-  systemStateManager.on("changed", eventsSource, (state) => {
+  systemStateManager.on("changed", (state) => {
     serialServer.sendMessage({ type: SerialMessageType.State, payload: state })
   })
 
-  doorManager.on("changed", eventsSource, (e) => {
+  doorManager.on("changed", (e) => {
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: e.percentage.toPrecision(2),
     })
   })
 
-  waterMonitor.on("safe", eventsSource, (_) => {
+  waterMonitor.on("safe", (_) => {
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: SAFE_LEVEL_DOOR_OPEN_PERC.toString(),
     })
   })
 
-  waterMonitor.on("danger", eventsSource, (_) => {
+  waterMonitor.on("danger", (_) => {
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: DANGEROUS_LEVEL_DOOR_OPEN_PERC.toString(),
     })
   })
 
-  waterMonitor.on("critical", eventsSource, (_) => {
+  waterMonitor.on("critical", (_) => {
     serialServer.sendMessage({
       type: SerialMessageType.Door,
       payload: CRITICAL_LEVEL_DOOR_OPEN_PERC.toString(),
@@ -70,7 +69,6 @@ export interface SerialPortStartOptions {
 
 export async function startSerialServer(
   baudRate: number,
-  eventsSource: string,
   waterMonitor: WaterMonitor,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
@@ -89,7 +87,7 @@ export async function startSerialServer(
   }
 
   const serialServer = new SerialMessagesServer(path, baudRate)
-  setup(serialServer, eventsSource, waterMonitor, systemStateManager, doorManager)
+  setup(serialServer, waterMonitor, systemStateManager, doorManager)
   await serialServer.start()
   return serialServer
 }

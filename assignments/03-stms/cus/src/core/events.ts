@@ -9,16 +9,7 @@ export type EventListener<T extends EventsMap<T>, K extends EventNames<T>> = (
   ...args: T[K]
 ) => void
 
-type EventSourceData<T extends EventsMap<T>, K extends EventNames<T>> = {
-  source: string
-  eventArgs: T[K]
-}
-
-type EventsSourceMap<T extends EventsMap<T>> = {
-  [K in keyof T]: [e: EventSourceData<T, K>]
-}
-
-type Emitter<T extends EventsMap<T>> = NodeEventEmitter<EventsSourceMap<T>>
+type Emitter<T extends EventsMap<T>> = NodeEventEmitter<T>
 
 export class EventsManager<T extends EventsMap<T>> {
   private eventEmitter: Emitter<T>
@@ -41,24 +32,19 @@ export class EventsManager<T extends EventsMap<T>> {
     return this.enabled
   }
 
-  protected emit<K extends EventNames<T>>(event: K, source: string, ...args: T[K]) {
+  protected emit<K extends EventNames<T>>(event: K, ...args: T[K]) {
     if (!this.enabled) {
       return
     }
-    const e = {
-      source: source,
-      eventArgs: args,
-    }
-    const emitter = this.eventEmitter as EventEmitter<any>
-    emitter.emit(event as any, e)
+    this.eventEmitter.emit(event as any, ...args as any)
   }
 
-  on<K extends EventNames<T>>(event: K, source: string, listener: EventListener<T, K>) {
-    this.eventEmitter.on(event as any, (e: EventSourceData<T, K>) => {
-      if (!this.isEnabled() || e.source === source) {
+  on<K extends EventNames<T>>(event: K, listener: EventListener<T, K>) {
+    this.eventEmitter.on(event as any, (...args: T[K]) => {
+      if (!this.isEnabled()) {
         return
       }
-      listener(...e.eventArgs)
+      listener(...args)
     })
   }
 }

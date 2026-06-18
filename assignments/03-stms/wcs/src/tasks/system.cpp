@@ -37,6 +37,7 @@ void SystemStateTask::ButtonObserver::onEvent(ButtonEvent event)
         break;
     }
     this->task->switchState(state);
+    this->task->serialManager->sendState(state);
 }
 
 void SystemStateTask::SerialObserver::onEvent(SerialMessage message)
@@ -60,11 +61,13 @@ void SystemStateTask::SerialObserver::onEvent(SerialMessage message)
 }
 
 SystemStateTask::SystemStateTask(SystemState initialState,
+                                 SerialManager *serialManager,
                                  EventFamily systemStateEventFamily,
                                  EventFamily buttonEventFamily,
                                  EventFamily serialEventFamily)
     : EventSource(systemStateEventFamily),
       state(initialState),
+      serialManager(serialManager),
       buttonObserver(this, buttonEventFamily),
       serialObserver(this, serialEventFamily) {}
 

@@ -25,8 +25,10 @@ void ControlTask::SystemStateObserver::onEvent(SystemState state)
 
 void ControlTask::PotentiometerObserver::onEvent(PotentiometerEvent event)
 {
-    int angle = fromPercentage(event.value, POT_SERVO_MAX_ANGLE);
+    float percentage = event.value;
+    int angle = fromPercentage(percentage, POT_SERVO_MAX_ANGLE);
     this->task->servo->setAngle(angle);
+    this->task->serialManager->sendDoorOpening(percentage);
 }
 
 void ControlTask::SerialObserver::onEvent(SerialMessage message)
@@ -42,10 +44,12 @@ void ControlTask::SerialObserver::onEvent(SerialMessage message)
 }
 
 ControlTask::ControlTask(ServoMotor *servo,
+                         SerialManager *serialManager,
                          EventFamily systemStateEventFamily,
                          EventFamily potEventFamily,
                          EventFamily serialEventFamily)
     : servo(servo),
+      serialManager(serialManager),
       systemStateObserver(this, systemStateEventFamily),
       potentiometerObserver(this, potEventFamily),
       serialObserver(this, serialEventFamily) {}

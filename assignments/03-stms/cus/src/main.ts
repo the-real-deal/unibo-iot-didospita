@@ -47,18 +47,15 @@ await startAllServers(waterMonitor, systemStateManager, doorManager, {
   http: {
     hostname: HTTP_HOSTNAME,
     port: HTTP_PORT,
-    eventsSource: "http",
   },
   mqtt: {
     brokerURL: MQTT_BROKER_URL,
     qos: MQTT_QOS,
     baseTopic: MQTT_BASE_TOPIC,
     unconnectedTimeoutMs: UNCONNECTED_TIMEOUT_MS,
-    eventsSource: "mqtt",
   },
   serial: {
     path: SERIAL_PORT,
     baudRate: SERIAL_BAUD_RATE,
-    eventsSource: "serial",
   },
 })

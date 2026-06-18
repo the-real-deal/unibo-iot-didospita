@@ -10,6 +10,7 @@ class SystemStateTask : public EventSource<SystemState>
 {
 private:
     SystemState state;
+    SerialManager *serialManager;
 
     bool generateStateEvent(SystemState state);
     void switchState(SystemState state);
@@ -34,8 +35,9 @@ private:
 
 public:
     SystemStateTask(SystemState initialState,
-                      EventFamily systemStateEventFamily,
-                      EventFamily buttonEventFamily,
-                      EventFamily serialEventFamily);
+                    SerialManager *serialManager,
+                    EventFamily systemStateEventFamily,
+                    EventFamily buttonEventFamily,
+                    EventFamily serialEventFamily);
     void begin(EventsManager *eventsManager) override;
 };

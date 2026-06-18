@@ -36,12 +36,12 @@ Led builtinLed(LED_BUILTIN);
 LCD lcd;
 
 SystemStateTask systemStateTask(SystemState::Automatic,
-                                  family(Events::SystemState),
-                                  button.getFamily(),
-                                  serialManager.getFamily());
-DisplayTask displayTask(&lcd, &serialManager,
-                        systemStateTask.getFamily(), servo.getFamily());
-ControlTask controlTask(&servo,
+                                &serialManager,
+                                family(Events::SystemState),
+                                button.getFamily(),
+                                serialManager.getFamily());
+DisplayTask displayTask(&lcd, systemStateTask.getFamily(), servo.getFamily());
+ControlTask controlTask(&servo, &serialManager,
                         systemStateTask.getFamily(),
                         potentiomenter.getFamily(),
                         serialManager.getFamily());

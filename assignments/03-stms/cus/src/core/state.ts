@@ -22,13 +22,13 @@ export class SystemStateManager extends EventsManager<SystemStateEventsMap> {
     return this.state
   }
 
-  registerSystemState(eventsSource: string, state: SystemState) {
+  registerSystemState(state: SystemState) {
     if (this.state === state) {
       return
     }
     const prev = this.state
     this.state = state
-    this.emit(state, eventsSource, prev)
-    this.emit("changed", eventsSource, state, prev)
+    this.emit(state, prev)
+    this.emit("changed", state, prev)
   }
 }

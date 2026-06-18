@@ -6,7 +6,6 @@
 
 void DisplayTask::displayState(SystemState state)
 {
-    this->serialManager->sendState(state);
     this->lcd->clearRow(0);
     this->lcd->print(enumToString(state, SYSTEM_STATE_STRINGS));
 }
@@ -14,8 +13,6 @@ void DisplayTask::displayState(SystemState state)
 void DisplayTask::displayAngle(int angle)
 {
     float percentage = toPercentage(angle, POT_SERVO_MAX_ANGLE);
-    this->serialManager->sendDoorOpening(percentage);
-
     uint8_t displayPercentage = round(percentage * 100.0);
     String displayString = String((uint16_t)displayPercentage) + "%";
     this->lcd->clearRow(1);
@@ -32,9 +29,8 @@ void DisplayTask::ServoMotorObserver::onEvent(ServoMotorEvent event)
     this->task->displayAngle(event.angle);
 }
 
-DisplayTask::DisplayTask(LCD *lcd, SerialManager *serialManager,
-                         EventFamily systemStateEventFamily, EventFamily servoEventFamily)
-    : lcd(lcd), serialManager(serialManager),
+DisplayTask::DisplayTask(LCD *lcd, EventFamily systemStateEventFamily, EventFamily servoEventFamily)
+    : lcd(lcd),
       systemStateObserver(this, systemStateEventFamily),
       servoObserver(this, servoEventFamily) {}
 

@@ -4,14 +4,12 @@
 #include "kernel/events.hpp"
 #include "core/system.hpp"
 #include "devices/lcd.hpp"
-#include "devices/serial.hpp"
 #include "devices/servo.hpp"
 
 class DisplayTask : public EventActor
 {
 private:
     LCD *lcd;
-    SerialManager *serialManager;
 
     void displayState(SystemState state);
     void displayAngle(int angle);
@@ -35,7 +33,6 @@ private:
     ServoMotorObserver servoObserver;
 
 public:
-    DisplayTask(LCD *lcd, SerialManager *serialManager,
-                EventFamily systemStateEventFamily, EventFamily servoEventFamily);
+    DisplayTask(LCD *lcd, EventFamily systemStateEventFamily, EventFamily servoEventFamily);
     void begin(EventsManager *eventsManager) override;
 };
