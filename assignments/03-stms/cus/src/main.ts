@@ -34,13 +34,14 @@ const MQTT_QOS = (() => {
 const SERIAL_PORT = getEnvString("SERIAL_PORT")
 const SERIAL_BAUD_RATE = getEnvNumber("SERIAL_BAUD_RATE") ?? 9600
 
+const systemStateManager = new SystemStateManager(SystemState.Automatic)
 const waterMonitor = new WaterMonitor(
   "safe",
+  systemStateManager,
   DANGER_WATER_LEVEL,
   CRITICAL_WATER_LEVEL,
   DANGER_TIMEOUT_MS,
 )
-const systemStateManager = new SystemStateManager(SystemState.Automatic)
 const doorManager = new DoorManager(0)
 
 await startAllServers(waterMonitor, systemStateManager, doorManager, {

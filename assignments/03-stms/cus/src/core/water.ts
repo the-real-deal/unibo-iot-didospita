@@ -1,4 +1,5 @@
 import { EventsManager, EventNames } from "./events.js"
+import { SystemState, SystemStateManager } from "./state.js"
 
 export interface WaterLevelEvent {
   level: number
@@ -20,6 +21,7 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
 
   constructor(
     initialState: EventNames<WaterEventsMap>,
+    systemStateManager: SystemStateManager,
     private dangerLevel: number,
     private criticalLevel: number,
     private dangerTimeoutMs: number,
@@ -27,6 +29,13 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
     super()
     this.levelState = initialState
     this.dangerEvent = null
+    systemStateManager.on("changed", (s) => {
+      if (s === SystemState.Automatic) {
+        this.enable()
+      } else {
+        this.disable()
+      }
+    })
   }
 
   private destroyDangerEvent() {
