@@ -15,7 +15,7 @@ void WaterMonitoringTask::NetworkObserver::onEvent(NetworkState state)
 
 void WaterMonitoringTask::SonarObserver::onEvent(SonarEvent event)
 {
-    float level = 1.0 - (min(event.distanceMm, (float)WATER_MONITORING_MAX_CAPACITY) / (float)WATER_MONITORING_MAX_CAPACITY);
+    float level = 1.0 - (min(event.distanceMm - SONAR_MIN_DISTANCE_MM, (float)WATER_MONITORING_MAX_CAPACITY) / (float)WATER_MONITORING_MAX_CAPACITY);
     String levelString = String(level);
     Serial.print(F("WATER LEVEL: "));
     Serial.println(levelString);
