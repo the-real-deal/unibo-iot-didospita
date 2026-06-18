@@ -1,12 +1,13 @@
 import { Request, Response } from "express"
+import { successRes } from "./utils.js"
 
 interface EventStreamEvent {
   id?: string
-  type?: string
+  event?: string
   data: any
 }
 
-export class EventStream {
+export class EventsStream {
   private registeredClients: Set<{ req: Request, res: Response }>
 
   constructor() {
@@ -23,16 +24,17 @@ export class EventStream {
     res.setHeader("Content-Type", "text/event-stream")
     res.setHeader("Cache-Control", "no-cache")
     res.setHeader("Connection", "keep-alive")
+    res.status(200).flushHeaders()
   }
 
-  sendEvent(event: EventStreamEvent) {
-    const { id, type, data } = event
+  sendEvent(streamEvent: EventStreamEvent) {
+    const { id, event, data } = streamEvent
     this.registeredClients.forEach(({ res }) => {
       if (id !== undefined) {
         res.write(`id: ${id}\n`)
       }
-      if (type !== undefined) {
-        res.write(`type: ${type}\n`)
+      if (event !== undefined) {
+        res.write(`event: ${event}\n`)
       }
       res.write(`data: ${JSON.stringify(data)}\n\n`)
     })

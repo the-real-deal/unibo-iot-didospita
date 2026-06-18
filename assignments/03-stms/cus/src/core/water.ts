@@ -13,42 +13,44 @@ export interface WaterEventsMap {
 }
 
 export class WaterMonitor extends EventsManager<WaterEventsMap> {
+  private level: number
   private levelState: EventNames<WaterEventsMap>
-  private dangerEvent: {
-    timeout: NodeJS.Timeout
-    level: number
-  } | null
+  private dangerTimeout: NodeJS.Timeout | null
 
   constructor(
-    initialState: EventNames<WaterEventsMap>,
-    systemStateManager: SystemStateManager,
+    initialLevel: number,
     private dangerLevel: number,
     private criticalLevel: number,
     private dangerTimeoutMs: number,
   ) {
     super()
-    this.levelState = initialState
-    this.dangerEvent = null
-    systemStateManager.on("changed", (s) => {
-      if (s === SystemState.Automatic) {
-        this.enable()
-      } else {
-        this.disable()
-      }
-    })
+    this.level = initialLevel
+    if (initialLevel < this.dangerLevel) {
+      this.levelState = "safe"
+    } else if (initialLevel < this.criticalLevel) {
+      this.levelState = "danger"
+    } else {
+      this.levelState = "critical"
+    }
+    this.dangerTimeout = null
   }
 
-  private destroyDangerEvent() {
-    if (this.dangerEvent === null) {
+  getLevel() {
+    return this.level
+  }
+
+  private destroyDangerTimeout() {
+    if (this.dangerTimeout === null) {
       return
     }
-    clearTimeout(this.dangerEvent.timeout)
-    this.dangerEvent = null
+    clearTimeout(this.dangerTimeout)
+    this.dangerTimeout = null
   }
 
   registerWaterLevel(level: number) {
     console.debug("WATER LEVEL:", level)
     const e = { level }
+    this.level = level
     this.emit("new", e)
 
     if (level < this.dangerLevel) {
@@ -56,27 +58,26 @@ export class WaterMonitor extends EventsManager<WaterEventsMap> {
         this.emit("safe", e)
       }
       this.levelState = "safe"
-      this.destroyDangerEvent()
+      this.destroyDangerTimeout()
     } else if (level < this.criticalLevel) {
       if (this.levelState === "critical") {
         this.emit("danger", e)
         this.levelState = "danger"
       } else if (this.levelState === "safe") {
-        if (this.dangerEvent === null) {
-          const timeout = setTimeout(() => {
-            this.emit("danger", {
-              level: this.dangerEvent!.level,
-            })
-            this.levelState = "danger"
-          }, this.dangerTimeoutMs)
-          this.dangerEvent = { timeout, level }
-        } else {
-          this.dangerEvent.level = level
+        if (this.dangerTimeout !== null) {
+          return
         }
+        const timeout = setTimeout(() => {
+          this.emit("danger", {
+            level: this.level,
+          })
+          this.levelState = "danger"
+        }, this.dangerTimeoutMs)
+        this.dangerTimeout = timeout
       }
     } else {
       if (this.levelState !== "critical") {
-        this.destroyDangerEvent()
+        this.destroyDangerTimeout()
         this.emit("critical", e)
       }
       this.levelState = "critical"

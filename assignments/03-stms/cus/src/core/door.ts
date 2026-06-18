@@ -16,7 +16,7 @@ export class DoorManager extends EventsManager<DoorEventsMap> {
     this.percentage = initialPercentage
   }
 
-  getPercentage(): number {
+  getOpeningPercentage(): number {
     return this.percentage
   }
 

@@ -72,6 +72,9 @@ export class SerialMessagesServer {
     message: SerialMessage,
     separator: string = SERIAL_MESSAGE_DELIMITER,
   ) {
+    if (!this.serialPort.isOpen) {
+      return
+    }
     this.serialPort.write(`${message.type}${separator}${message.payload}\n`)
     this.serialPort.flush()
   }
@@ -83,6 +86,7 @@ export class SerialMessagesServer {
     })
     parser.on("data", (buffer: Buffer) => {
       const message = this.parseSerialMessage(buffer)
+      console.debug("SERIAL MESSAGE:", message)
       const callback = this.callbacks[message.type]
       if (callback !== undefined) {
         const response = callback(message)
@@ -97,10 +101,14 @@ export class SerialMessagesServer {
       console.debug("Opening serial port at:", this.serialPort.path)
       this.serialPort.open((err) => {
         if (err === null) {
-          this.serialPort.flush(() => {
-            this.serialPort.pipe(parser)
-            console.debug("Successfully opened serial port")
-            resolve()
+          this.serialPort.flush((err) => {
+            if (err === null) {
+              this.serialPort.pipe(parser)
+              console.debug("Successfully opened serial port")
+              resolve()
+            } else {
+              reject(err)
+            }
           })
         } else {
           reject(err)

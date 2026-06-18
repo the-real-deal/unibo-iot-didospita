@@ -1,8 +1,6 @@
-// The NodeJS events api doesn't expose all types
-
 import { EventEmitterOptions, EventEmitter as NodeEventEmitter } from "events"
-import { EventEmitter } from "stream"
 
+// The NodeJS events api doesn't expose all types
 export type EventsMap<T> = Record<keyof T, any[]>
 export type EventNames<T extends EventsMap<T>> = keyof T
 export type EventListener<T extends EventsMap<T>, K extends EventNames<T>> = (

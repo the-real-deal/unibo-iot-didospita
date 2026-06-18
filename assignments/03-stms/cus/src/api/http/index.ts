@@ -4,15 +4,9 @@ import { SystemState, SystemStateManager } from "../../core/state.js"
 import { parseEnum } from "../../utils/enum.js"
 import { DoorManager } from "../../core/door.js"
 import { WaterMonitor } from "../../core/water.js"
-import { EventStream } from "../../http/sse.js"
-
-function successRes(value: any) {
-  return { success: true, data: value }
-}
-
-function errorRes(error: string) {
-  return { success: false, data: error }
-}
+import { EventsStream } from "../../http/sse.js"
+import { errorRes, successRes } from "../../http/utils.js"
+import cors from "cors"
 
 function setup(
   app: Express,
@@ -21,67 +15,74 @@ function setup(
   doorManager: DoorManager,
 ) {
   app.use(express.json())
+  app.use(cors())
 
-  app.head("/", (req, res) => {
+  app.head("/", (_, res) => {
     return res.status(200).end()
   })
 
   app.post("/state", (req, res) => {
+    console.info("HTTP STATE BODY:", req.body)
     const bodyState = req.body.state
     if (typeof bodyState !== "string") {
       return res.status(400).send(errorRes("Invalid field: state"))
     }
     const state = parseEnum(SystemState, bodyState)
     if (state === null || state === SystemState.Unconnected) {
-      return res.status(400).send(errorRes("Invalid state"))
+      return res.status(400).send(errorRes("Invalid value"))
     }
 
+    if (systemStateManager.getState() === SystemState.Unconnected) {
+      return res.status(400).send(errorRes("Invalid state"))
+    }
     systemStateManager.registerSystemState(state)
-    return res.status(200).send(successRes(state))
+    return res.status(200).send(successRes({ state }))
   })
 
   app.post("/door/opening", (req, res) => {
-    const bodyValue = req.body.value
-    if (typeof bodyValue !== "number") {
-      return res.status(400).send(errorRes("Invalid field: value"))
+    console.info("HTTP DOOR BODY:", req.body)
+    const bodyPercentage = req.body.percentage
+    if (typeof bodyPercentage !== "number") {
+      return res.status(400).send(errorRes("Invalid field: percentage"))
     }
-    const percentage = Number(bodyValue)
+    const percentage = Number(bodyPercentage)
     if (isNaN(percentage) || percentage < 0 || percentage > 1) {
       return res.status(400).send(errorRes("Invalid value"))
     }
 
+    if (systemStateManager.getState() !== SystemState.Manual) {
+      return res.status(400).send(errorRes("Invalid state"))
+    }
     doorManager.registerDoorPercentage(percentage)
-    return res.status(200).send(successRes(percentage))
+    return res.status(200).send(successRes({ percentage }))
   })
 
-  const waterLevelEventStream = new EventStream()
-
-  app.get("/water/level/events", (req, res) => {
-    waterLevelEventStream.registerClient(req, res)
+  app.get("/snapshot", (_, res) => {
+    const state = systemStateManager.getState()
+    const percentage = doorManager.getOpeningPercentage()
+    const level = waterMonitor.getLevel()
+    return res.status(200).send(
+      successRes({
+        state,
+        waterLevel: level,
+        doorOpening: percentage,
+      }),
+    )
   })
+
+  const eventsStream = new EventsStream()
+  app.get("/events", (req, res) => eventsStream.registerClient(req, res))
 
   waterMonitor.on("new", (e) => {
-    waterLevelEventStream.sendEvent({ data: e })
+    eventsStream.sendEvent({ event: "water/level", data: e.level })
   })
 
-  const systemStateEventStream = new EventStream()
-
-  app.get("/state/events", (req, res) => {
-    systemStateEventStream.registerClient(req, res)
-  })
-
-  systemStateManager.on("changed", (e) => {
-    systemStateEventStream.sendEvent({ data: e })
-  })
-
-  const doorEventStream = new EventStream()
-
-  app.get("/door/opening/events", (req, res) => {
-    doorEventStream.registerClient(req, res)
+  systemStateManager.on("changed", (state) => {
+    eventsStream.sendEvent({ event: "state", data: state })
   })
 
   doorManager.on("changed", (e) => {
-    doorEventStream.sendEvent({ data: e })
+    eventsStream.sendEvent({ event: "door/opening", data: e.percentage })
   })
 }
 

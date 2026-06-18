@@ -1,60 +1,141 @@
-import "./style.css"
-import typescriptLogo from "./assets/typescript.svg"
-import viteLogo from "./assets/vite.svg"
-import heroImg from "./assets/hero.png"
-import { setupCounter } from "./counter.ts"
+import Chart from "chart.js/auto"
+import { CUSApi, type SystemState } from "./cus"
 
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+// configuration can't come from env since this is pure client
+const CUS_ENDPOINT = "http://localhost:3000"
+const CUS_FETCH_TIMEOUT_MS = 3000
+const CUS_PING_INTERVAL_MS = 1000
+const WATER_CHART_MAX_MEASUREMENTS = 20
 
-<div class="ticks"></div>
+const stateDisplay = document.getElementById("state-display") as HTMLElement
+const valveDisplay = document.getElementById("valve-display") as HTMLElement
+const waterLevelDisplay = document.getElementById(
+  "water-level-display",
+) as HTMLElement
+const btnStateSwitch = document.getElementById(
+  "btn-state-switch",
+) as HTMLButtonElement
+const valveSlider = document.getElementById("valve-slider") as HTMLInputElement
+const waterChartCanvas = document.getElementById(
+  "waterChart",
+) as HTMLCanvasElement
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+const waterChart = new Chart(waterChartCanvas, {
+  type: "line",
+  data: {
+    labels: [] as string[],
+    datasets: [
+      {
+        label: "Water Level",
+        data: [] as number[],
+        fill: true,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { min: 0, max: 100 },
+    },
+  },
+})
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+const cusApi = new CUSApi(
+  CUS_ENDPOINT,
+  CUS_FETCH_TIMEOUT_MS,
+  CUS_PING_INTERVAL_MS,
+)
 
-setupCounter(document.querySelector<HTMLButtonElement>("#counter")!)
+function percentageDisplay(percentage: number): number {
+  return Math.round(Math.min(Math.max(0, percentage), 1) * 100)
+}
+
+function percentageString(percentage: number): string {
+  return `${percentageDisplay(percentage)}%`
+}
+
+cusApi.on("badResponse", (e) => alert(e))
+
+let prevState: SystemState | null = null
+let btnStateSwitchPrevDisabled = true
+let valveSliderPrevDisabled = true
+
+function setState(state: SystemState) {
+  prevState = state
+  stateDisplay.textContent = state
+}
+
+function setBtnSwitchEnabled(enabled: boolean) {
+  const disabled = !enabled
+  btnStateSwitchPrevDisabled = btnStateSwitch.disabled
+  btnStateSwitch.disabled = disabled
+}
+
+function setValveSliderEnabled(enabled: boolean) {
+  const disabled = !enabled
+  valveSliderPrevDisabled = valveSlider.disabled
+  valveSlider.disabled = disabled
+}
+
+btnStateSwitch.addEventListener("click", () => {
+  if (prevState !== "AUTOMATIC" && prevState !== "MANUAL") {
+    return
+  }
+  cusApi.setState(prevState === "MANUAL" ? "AUTOMATIC" : "MANUAL")
+})
+
+valveSlider.addEventListener("change", () => {
+  const percentage = valveSlider.valueAsNumber / Number(valveSlider.max)
+  cusApi.setDoorOpening(percentage)
+})
+
+cusApi.on("notreachable", () => {
+  stateDisplay.textContent = "NOT REACHABLE"
+  setBtnSwitchEnabled(false)
+  setValveSliderEnabled(false)
+})
+
+cusApi.on("reachable", () => {
+  stateDisplay.textContent = prevState ?? "REACHABLE"
+  btnStateSwitch.disabled = btnStateSwitchPrevDisabled
+  valveSlider.disabled = valveSliderPrevDisabled
+})
+
+cusApi.on("state", (state) => {
+  setState(state)
+  switch (state) {
+    case "UNCONNECTED":
+      setBtnSwitchEnabled(false)
+      setValveSliderEnabled(false)
+      break
+    case "MANUAL":
+      setBtnSwitchEnabled(true)
+      setValveSliderEnabled(true)
+      break
+    case "AUTOMATIC":
+      setBtnSwitchEnabled(true)
+      setValveSliderEnabled(false)
+      break
+  }
+})
+
+cusApi.on("doorOpening", (percentage) => {
+  valveDisplay.textContent = percentageString(percentage)
+  valveSlider.value = percentageDisplay(percentage).toString()
+})
+
+cusApi.on("waterLevel", (level) => {
+  waterLevelDisplay.textContent = percentageString(level)
+  const now = new Date()
+
+  waterChart.data.labels?.push(now.toLocaleTimeString())
+  waterChart.data.datasets[0].data.push(percentageDisplay(level))
+
+  if ((waterChart.data.labels?.length || 0) > WATER_CHART_MAX_MEASUREMENTS) {
+    waterChart.data.labels?.shift()
+    waterChart.data.datasets[0].data.shift()
+  }
+  waterChart.update()
+})
+
+await cusApi.beginListening()

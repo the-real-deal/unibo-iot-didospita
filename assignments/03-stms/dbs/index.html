@@ -1,13 +1,64 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dbs</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>STMS - DBS</title>
+        <link rel="stylesheet" href="/style.css" />
+    </head>
+    <body>
+        <div id="app">
+            <header>
+                <h1>DBS Tank Monitoring Dashboard</h1>
+            </header>
+
+            <main class="dashboard-grid">
+                <section class="card status-panel">
+                    <h2>System Status</h2>
+                    <div class="status-row">
+                        <span>State:</span>
+                        <strong id="state-display" class="state-badge"
+                            >--</strong
+                        >
+                    </div>
+                    <div class="status-row">
+                        <span>Valve Opening:</span>
+                        <strong id="valve-display">--</strong>
+                    </div>
+                    <div class="status-row">
+                        <span>Water level:</span>
+                        <strong id="water-level-display">--</strong>
+                    </div>
+                </section>
+
+                <section class="card controls-panel">
+                    <h2>Controls</h2>
+                    <div class="state-controls">
+                        <button id="btn-state-switch" disabled>Switch control mode</button>
+                    </div>
+                    <hr />
+                    <div class="valve-controls">
+                        <label for="valve-slider">Valve opening:</label>
+                        <div class="slider-group">
+                            <input
+                                type="range"
+                                id="valve-slider"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value="0"
+                                disabled
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card chart-panel">
+                    <h2>Rainwater Level History</h2>
+                    <canvas id="waterChart"></canvas>
+                </section>
+            </main>
+        </div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
 </html>

@@ -20,9 +20,9 @@ private:
     AnalogInputPin pin;
     double value;
 
-    double readPin();
-
+    
 protected:
+    double readPin();
     void generateEvents() override;
 
 public:

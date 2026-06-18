@@ -11,6 +11,8 @@ void Potentiometer::begin(EventsManager *eventsManager)
 {
     EventSource<PotentiometerEvent>::begin(eventsManager);
     this->pin.setup();
+    this->value = this->readPin();
+    this->generateEvent({ .value = value });
 }
 
 double Potentiometer::readPin()

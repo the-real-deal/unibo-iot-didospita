@@ -9,7 +9,7 @@ import {
 import { parseEnum } from "../../utils/enum.js"
 
 const SAFE_LEVEL_DOOR_OPEN_PERC = 0
-const DANGEROUS_LEVEL_DOOR_OPEN_PERC = 0.5
+const DANGER_LEVEL_DOOR_OPEN_PERC = 0.5
 const CRITICAL_LEVEL_DOOR_OPEN_PERC = 1.0
 
 function setup(
@@ -30,36 +30,46 @@ function setup(
     systemStateManager.registerSystemState(state)
   })
 
+  serialServer.onMessage(SerialMessageType.Door, (message) => {
+    const percentage = Number(message.payload.toString())
+    if (isNaN(percentage) || percentage < 0 || percentage > 1) {
+      return
+    }
+    doorManager.registerDoorPercentage(percentage)
+  })
+
   systemStateManager.on("changed", (state) => {
     serialServer.sendMessage({ type: SerialMessageType.State, payload: state })
   })
 
-  doorManager.on("changed", (e) => {
+  function sendDoorCommand(percentage: number) {
     serialServer.sendMessage({
       type: SerialMessageType.Door,
-      payload: e.percentage.toPrecision(2),
+      payload: percentage.toPrecision(2),
     })
+  }
+
+  function sendEmergencyDoorCommand(percentage: number) {
+    if (systemStateManager.getState() !== SystemState.Automatic) {
+      return
+    }
+    sendDoorCommand(percentage)
+  }
+
+  doorManager.on("changed", (e) => {
+    sendDoorCommand(e.percentage)
   })
 
   waterMonitor.on("safe", (_) => {
-    serialServer.sendMessage({
-      type: SerialMessageType.Door,
-      payload: SAFE_LEVEL_DOOR_OPEN_PERC.toString(),
-    })
+    sendEmergencyDoorCommand(SAFE_LEVEL_DOOR_OPEN_PERC)
   })
 
   waterMonitor.on("danger", (_) => {
-    serialServer.sendMessage({
-      type: SerialMessageType.Door,
-      payload: DANGEROUS_LEVEL_DOOR_OPEN_PERC.toString(),
-    })
+    sendEmergencyDoorCommand(DANGER_LEVEL_DOOR_OPEN_PERC)
   })
 
   waterMonitor.on("critical", (_) => {
-    serialServer.sendMessage({
-      type: SerialMessageType.Door,
-      payload: CRITICAL_LEVEL_DOOR_OPEN_PERC.toString(),
-    })
+    sendEmergencyDoorCommand(CRITICAL_LEVEL_DOOR_OPEN_PERC)
   })
 }
 

@@ -36,8 +36,7 @@ const SERIAL_BAUD_RATE = getEnvNumber("SERIAL_BAUD_RATE") ?? 9600
 
 const systemStateManager = new SystemStateManager(SystemState.Automatic)
 const waterMonitor = new WaterMonitor(
-  "safe",
-  systemStateManager,
+  0,
   DANGER_WATER_LEVEL,
   CRITICAL_WATER_LEVEL,
   DANGER_TIMEOUT_MS,
