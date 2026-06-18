@@ -38,6 +38,7 @@ export async function startAllServers(
       hostname,
       port,
       options.http.eventsSource,
+      waterMonitor,
       systemStateManager,
       doorManager,
     )
