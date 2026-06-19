@@ -1,6 +1,6 @@
 import { DoorManager } from "../core/door.js"
 import { SystemStateManager } from "../core/state.js"
-import { WaterMonitor } from "../core/water.js"
+import { WaterManager } from "../core/water.js"
 import { QoS } from "../mqtt/qos.js"
 import { startHTTPServer } from "./http/index.js"
 import { startMQTTClient } from "./mqtt/index.js"
@@ -24,7 +24,7 @@ export interface ServersOptions {
 }
 
 export async function startAllServers(
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
   options: ServersOptions,
@@ -34,7 +34,7 @@ export async function startAllServers(
     const httpServer = await startHTTPServer(
       hostname,
       port,
-      waterMonitor,
+      waterManager,
       systemStateManager,
       doorManager,
     )
@@ -47,7 +47,7 @@ export async function startAllServers(
     await startMQTTClient(
       options.mqtt.brokerURL,
       options.mqtt.unconnectedTimeoutMs,
-      waterMonitor,
+      waterManager,
       systemStateManager,
       {
         qos: options.mqtt.qos,
@@ -66,7 +66,7 @@ export async function startAllServers(
   try {
     const serialServer = await startSerialServer(
       options.serial.baudRate,
-      waterMonitor,
+      waterManager,
       systemStateManager,
       doorManager,
 

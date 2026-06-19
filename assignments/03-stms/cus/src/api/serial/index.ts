@@ -1,6 +1,6 @@
 import { DoorManager } from "../../core/door.js"
 import { SystemState, SystemStateManager } from "../../core/state.js"
-import { WaterMonitor } from "../../core/water.js"
+import { WaterManager } from "../../core/water.js"
 import { findSerialDevice } from "../../serial/index.js"
 import {
   SerialMessagesServer,
@@ -14,7 +14,7 @@ const CRITICAL_LEVEL_DOOR_OPEN_PERC = 1.0
 
 function setup(
   serialServer: SerialMessagesServer,
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
 ) {
@@ -60,15 +60,15 @@ function setup(
     sendDoorCommand(e.percentage)
   })
 
-  waterMonitor.on("safe", (_) => {
+  waterManager.on("safe", (_) => {
     sendEmergencyDoorCommand(SAFE_LEVEL_DOOR_OPEN_PERC)
   })
 
-  waterMonitor.on("danger", (_) => {
+  waterManager.on("danger", (_) => {
     sendEmergencyDoorCommand(DANGER_LEVEL_DOOR_OPEN_PERC)
   })
 
-  waterMonitor.on("critical", (_) => {
+  waterManager.on("critical", (_) => {
     sendEmergencyDoorCommand(CRITICAL_LEVEL_DOOR_OPEN_PERC)
   })
 }
@@ -79,7 +79,7 @@ export interface SerialPortStartOptions {
 
 export async function startSerialServer(
   baudRate: number,
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
   options: SerialPortStartOptions = {},
@@ -97,7 +97,7 @@ export async function startSerialServer(
   }
 
   const serialServer = new SerialMessagesServer(path, baudRate)
-  setup(serialServer, waterMonitor, systemStateManager, doorManager)
+  setup(serialServer, waterManager, systemStateManager, doorManager)
   await serialServer.start()
   return serialServer
 }

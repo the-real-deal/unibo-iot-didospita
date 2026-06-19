@@ -12,7 +12,7 @@ export interface WaterEventsMap {
   new: [e: WaterLevelEvent]
 }
 
-export class WaterMonitor extends EventsManager<WaterEventsMap> {
+export class WaterManager extends EventsManager<WaterEventsMap> {
   private level: number
   private levelState: EventNames<WaterEventsMap>
   private dangerTimeout: NodeJS.Timeout | null

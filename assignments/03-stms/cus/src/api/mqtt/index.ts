@@ -4,12 +4,12 @@ import {
   type TopicCallbacksMap,
   type TopicSubscriptionOptions,
 } from "../../mqtt/sub.js"
-import { WaterMonitor } from "../../core/water.js"
+import { WaterManager } from "../../core/water.js"
 import { SystemState, SystemStateManager } from "../../core/state.js"
 
 function defineCallbacks(
   unconnectedTimeoutMs: number,
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
 ): [() => void, TopicCallbacksMap] {
   let unconnectedTimeout: NodeJS.Timeout | null = null
@@ -40,7 +40,7 @@ function defineCallbacks(
         resetTimeout()
         try {
           const waterLevel = parseFloat(payload.toString())
-          waterMonitor.registerWaterLevel(waterLevel)
+          waterManager.registerWaterLevel(waterLevel)
         } catch (e) {
           console.error("Error parsing MQTT water level payload:", e)
         }
@@ -56,7 +56,7 @@ export interface MQTTClientStartOptions {
 export async function startMQTTClient(
   brokerURL: string,
   unconnectedTimeoutMs: number,
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
   subscribeOptions: IClientSubscribeOptions,
   options: MQTTClientStartOptions = {},
@@ -67,7 +67,7 @@ export async function startMQTTClient(
   console.debug(`MQTT client connected`)
   const [resetTimeout, callbacks] = defineCallbacks(
     unconnectedTimeoutMs,
-    waterMonitor,
+    waterManager,
     systemStateManager,
   )
   await subscribeToTopics(

@@ -3,14 +3,14 @@ import http, { Server } from "http"
 import { SystemState, SystemStateManager } from "../../core/state.js"
 import { parseEnum } from "../../utils/enum.js"
 import { DoorManager } from "../../core/door.js"
-import { WaterMonitor } from "../../core/water.js"
+import { WaterManager } from "../../core/water.js"
 import { EventsStream } from "../../http/sse.js"
 import { errorRes, successRes } from "../../http/utils.js"
 import cors from "cors"
 
 function setup(
   app: Express,
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
 ) {
@@ -60,7 +60,7 @@ function setup(
   app.get("/snapshot", (_, res) => {
     const state = systemStateManager.getState()
     const percentage = doorManager.getOpeningPercentage()
-    const level = waterMonitor.getLevel()
+    const level = waterManager.getLevel()
     return res.status(200).send(
       successRes({
         state,
@@ -73,7 +73,7 @@ function setup(
   const eventsStream = new EventsStream()
   app.get("/events", (req, res) => eventsStream.registerClient(req, res))
 
-  waterMonitor.on("new", (e) => {
+  waterManager.on("new", (e) => {
     eventsStream.sendEvent({ event: "water/level", data: e.level })
   })
 
@@ -89,14 +89,14 @@ function setup(
 export async function startHTTPServer(
   hostname: string,
   port: number,
-  waterMonitor: WaterMonitor,
+  waterManager: WaterManager,
   systemStateManager: SystemStateManager,
   doorManager: DoorManager,
 ): Promise<Server> {
   return new Promise((resolve, reject) => {
     try {
       const app = express()
-      setup(app, waterMonitor, systemStateManager, doorManager)
+      setup(app, waterManager, systemStateManager, doorManager)
       const server = http.createServer(app)
       server.listen(port, hostname)
       resolve(server)

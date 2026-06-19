@@ -1,7 +1,7 @@
 import { startAllServers } from "./api/index.js"
 import { DoorManager } from "./core/door.js"
 import { SystemState, SystemStateManager } from "./core/state.js"
-import { WaterMonitor } from "./core/water.js"
+import { WaterManager } from "./core/water.js"
 import { sanitizeQoS } from "./mqtt/qos.js"
 import { getEnvNumber, getEnvString, setEnvPrefix } from "./utils/env.js"
 
@@ -35,7 +35,7 @@ const SERIAL_PORT = getEnvString("SERIAL_PORT")
 const SERIAL_BAUD_RATE = getEnvNumber("SERIAL_BAUD_RATE") ?? 9600
 
 const systemStateManager = new SystemStateManager(SystemState.Automatic)
-const waterMonitor = new WaterMonitor(
+const waterManager = new WaterManager(
   0,
   DANGER_WATER_LEVEL,
   CRITICAL_WATER_LEVEL,
@@ -43,7 +43,7 @@ const waterMonitor = new WaterMonitor(
 )
 const doorManager = new DoorManager(0)
 
-await startAllServers(waterMonitor, systemStateManager, doorManager, {
+await startAllServers(waterManager, systemStateManager, doorManager, {
   http: {
     hostname: HTTP_HOSTNAME,
     port: HTTP_PORT,
