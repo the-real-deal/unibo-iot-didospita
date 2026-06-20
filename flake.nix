@@ -42,7 +42,6 @@
               libcpp
               # docs
               plantuml
-              mermaid-cli
             ];
             env = {
               LD_LIBRARY_PATH = lib.makeLibraryPath [
