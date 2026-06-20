@@ -22,11 +22,13 @@ Il sistema è composto da 4 sottosistemi principali:
 
 ![layout](images/assignment-03-sketch.png)
 
+Tutti i sistemi sono implementati utilizzando **Asyncronous Finite State Machines (AFSM)**.
+
 ---
 
-## 2 Architettura generale: Asynchronous Finite State Machine
+## 2 Architettura dei sistemi embedded
 
-A differenza di un approccio basato su polling ciclico con funzioni di "step" eseguite periodicamente, l'intero sistema (TMS e WCS) è stato realizzato sfruttando un **gestore di eventi asincrono**, che implementa il pattern Observer in forma disaccoppiata.
+A differenza di un approccio basato su polling ciclico con funzioni di "step" eseguite periodicamente, TMS e WCS sfruttano un **gestore di eventi asincrono**, che implementa il pattern Observer in forma disaccoppiata.
 
 ### 2.1 Principio di funzionamento
 
@@ -38,20 +40,20 @@ Il sistema si basa su tre concetti principali:
 
 Il punto cardine dell'architettura è il manager di eventi, che:
 
-1. mantiene una coda popolata dalle varie sorgenti, anche durante interrupt (l'accesso alla coda è protetto disabilitando temporaneamente gli interrupt)
+1. mantiene una coda popolata dalle varie sorgenti
 2. mantiene la lista degli observer registrati
 3. ad ogni ciclo di loop estrae un evento dalla coda e notifica solo gli observer la cui famiglia corrisponde a quella dell'evento
 
-Questo disaccoppiamento tra generazione e notifica garantisce che gli observer vengano eseguiti **esclusivamente nel contesto del loop principale**, e non, ad esempio, durante un interrupt hardware — evitando quindi problemi dovuti all'esecuzione di determinate istruzioni in
+Questo disaccoppiamento tra generazione e notifica garantisce che gli observer vengano eseguiti **esclusivamente nel contesto del loop principale**, e non, ad esempio, durante un interrupt hardware; evitando quindi problemi dovuti all'esecuzione di determinate istruzioni in
 contesti non standard.
 
 ### 2.2 Sorgenti sincrone e task in background
 
 Oltre alle sorgenti "pure" che generano eventi in risposta a interrupt o callback, sono
 previste anche sorgenti sincrone, pensate per integrare componenti che richiedono
-una lettura dei valori manuale. Questo tipo di sorgente espone un metodo da invocare periodicamente per verificare la presenza di nuovi eventi da generare.
+una lettura dei valori manuale. Questo tipo di sorgenti espone un metodo da invocare periodicamente per verificare la presenza di nuovi eventi da generare.
 
-Sulla piattaforma ESP32 questo controllo periodico viene delegato a una **task FreeRTOS in background**, che simula il superloop con un periodo con un periodo indipendente.
+Sulla piattaforma ESP32 questo controllo periodico viene delegato a una **task FreeRTOS in background**, che simula il superloop con un periodo indipendente.
 Su Arduino, non disponendo nativamente di un sistema di task concorrenti, il medesimo controllo periodico viene invece integrato direttamente nel ciclo di loop.
 
 ### 2.3 Composizione delle task applicative
@@ -59,6 +61,7 @@ Su Arduino, non disponendo nativamente di un sistema di task concorrenti, il med
 Le varie funzionalità applicative (es. monitoraggio della rete, lettura del sonar, gestione del display) sono quindi implementate come combinazioni di observer e sorgenti di eventi, senza la necessità di una funzione di step periodica dedicata per ciascuna di esse: ogni task si "compone" dichiarando a quali famiglie di eventi reagisce e quali eventi produce a sua volta, lasciando al gestore di eventi l'onere dello scheduling delle notifiche.
 
 ![diagramma di sequenza del sistema di eventi](diagrams/events-manager.png)
+
 _Diagramma di sequenza del sistema di eventi utilizzato per WCS e TMS. Non viene
 mostrato il caso specifico delle sorgenti sincrone per semplificare la comprensione._
 
@@ -77,11 +80,9 @@ mostrato il caso specifico delle sorgenti sincrone per semplificare la comprensi
 
 ![circuito TMS](circuits/tms-circuit.png)
 
-### 3.1 Struttura
-
 Il TMS è responsabile della lettura continua del livello dell'acqua nel serbatoio e dell'invio di tale dato al CUS.
 
-### 3.2 FSM
+### 3.1 Tasks
 
 - **NetworkTask**: si registra come observer sugli eventi di stato della connessione di rete,
   ed al variare dello stato aggiorna i due LED indicatori ed avvia la connessione
@@ -108,12 +109,10 @@ Il TMS è responsabile della lettura continua del livello dell'acqua nel serbato
 
 ![circuito WCS](circuits/wcs-circuit.png)
 
-### 4.1 Struttura
-
 Il WCS controlla l'apertura/chiusura del canale d'acqua tramite un servomotore (con range 0-90°)
 e fornisce un pannello locale (bottone + potenziometro) per l'interazione manuale da parte di un operatore in loco. È implementato secondo la stessa architettura a eventi del TMS (adattata per Arduino, senza task RTOS in background).
 
-### 4.2 Tasks
+### 4.1 Tasks
 
 **SystemStateTask**: osserva le sorgenti che possono richiedere un cambio di modalità di sistema (`AUTOMATIC`, `MANUAL`, `UNCONNECTED`), ovvero il bottone fisico e i messaggi seriali di tipo `STATE` provenienti dal CUS. Produce un evento unificato di stato di sistema solo quando il nuovo stato richiesto differisce da quello corrente, evitando notifiche ridondanti.
 
@@ -135,11 +134,9 @@ e fornisce un pannello locale (bottone + potenziometro) per l'interazione manual
 
 **Piattaforma:** PC (back-end)
 
-### 5.1 Struttura
-
 Il CUS è il coordinatore centrale del sistema: riceve i dati dal TMS, applica la politica di controllo del canale d'acqua, comunica con il WCS e fornisce un'API per il DBS. Anche il CUS adotta un'architettura **event-driven**, coerente con quella delle piattaforme embedded, sfruttando in questo caso il supporto nativo agli eventi della piattaforma di esecuzione: i dati ricevuti dalle varie interfacce di comunicazione vengono inoltrati a manager centrali, i quali producono eventi a cui i vari componenti reagiscono per propagare gli aggiornamenti verso gli altri sottosistemi.
 
-### 5.2 Struttura logica
+### 5.1 Funzionamento
 
 Il sistema è composto da 3 manager per gli eventi:
 - **SystemStateManager**: riceve i valori di stato del sistema e genera un evento ogni volta che lo stato cambia rispetto al precedente.
@@ -169,8 +166,6 @@ eventi di emergenza in base alle soglie L1 ed L2.
 
 ![DBS](images/dbs.png)
 
-### 6.1 Struttura
-
 Il DBS è un'interfaccia web a pagina singola che consente agli operatori remoti di monitorare lo stato del sistema e di interagire con esso. Mostra:
 
 - lo stato corrente del sistema (`AUTOMATIC`, `MANUAL`, `UNCONNECTED` o `NOT AVAILABLE`).
@@ -183,7 +178,7 @@ Fornisce inoltre:
 - un bottone per cambiare modalità tra `AUTOMATIC` e `MANUAL`;
 - uno slider per il controllo manuale dell'apertura del canale.
 
-### 6.2 Comportamento
+### 6.2 Funzionamento
 
 La pagina invia periodicamente un _ping_ al CUS per verificarne la raggiungibilità:
 
