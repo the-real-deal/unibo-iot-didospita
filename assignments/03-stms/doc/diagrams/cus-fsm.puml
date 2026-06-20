@@ -1,0 +1,53 @@
+@startuml
+
+[*] --> Operating
+
+state Operating {
+    [*] --> Automatic
+
+    state Manual {
+    }
+    Manual : DBS door value / send door value do WCS
+    Manual : WCS door value / send door value do DBS
+
+    Automatic --> Manual : WCS state MANUAL || DBS btn pressed
+    Manual --> Automatic : WCS state AUTOMATIC || DBS btn pressed
+
+    state Automatic {
+        state Safe {
+        }
+        Safe : entry / send door = 0% to DBS and WCS
+
+        state Danger {
+        }
+        Danger : entry / send door = 50% to DBS and WCS
+
+        state Critical {
+        }
+        Critical : entry / send door = 100% to DBS and WCS
+
+        state "Check danger" as CheckDanger {
+        }
+        CheckDanger : entry / timer = T1
+        CheckDanger : exit / delete timer
+
+        [*] --> Safe
+        Safe --> CheckDanger : waterLevel >= L1
+        CheckDanger --> Danger : timer ended
+        CheckDanger --> Critical : waterLevel >= L2
+        CheckDanger --> Safe : waterLevel < L1
+        Danger --> Critical : waterLevel >= L2
+        Danger --> Safe : waterLevel < L1
+        Critical --> Danger : waterLevel < L2
+    }
+}
+Operating --> Operating : MQTT value / send to DBS and WCS
+
+state Unconnected {
+}
+Unconnected : entry / send state UNCONNECTED to WCS and DBS
+
+Operating --> Unconnected : MQTT value timeout
+Unconnected --> Operating : new MQTT value / return to previous state AUTOMATIC/MANUAL
+
+@enduml

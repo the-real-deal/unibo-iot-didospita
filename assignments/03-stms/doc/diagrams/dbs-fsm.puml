@@ -1,0 +1,41 @@
+@startuml
+hide empty description
+
+state "CUS unreachable" as CUSUnreachable
+CUSUnreachable : entry / display state "NOT REACHABLE"
+CUSUnreachable : entry / disable all controls
+CUSUnreachable : do / ping CUS
+
+state "CUS reachable" as CUSReachable {
+    state Unconnected
+    Unconnected : entry / disable all controls
+
+    state Operating {
+        state Manual {
+        }
+        Manual : entry / display state "MANUAL"
+        Manual : entry / enable all controls
+
+        state Automatic {
+        }
+        Automatic : entry / display state "AUTOMATIC"
+        Automatic : entry / enable switch button
+        Automatic : entry / disable valve slider
+
+        Automatic --> Manual : CUS state change to MANUAL || switch button pressed
+        Manual --> Automatic : CUS state change to AUTOMATIC || switch button pressed
+        [*] --> Automatic
+    }
+
+    [*] --> Operating
+    Operating --> Operating : CUS water level value / display water level and add to graph
+    Operating --> Unconnected : CUS state change to UNCONNECTED
+    Unconnected --> Operating : CUS state change to AUTOMATIC/MANUAL
+}
+
+
+[*] --> CUSUnreachable
+CUSUnreachable --> CUSReachable : CUS responded / return to previous state
+CUSReachable --> CUSUnreachable : CUS not responding
+
+@enduml
