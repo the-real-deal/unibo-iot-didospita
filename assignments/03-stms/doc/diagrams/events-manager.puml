@@ -1,0 +1,30 @@
+@startuml
+hide empty description
+
+participant EventsSource
+participant EventsObserver
+participant EventsManager
+database ObserversStore
+queue EventsQueue
+control Loop
+
+EventsObserver -> EventsManager : register(family)
+EventsManager -> ObserversStore : store(family, observer)
+ObserversStore --> EventsManager : ok
+EventsManager --> EventsObserver : ok
+
+EventsSource -> EventsManager : generate(family, event)
+EventsManager -> EventsQueue : push(family, event)
+EventsQueue --> EventsManager : ok
+EventsManager --> EventsSource : ok
+
+Loop -> EventsManager : handleEvents
+EventsManager -> EventsQueue : popLastEvent
+EventsQueue --> EventsManager : family, event
+EventsManager -> ObserversStore : getObservers(family)
+ObserversStore --> EventsManager : observers
+loop foreach observer in observers
+    EventsManager -> EventsObserver : onEvent(event)
+end
+
+@enduml

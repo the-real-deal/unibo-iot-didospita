@@ -1,0 +1,24 @@
+PLANTUML?=plantuml
+PLANTUML_FORMAT?=png
+PLANTUML_EXT?=puml
+PLANTUML_OUT_EXT?=$(PLANTUML_FORMAT)
+PLANTUML_DPI?=200
+PLANTUML_LIMIT_SIZE=8192
+
+SOURCES:=$(wildcard diagrams/*.$(PLANTUML_EXT))
+TARGETS:=$(SOURCES:.$(PLANTUML_EXT)=.$(PLANTUML_OUT_EXT))
+
+.PHONY: all build
+
+all: build
+
+build: $(TARGETS)
+
+%.$(PLANTUML_OUT_EXT): %.$(PLANTUML_EXT)
+	PLANTUML_LIMIT_SIZE=$(PLANTUML_LIMIT_SIZE) $(PLANTUML) \
+	    -f $(PLANTUML_FORMAT) \
+	    --skinparam dpi=$(PLANTUML_DPI) \
+		-p < $< > $@
+
+clean:
+	rm -f $(TARGETS)

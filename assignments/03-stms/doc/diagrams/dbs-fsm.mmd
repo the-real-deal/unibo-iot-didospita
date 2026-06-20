@@ -1,0 +1,44 @@
+---
+  config:
+    layout: elk
+    theme: neutral
+    class:
+      hideEmptyMembersBox: true
+---
+
+stateDiagram-v2
+    state CUSReachable {
+        Unconnected : Unconnected
+        Unconnected : entry / disable all controls
+
+        state Operating {
+            Manual : Manual
+            Manual : entry / display state "MANUAL"
+            Manual : entry / enable all controls
+
+            Automatic : Automatic
+            Automatic : entry / display state "AUTOMATIC"
+            Automatic : entry / enable switch button
+            Automatic : entry / disable valve slider
+
+
+            Automatic --> Manual : CUS state change to MANUAL || switch button pressed
+            Manual --> Automatic : CUS state change to AUTOMATIC || switch button pressed
+            [*] --> Automatic
+        }
+
+        [*] --> Operating
+        Operating --> Operating : CUS water level value / display water level and add to graph
+        Operating --> Unconnected : CUS state change to UNCONNECTED
+        Unconnected --> Operating : CUS state change to AUTOMATIC/MANUAL
+    }
+    CUSReachable : CUS reachable
+
+    CUSUnreachable : CUS unreachable
+    CUSUnreachable : entry / display state "NOT REACHABLE"
+    CUSUnreachable : entry / disable all controls
+    CUSUnreachable : do / ping CUS
+
+    [*] --> CUSUnreachable
+    CUSUnreachable --> CUSReachable : CUS responded / return to previous state
+    CUSReachable --> CUSUnreachable : CUS not responding
