@@ -211,3 +211,7 @@ Sia il WCS che il DBS (e lo stesso CUS) disabilitano dinamicamente le operazioni
 - **`UNCONNECTED`**: tutti i controlli sono disabilitati, poiché senza il monitoraggio del livello dell'acqua non avrebbe senso controllare il canale.
 - **`AUTOMATIC`**: non è possibile controllare manualmente il canale da nessuna interfaccia, ma è possibile passare alla modalità `MANUAL`.
 - **`MANUAL`**: è possibile controllare manualmente il canale da qualunque interfaccia (pannello WCS o DBS), ed è possibile tornare alla modalità `AUTOMATIC`.
+
+## 8 Demo Video
+
+![demo video](demonstration.mp4)
